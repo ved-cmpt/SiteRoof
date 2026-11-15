@@ -1,0 +1,534 @@
+@use '@angular/material' as mat;
+
+// ============================================================================
+// Product UI (/app). Three type sizes per screen: title 20px/600, body 14px/400-500,
+// small 12px. Spacing from the 4/8/12/16/24/32 scale, one 6px radius, hairlines.
+// Shared building blocks: page head, section, panel, data table, list rows, stats,
+// states. Every /app screen uses these instead of local variants.
+// ============================================================================
+
+.sr-app,
+.cdk-overlay-container {
+  font-size: var(--sr-app-body);
+  line-height: 1.5;
+
+  h1 {
+    font-size: var(--sr-app-title);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  h2,
+  h3 {
+    font-size: var(--sr-app-body);
+    font-weight: 500;
+    letter-spacing: 0;
+    margin: 0;
+  }
+
+  .sr-meta {
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+  }
+
+  .sr-kicker {
+    font-size: 0.6875rem;
+    margin: 0;
+  }
+}
+
+// ---------------------------------------------------------------- page
+.sr-app .sr-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--sr-s5) var(--sr-s6) var(--sr-s6);
+
+  @media (max-width: 767px) {
+    padding: var(--sr-s4) var(--sr-s4) var(--sr-s6);
+  }
+}
+
+// Page header: breadcrumb, title, one meta line, actions on the right (below on phones).
+.sr-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sr-s3) var(--sr-s4);
+  flex-wrap: wrap;
+  padding-bottom: var(--sr-s4);
+  margin-bottom: var(--sr-s5);
+  border-bottom: 1px solid var(--sr-line);
+
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sr-s1);
+    align-items: center;
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+    margin-bottom: var(--sr-s1);
+
+    a {
+      color: var(--sr-ink-3);
+    }
+
+    .sep {
+      color: var(--sr-ink-4);
+    }
+  }
+
+  .meta {
+    margin-top: var(--sr-s1);
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--sr-s2);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--sr-s2);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 767px) {
+    margin-bottom: var(--sr-s4);
+
+    .actions {
+      width: 100%;
+
+      > * {
+        flex: 1 1 auto;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------- sections and panels
+.sr-section {
+  margin-bottom: var(--sr-s5);
+
+  > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sr-s3);
+    min-height: 32px;
+    margin-bottom: var(--sr-s2);
+  }
+
+  > header .aside {
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+  }
+}
+
+.sr-panel {
+  background: var(--sr-surface);
+  border: 1px solid var(--sr-line);
+  border-radius: var(--sr-radius);
+  overflow: hidden;
+
+  &.pad {
+    padding: var(--sr-s4);
+  }
+}
+
+// ---------------------------------------------------------------- data table
+// Desktop: aligned columns. Below 640px each row becomes a stacked list row:
+// title (+ status on the right), then a meta line made of the other visible cells.
+// Mark cells: .c-title, .c-status, .c-id, .num, .m-hide (hidden on phones).
+.sr-dt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sr-app-body);
+
+  th,
+  td {
+    text-align: left;
+    padding: var(--sr-s2) var(--sr-s3);
+    border-bottom: 1px solid var(--sr-line);
+    vertical-align: middle;
+  }
+
+  thead th {
+    font-size: var(--sr-app-small);
+    font-weight: 500;
+    color: var(--sr-ink-3);
+    white-space: nowrap;
+    background: var(--sr-surface);
+  }
+
+  tbody tr {
+    position: relative;
+    transition: background-color var(--sr-fast) var(--sr-ease);
+
+    &:hover {
+      background: var(--sr-subtle);
+    }
+
+    &:last-child td {
+      border-bottom: 0;
+    }
+  }
+
+  .num {
+    text-align: right;
+    font-family: var(--sr-font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .c-id {
+    font-family: var(--sr-font-mono);
+    color: var(--sr-ink-3);
+    white-space: nowrap;
+    width: 1%;
+  }
+
+  .c-date {
+    font-family: var(--sr-font-mono);
+    white-space: nowrap;
+  }
+
+  .c-title a,
+  a.row-link {
+    color: var(--sr-ink);
+    text-decoration: none;
+    font-weight: 500;
+
+    // Whole row is the tap target.
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+
+    &:focus-visible {
+      box-shadow: none;
+    }
+
+    &:focus-visible::after {
+      box-shadow: inset 0 0 0 2px var(--sr-accent);
+      border-radius: var(--sr-radius);
+    }
+  }
+
+  .late {
+    color: var(--sr-accent-strong);
+  }
+
+  .muted {
+    color: var(--sr-ink-3);
+  }
+
+  // Interactive controls sit above the row link.
+  button,
+  select,
+  .above {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 639px) {
+    thead {
+      display: none;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+    }
+
+    tbody tr {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px var(--sr-s2);
+      padding: var(--sr-s3) var(--sr-s4);
+      min-height: 44px;
+      border-bottom: 1px solid var(--sr-line);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    td {
+      padding: 0;
+      border: 0;
+      order: 3;
+      font-size: var(--sr-app-small);
+      color: var(--sr-ink-3);
+      width: auto !important;
+    }
+
+    .c-title {
+      order: 0;
+      flex: 1 1 calc(100% - 120px);
+      font-size: var(--sr-app-body);
+      color: var(--sr-ink);
+    }
+
+    .c-status {
+      order: 1;
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
+    .c-id {
+      order: 2;
+    }
+
+    .num {
+      text-align: left;
+    }
+
+    .m-hide {
+      display: none;
+    }
+
+    .m-label::before {
+      content: attr(data-label) ' ';
+      font-family: var(--sr-font-sans);
+    }
+
+    .m-actions {
+      flex: 1 1 100%;
+      display: flex;
+      gap: var(--sr-s2);
+      margin-top: var(--sr-s2);
+
+      > * {
+        flex: 1 1 0;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------- list rows (feeds, history)
+.sr-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  > li {
+    padding: var(--sr-s3) var(--sr-s4);
+    border-bottom: 1px solid var(--sr-line);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- filters / toolbars
+.sr-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sr-s2);
+  margin-bottom: var(--sr-s3);
+}
+
+// Compact native select and input used in toolbars (accessible, small, consistent).
+.sr-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sr-s2);
+  height: 32px;
+  padding: 0 var(--sr-s2);
+  border: 1px solid var(--sr-line-strong);
+  border-radius: var(--sr-radius);
+  background: var(--sr-surface);
+  font-size: var(--sr-app-body);
+  color: var(--sr-ink-3);
+
+  &:focus-within {
+    box-shadow: var(--sr-focus);
+  }
+
+  select,
+  input {
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: var(--sr-ink);
+    min-width: 0;
+    height: 100%;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  input {
+    width: 100%;
+  }
+
+  @media (max-width: 767px) {
+    height: 44px;
+  }
+}
+
+.sr-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sr-s2);
+  height: 32px;
+  font-size: var(--sr-app-body);
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--sr-accent-strong);
+  }
+
+  @media (max-width: 767px) {
+    height: 44px;
+  }
+}
+
+// Segmented control (status picker on the phone board, approval filters).
+.sr-seg {
+  display: inline-flex;
+  border: 1px solid var(--sr-line-strong);
+  border-radius: var(--sr-radius);
+  overflow: hidden;
+  background: var(--sr-surface);
+
+  button {
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: var(--sr-app-body);
+    color: var(--sr-ink-3);
+    height: 32px;
+    padding: 0 var(--sr-s3);
+    cursor: pointer;
+    white-space: nowrap;
+
+    & + button {
+      border-left: 1px solid var(--sr-line);
+    }
+
+    &[aria-pressed='true'],
+    &[aria-selected='true'] {
+      background: var(--sr-subtle);
+      color: var(--sr-ink);
+      font-weight: 500;
+    }
+  }
+
+  @media (max-width: 767px) {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+
+    button {
+      flex: 1 0 auto;
+      height: 44px;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- definition lists
+.sr-dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--sr-s2) var(--sr-s4);
+
+  dt {
+    color: var(--sr-ink-3);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+// ---------------------------------------------------------------- status pill (status columns only)
+.sr-app .sr-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--sr-s2);
+  border-radius: var(--sr-radius);
+  font-size: var(--sr-app-small);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------- phone and touch
+@media (max-width: 767px) {
+  html {
+    @include mat.button-overrides(
+      (
+        filled-container-height: 44px,
+        outlined-container-height: 44px,
+        text-container-height: 44px,
+      )
+    );
+  }
+
+  .sr-app .sr-btn {
+    height: 44px;
+  }
+
+  // Dialogs become full-screen sheets with the actions pinned to the bottom.
+  .cdk-overlay-pane.mat-mdc-dialog-panel {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    height: 100dvh;
+    max-height: 100dvh !important;
+  }
+
+  .mat-mdc-dialog-container {
+    --mat-dialog-container-shape: 0;
+    --mdc-dialog-container-shape: 0;
+
+    .mat-mdc-dialog-surface {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mat-mdc-dialog-content {
+      flex: 1 1 auto;
+      max-height: none;
+    }
+
+    .mat-mdc-dialog-actions {
+      border-top: 1px solid var(--sr-line);
+      padding: var(--sr-s3) var(--sr-s4) max(var(--sr-s3), env(safe-area-inset-bottom));
+
+      .mat-mdc-button-base {
+        flex: 1 1 0;
+      }
+    }
+  }
+}
+
+// Sticky primary action at the bottom of a form on phones.
+.sr-sticky-actions {
+  display: flex;
+  gap: var(--sr-s2);
+
+  @media (max-width: 767px) {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: var(--sr-s3) calc(-1 * var(--sr-s4)) calc(-1 * var(--sr-s4));
+    padding: var(--sr-s3) var(--sr-s4) max(var(--sr-s3), env(safe-area-inset-bottom));
+    background: var(--sr-surface);
+    border-top: 1px solid var(--sr-line);
+
+    > * {
+      flex: 1 1 0;
+    }
+  }
+}
