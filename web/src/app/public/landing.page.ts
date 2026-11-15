@@ -24,10 +24,10 @@ export class LandingPage {
 
   /** Numbered callouts over the work-order screenshot (positions match docs/screenshots/work-order.png). */
   protected readonly callouts: Callout[] = [
-    { n: 1, x: 69.5, y: 16.5, title: 'Status follows a state machine', body: 'Start, block, complete, close. Closed work is locked; reopening needs a manager and a reason.' },
-    { n: 2, x: 17.4, y: 30.2, title: 'Crew report from the field', body: 'Quantity installed, a note and an optional blocker. A blocker moves the work order to Blocked.' },
-    { n: 3, x: 71.7, y: 69.8, title: 'Someone else verifies', body: 'Progress is verified by a supervisor who did not report it. Blockers are resolved explicitly.' },
-    { n: 4, x: 74.9, y: 63.3, title: 'Materials, approved once', body: 'Requests are tied to the work order and decided once by the project manager, with an audit entry.' },
+    { n: 1, x: 69.6, y: 12, title: 'Status follows a state machine', body: 'Start, block, complete, close. Closed work is locked; reopening needs a manager and a reason.' },
+    { n: 2, x: 18.2, y: 30, title: 'Crew report from the field', body: 'Quantity installed, a note and an optional blocker. A blocker moves the work order to Blocked.' },
+    { n: 3, x: 72.9, y: 65.6, title: 'Someone else verifies', body: 'Progress is verified by a supervisor who did not report it. Blockers are resolved explicitly.' },
+    { n: 4, x: 92.6, y: 61.8, title: 'Materials, approved once', body: 'Requests are tied to the work order and decided once by the project manager, with an audit entry.' },
   ];
 
   protected readonly capabilities = [
@@ -60,7 +60,7 @@ export class LandingPage {
   protected readonly metrics = [
     { value: '60', label: 'backend tests', detail: 'xUnit against SQL Server 2022 in a disposable container' },
     { value: '14', label: 'frontend unit tests', detail: 'Angular services and components' },
-    { value: '15', label: 'browser tests', detail: 'Playwright, including the full demo scenario' },
+    { value: '16', label: 'browser tests', detail: 'Playwright, including the full demo scenario' },
     { value: '33 ms', label: 'dashboard median', detail: 'Measured locally against the Docker container, not a hosted service' },
   ];
 }
