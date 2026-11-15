@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 const STYLES = `
-  .status { max-width: 600px; margin: 72px auto; padding: 28px; background: var(--sr-surface); border: 1px solid var(--sr-line); border-radius: var(--sr-radius-lg); }
-  .code { display: inline-block; font-family: var(--sr-font-mono); font-size: 0.75rem; letter-spacing: 0.12em; color: var(--sr-ink-3); border: 1px solid var(--sr-line-strong); padding: 2px 8px; border-radius: var(--sr-radius-sm); }
-  h1 { font-size: var(--sr-text-xl); letter-spacing: -0.025em; margin: 14px 0 8px; }
-  p { color: var(--sr-ink-3); }
-  .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
-  :host { display: block; padding: 0 16px; }
+  :host { display: block; }
+  .status { display: grid; gap: var(--sr-s3); justify-items: start; max-width: 640px; margin: var(--sr-s5) auto; padding: var(--sr-s5); background: var(--sr-surface); border: 1px solid var(--sr-line); border-radius: var(--sr-radius); }
+  .code { font-family: var(--sr-font-mono); font-size: 0.75rem; color: var(--sr-ink-3); }
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0; }
+  p { margin: 0; color: var(--sr-ink-3); }
+  .row { display: flex; gap: var(--sr-s4); align-items: center; flex-wrap: wrap; }
+  @media (max-width: 767px) { .status { margin: var(--sr-s4); padding: var(--sr-s4); } .row a { width: 100%; } }
 `;
 
 @Component({
