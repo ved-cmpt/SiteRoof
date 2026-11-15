@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using SiteRoof.Api.Domain;
@@ -136,5 +137,30 @@ public sealed class DemoTests(SiteRoofFactory factory)
             Assert.True(point.GetProperty("evidence").GetArrayLength() > 0);
         }
         Assert.Contains(summary.GetProperty("points").EnumerateArray(), p => p.GetProperty("text").GetString()!.Contains("materials"));
+    }
+
+    [Fact]
+    public async Task Demo_provisioning_is_rate_limited_per_client()
+    {
+        await using var limited = factory.WithWebHostBuilder(b => b.UseSetting("Demo:ProvisionPermitsPerWindow", "2"));
+        var codes = new List<HttpStatusCode>();
+        for (var i = 0; i < 3; i++)
+        {
+            using var http = limited.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions { HandleCookies = true });
+            await http.GetAsync("/api/auth/me");
+            // Read the anti-forgery cookie the same way the browser client does.
+            var me = await http.GetAsync("/api/auth/me");
+            var token = me.Headers.GetValues("Set-Cookie").Select(c => c.Split(';')[0]).First(c => c.StartsWith("XSRF-TOKEN=")).Split('=', 2)[1];
+            var req = new HttpRequestMessage(HttpMethod.Post, "/api/demo/start") { Content = System.Net.Http.Json.JsonContent.Create(new { persona = "manager" }) };
+            req.Headers.Add("X-XSRF-TOKEN", Uri.UnescapeDataString(token));
+            var res = await http.SendAsync(req);
+            codes.Add(res.StatusCode);
+            if (res.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                Assert.Equal("rate-limited", (await res.Problem(HttpStatusCode.TooManyRequests)).Code());
+                Assert.True(res.Headers.Contains("Retry-After"));
+            }
+        }
+        Assert.Equal(new[] { HttpStatusCode.OK, HttpStatusCode.OK, HttpStatusCode.TooManyRequests }, codes);
     }
 }
