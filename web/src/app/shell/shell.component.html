@@ -54,8 +54,10 @@
   </button>
   <mat-menu #mainMenu="matMenu" xPosition="before" class="sr-main-menu">
     <div class="menu-who" mat-menu-item disabled>
-      <span>{{ session.user()?.displayName }}</span>
-      <span class="sr-meta">{{ session.user()?.jobTitle }} · {{ session.user()?.tenant?.name }}</span>
+      <span class="menu-persona">
+        <span>{{ session.user()?.displayName }}</span>
+        <span class="sr-meta">{{ session.user()?.jobTitle }} · {{ session.user()?.tenant?.name }}</span>
+      </span>
     </div>
     @if (isHandset()) {
       @if (projects.data(); as list) {
