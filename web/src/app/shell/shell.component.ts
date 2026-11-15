@@ -113,8 +113,10 @@ export class ShellComponent implements OnInit {
     this.currentProjectId.set(match?.[1] ?? '');
   }
 
-  protected openProject(id: string): void {
-    if (id) void this.router.navigate(['/app/projects', id]);
+  /** First name of a persona for the guide's buttons ("Switch to Marcus and go"). */
+  protected personaName(key: Persona): string {
+    const name = this.scenario.data()?.personas.find((p) => p.key === key)?.displayName;
+    return name?.split(' ')[0] ?? key;
   }
 
   protected async switchTo(persona: Persona, target?: string): Promise<void> {

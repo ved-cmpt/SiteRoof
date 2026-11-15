@@ -114,7 +114,7 @@
                 }
                 <p class="sr-meta">{{ step.description }}</p>
                 <button type="button" class="go" (click)="switchTo(step.persona, step.link)" [disabled]="switching()">
-                  {{ session.persona() === step.persona ? 'Go' : 'Switch to ' + step.persona + ' and go' }}
+                  {{ session.persona() === step.persona ? 'Go' : 'Switch to ' + personaName(step.persona) + ' and go' }}
                 </button>
               </div>
             </li>
