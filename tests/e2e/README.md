@@ -4,7 +4,7 @@ Specs in `specs/` drive the real app in Chromium against a real SQL Server:
 
 | Spec | Covers |
 | --- | --- |
-| `recruiter-demo.spec.ts` | Open Riverbend → inspect delayed work → crew submits progress → supervisor verifies → manager approves material request → ERP 503 then retry succeeds → dashboard and activity update |
+| `demo-scenario.spec.ts` | Open Riverbend → inspect delayed work → crew submits progress → supervisor verifies → manager approves material request → ERP 503 then retry succeeds → dashboard and activity update |
 | `security.spec.ts` | Crew changing a project id in the URL gets 403; crew cannot approve via UI or API; 404 page; CSRF required |
 | `conflict.spec.ts` | Stale status change shows the 409 conflict banner and nothing is overwritten |
 | `work-order-lifecycle.spec.ts` | Supervisor creates and assigns work; crew completes it; dashboard and activity feed update |

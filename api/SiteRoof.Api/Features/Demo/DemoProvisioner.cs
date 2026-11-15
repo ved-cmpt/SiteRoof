@@ -22,7 +22,7 @@ public sealed class DemoOptions
 
 /// <summary>
 /// Creates one isolated guest tenant per visitor: its own users (no passwords), roles, memberships and a
-/// freshly seeded scenario. Nothing is shared between visitors, so one recruiter's clicks never change another's data.
+/// freshly seeded scenario. Nothing is shared between visitors, so one visitor's clicks never change another's data.
 /// </summary>
 public sealed class DemoProvisioner(
     SiteRoofDbContext db,

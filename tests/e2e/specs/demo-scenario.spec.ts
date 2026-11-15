@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { startDemo, switchPersona } from './helpers';
 
-// The scripted recruiter scenario from the spec:
+// The guided demo scenario from the spec:
 // Open Riverbend -> inspect delayed work -> submit progress -> approve material request -> see dashboard and ERP status update.
-test('recruiter demo scenario runs end to end on real data', async ({ page }) => {
+test('guided demo scenario runs end to end on real data', async ({ page }) => {
   test.setTimeout(120_000);
   await startDemo(page);
   await expect(page.getByTestId('kpi-approvals')).toHaveText('5');
