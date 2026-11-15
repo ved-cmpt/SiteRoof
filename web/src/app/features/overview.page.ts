@@ -19,8 +19,8 @@ import { AgoPipe, StateComponent, StatItem, StatsComponent, StatusChipComponent 
           <h1>Overview</h1>
           @if (overview.data(); as o) {
             <div class="meta">
-              <span>{{ o.projects.length }} projects</span>
-              <span>{{ o.kpis.openWorkOrders }} open work orders</span>
+              <span>{{ o.projects.length }} project{{ o.projects.length === 1 ? '' : 's' }}</span>
+              <span>{{ o.kpis.openWorkOrders }} open work order{{ o.kpis.openWorkOrders === 1 ? '' : 's' }}</span>
               <span>{{ o.kpis.percentComplete }}% complete overall</span>
               <span>Updated {{ o.generatedAt | ago }}</span>
             </div>
