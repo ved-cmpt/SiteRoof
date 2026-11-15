@@ -88,7 +88,9 @@ export class ShellComponent implements OnInit {
     if (this.session.isDemo()) this.scenario.load(this.api.scenario());
     this.projects.load(this.api.projects());
     this.trackProject(this.router.url);
-    if (this.route.snapshot.queryParamMap.has('guide') || this.router.url.includes('guide=1')) this.guideOpen.set(true);
+    // The guide opens on first entry beside the content; on phones it would cover the app, so it waits to be opened.
+    const wantsGuide = this.route.snapshot.queryParamMap.has('guide') || this.router.url.includes('guide=1');
+    if (wantsGuide && !this.isHandset()) this.guideOpen.set(true);
     let identity = this.session.identityVersion();
     this.router.events
       .pipe(
