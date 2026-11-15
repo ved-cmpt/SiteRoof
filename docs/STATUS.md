@@ -1,6 +1,6 @@
 # SiteRoof — Status
 
-_Last updated: 2026-11-15. Phases 1–3, the visual redesign and the app polish pass are complete locally. **Not deployed.**_
+_Last updated: 2026-11-15. Phases 1–3, the visual redesign, the app polish pass and feedback pass 3 are complete locally. **Not deployed.**_
 
 ## Done
 
@@ -77,21 +77,46 @@ _Last updated: 2026-11-15. Phases 1–3, the visual redesign and the app polish 
 - New Playwright phone checks (375 px): no horizontal overflow on every /app route (plus milestones/team and list
   view), drawer and compact menu, one-column board, crew logs progress and a blocker, dialogs as full-screen sheets.
 
-## Verification (run on 2026-11-15 after the polish pass, Windows 11, Docker Desktop)
+**Feedback pass 3 (2026-11-15)**
+- Sidebar shell: logo and workspace name at the top; Home (renamed from Overview; `/app/overview` redirects to
+  `/app/home`), Projects, Approvals, Activity, Admin; a plain-text project list with mono codes, neutral hover and
+  active states, and a thin neutral `:focus-visible` ring. The top-bar project dropdown is gone.
+- Guided demo entry and the profile menu (avatar, name, role, Act as, Reset my demo, Leave the demo) sit at the
+  bottom-left of the sidebar; on phones the sidebar is a drawer with the same footer. The top bar is replaced by
+  a one-line demo notice.
+- Alignment: one left edge for page titles and content, equal table cell padding, numbers right-aligned in mono,
+  duplicate workspace name above page titles removed; checked at 375, 768 and 1440 px. The app canvas uses the
+  landing page's hairline grid; panels stay white. Text selection is a darker tint (ink on it is 11:1).
+- New logo mark (plan view of a hip roof with one orange hip end), used in the app, landing, favicon and a new
+  1200 × 630 social preview (`tests/e2e/scripts/social-preview.mjs`).
+- Landing: split hero with a Home screenshot; the about section is replaced by "The problem" (coordination between
+  office and site, and who it is for); minimal footer ("A personal project · all data is fictional", Try the demo,
+  Case study, GitHub). No portfolio or job-application wording on the site; font and icon credits moved to
+  `NOTICE.md`. Case study proofread and framed around the product problem.
+- Copy: "(s)" placeholders replaced by proper singular/plural wording in the web app and API messages; guide
+  buttons name the persona ("Switch to Marcus and go").
+- Tests: new browser tests for the sidebar project list (only accessible projects, current one marked) and for the
+  persona switcher living at the bottom of the sidebar and switching persona; phone drawer test updated for the
+  sidebar footer. The scenario spec is now `demo-scenario.spec.ts`. No assertion was relaxed; the ERP text check
+  now expects "after 2 attempts".
+- Screenshots in `docs/screenshots` and `web/public/screens` recaptured from the new layout.
+
+## Verification (run on 2026-11-15 after feedback pass 3, Windows 11, Docker Desktop)
 
 | Command | Result |
 | --- | --- |
 | `cd web; npm run lint` | All files pass linting |
 | `cd web; npm test` | **14 passed** (3 files, Vitest) |
-| `cd web; npm run build` | Succeeded, no warnings; initial bundle 340.36 kB raw / 88.41 kB estimated transfer |
+| `cd web; npm run build` | Succeeded, no warnings; initial bundle 340.81 kB raw / 88.50 kB estimated transfer |
 | `dotnet test SiteRoof.slnx` | **60 passed**, 0 failed (xUnit; SQL Server 2022 via Testcontainers) |
-| `cd tests/e2e; npx playwright test --project=chromium` (API on :5080 serving the production build) | **15 passed** (10 desktop + 5 phone-viewport) |
-| `docker compose --profile full up -d --build` (default demo limit, 6 per client per 15 min) | Built and started; `/health/ready` 200; demo start, `/api/overview` and `/app/overview` return 200 |
-| `node scripts/audit.mjs .local/audit/after http://127.0.0.1:8080` | 51 after-screenshots captured from the production container |
+| `cd tests/e2e; npx playwright test --project=chromium` (API on :5080 serving the production build) | **16 passed** (11 desktop + 5 phone-viewport) |
+| `cd tests/e2e; npx playwright test --project=screenshots` | 1 passed; screenshots recaptured |
+| `docker compose --profile full up -d --build app` (default demo limit, 6 per client per 15 min) | Built and started; `/health/ready` Healthy; `/`, `/case-study`, `/app/home`, `/favicon.svg`, `/social-preview.png` return 200; `Demo__ProvisionPermitsPerWindow` = 6 in the container |
+| `E2E_BASE_URL=http://localhost:8080 npx playwright test --project=chromium demo-scenario accessibility.spec.ts:54` | **2 passed** against the container (guided demo scenario; persona switcher in the sidebar) |
 
-The full Playwright suite was not run against the default-limit container: it starts about 15 demo workspaces and
+The full Playwright suite was not run against the default-limit container: it starts about 16 demo workspaces and
 the production limit allows 6 per client per 15 minutes (see Known issues). It passed against the production build
-served by the API. The previous container run (raised limit) passed 10/10 before the polish pass.
+served by the API, and two specs passed against the container.
 
 Earlier checks still valid (no backend or workflow changes since): `dotnet build -c Release -warnaserror` 0 warnings,
 actionlint no findings, gitleaks no leaks.
@@ -119,7 +144,7 @@ These are single-machine numbers for orientation only; nothing has been measured
   limit (`DEMO_PROVISION_PERMITS` / `Demo__ProvisionPermitsPerWindow`), because each spec creates a workspace.
 - Material form fields in the work-order, project and material dialogs keep their own outline style; all other
   app forms use the shared labelled fields.
-- The optional AI summary provider is an interface only; no provider is implemented or configured.
+- The optional language-model summary provider is an interface only; no provider is implemented or configured.
 
 ## Owner-only next steps
 
