@@ -51,7 +51,7 @@ test('capture product screenshots', async ({ page }) => {
   await switchPersona(page, 'crew');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/app/overview');
-  await expect(page.getByTestId('kpi-open')).toBeVisible();
+  await expect(page.getByTestId('kpi-overdue')).toBeVisible();
   await page.screenshot({ path: `${out}/mobile-overview.png` });
   await page.goto('/');
   await page.screenshot({ path: `${out}/mobile-landing.png` });

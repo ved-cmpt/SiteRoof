@@ -7,7 +7,7 @@ export async function startDemo(page: Page): Promise<void> {
   await page.goto('/');
   await page.getByTestId('hero-try-demo').click();
   await expect(page).toHaveURL(/\/app\/overview/);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Good to see you');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Overview');
 }
 
 /** Switches persona through the in-app switcher. */
