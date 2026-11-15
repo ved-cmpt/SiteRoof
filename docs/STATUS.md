@@ -1,6 +1,6 @@
 # SiteRoof — Status
 
-_Last updated: 2026-11-15. Phases 1–3, the visual redesign, the app polish pass and feedback pass 3 are complete locally. **Not deployed.**_
+_Last updated: 2026-11-15. Phases 1–3, the visual redesign, the app polish pass and feedback pass 3 are complete. Published to GitHub (https://github.com/ved-cmpt/SiteRoof); CI green on `main`. **Hosting: not deployed.**_
 
 ## Done
 
@@ -134,9 +134,31 @@ production container and SQL Server 2022 in Docker on the development machine (n
 
 These are single-machine numbers for orientation only; nothing has been measured on a hosted environment.
 
+## GitHub and CI (2026-11-15)
+
+- Repository: https://github.com/ved-cmpt/SiteRoof (public). `main` pushed with its full 72-commit history; before
+  the first push the author/committer email of every commit was changed to the account's GitHub noreply address
+  (messages, dates and trees unchanged). gitleaks on the full history: no leaks.
+- First CI run on `main` (run 43747376084): all jobs passed.
+
+| Job | Result |
+| --- | --- |
+| Backend build and tests | 60 passed, 0 failed (xUnit; SQL Server 2022 via Testcontainers) |
+| Frontend lint, test and build | Lint clean; 14 passed (3 files, Vitest); build succeeded |
+| Playwright end-to-end | 16 passed (chromium project) |
+| Docker image build | Succeeded |
+| ci-ok | Passed |
+
+  Annotations only: some actions (`checkout@v4`, `setup-node@v4`, `setup-dotnet@v4`, `upload-artifact@v4`,
+  `download-artifact@v4`, `paths-filter@v3`, docker actions) target the deprecated Node.js 20 runtime and are forced
+  onto Node.js 24; the monthly Dependabot github-actions group is expected to bump them.
+- Repository settings: description and topics set; Dependabot alerts and security updates enabled; `main`
+  protected (pull request required with 0 approvals, required status check `ci-ok`, no force-push, no deletion,
+  rules apply to administrators).
+
 ## Known issues and limitations
 
-- **Not deployed.** CI has only been validated locally (actionlint); it runs for real once the GitHub repository exists.
+- **Not deployed.** No hosting has been created; the public site and demo exist only locally.
 - Data-protection keys are not persisted: a container restart signs visitors out (they start a new demo).
 - Rate limiting is in memory, per instance.
 - Dependabot's `open-pull-requests-limit: 2` applies per ecosystem (GitHub has no global cap).
@@ -148,13 +170,13 @@ These are single-machine numbers for orientation only; nothing has been measured
 
 ## Owner-only next steps
 
-1. Create the GitHub repository `SiteRoof` under the owner's account, add the remote, push `main`
-   (`docs/DEPLOYMENT.md` §1) and require the `ci-ok` check on `main`.
-2. Create the Azure SQL Database free-offer database and firewall rules (§2).
-3. Create the Render free web service from the Dockerfile and set the secrets
+1. Create the Azure SQL Database free-offer database and firewall rules (`docs/DEPLOYMENT.md` §2).
+2. Create the Render free web service from the Dockerfile and set the secrets
    `ConnectionStrings__SiteRoof` and `Erp__ApiKey` (§3).
-4. Run the smoke test in §4, record the URL and results here, and update the README "Hosting status" line.
-5. Optional: confirm the GitHub URL used on the landing page and case study (`https://github.com/ved-cmpt/SiteRoof`).
+3. Run the smoke test in §4, record the URL and results here, and update the README "Hosting status" line.
+
+Done: GitHub repository created and `main` pushed with `ci-ok` required (§1); the GitHub URL on the landing page
+and case study matches the repository.
 
 ## How to resume
 
