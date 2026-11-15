@@ -112,19 +112,19 @@ const ACTIONS: { value: string; label: string }[] = [
     .small { font-size: 0.85rem; }
     .feed { list-style: none; margin: 0; padding: 0; }
     .feed li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sr-line); }
-    .ico { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--sr-concrete); color: var(--sr-ink-2); }
+    .ico { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--sr-subtle); color: var(--sr-ink-2); }
     .ico[data-kind='good'] { background: var(--sr-good-soft); color: var(--sr-good); }
     .ico[data-kind='bad'] { background: var(--sr-critical-soft); color: var(--sr-critical); }
-    .ico[data-kind='warn'] { background: var(--sr-warning-soft); color: var(--sr-warning); }
+    .ico[data-kind='warn'] { background: var(--sr-warn-soft); color: var(--sr-warn); }
     .summary { margin: 0; }
     .summary strong { margin-right: 6px; }
     .summary a { color: var(--sr-ink); }
     .meta { margin: 2px 0 0; font-size: 0.8rem; color: var(--sr-ink-3); }
     details { margin-top: 6px; font-size: 0.85rem; }
-    summary { cursor: pointer; color: var(--sr-blueprint); }
+    summary { cursor: pointer; color: var(--sr-ink-2); }
     .diff { border-collapse: collapse; margin-top: 6px; }
     .diff th, .diff td { border: 1px solid var(--sr-line); padding: 4px 8px; text-align: left; vertical-align: top; max-width: 320px; overflow-wrap: anywhere; }
-    .diff thead th { background: var(--sr-concrete); font-size: 0.75rem; }
+    .diff thead th { background: var(--sr-subtle); font-size: 0.75rem; }
     .pager { display: flex; align-items: center; gap: 12px; justify-content: center; margin-top: 14px; }
   `,
 })

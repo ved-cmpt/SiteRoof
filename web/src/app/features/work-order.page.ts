@@ -23,7 +23,6 @@ import { SessionService } from '../core/session.service';
 import { IconName } from '../shared/icons.generated';
 import {
   AgoPipe,
-  DayPipe,
   ErpStatusComponent,
   IconComponent,
   MaterialStatusComponent,
@@ -69,7 +68,7 @@ const TRANSITIONS: Record<WorkOrderTransition, TransitionUi> = {
     MaterialStatusComponent,
     ErpStatusComponent,
     AgoPipe,
-    DayPipe,
+
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './work-order.page.html',

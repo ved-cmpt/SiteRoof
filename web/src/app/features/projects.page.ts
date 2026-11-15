@@ -11,7 +11,7 @@ import { Loader } from '../core/loader';
 import { ProjectDetail, ProjectSummary } from '../core/models';
 import { NotifyService } from '../core/notify.service';
 import { SessionService } from '../core/session.service';
-import { DayPipe, IconComponent, MeterComponent, StateComponent } from '../shared/ui';
+import { IconComponent, MeterComponent, StateComponent } from '../shared/ui';
 
 @Component({
   selector: 'sr-project-dialog',
@@ -100,15 +100,15 @@ export class ProjectDialogComponent {
 
 @Component({
   selector: 'sr-projects',
-  imports: [RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, IconComponent, StateComponent, MeterComponent, DayPipe],
+  imports: [RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, IconComponent, StateComponent, MeterComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sr-page">
-      <div class="head">
+      <header class="sr-page-head">
         <div>
           <p class="sr-kicker">Projects</p>
           <h1>Your projects</h1>
-          <p class="sr-muted">Only projects you are a member of are listed{{ session.isAdmin() ? ' (admins see every project in the workspace)' : '' }}.</p>
+          <p>Only projects you are a member of are listed{{ session.isAdmin() ? ' (admins see every project in the workspace)' : '' }}.</p>
         </div>
         <div class="sr-row">
           <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
@@ -119,7 +119,7 @@ export class ProjectDialogComponent {
             <button mat-flat-button (click)="create()"><sr-icon name="add" [size]="18" /> New project</button>
           }
         </div>
-      </div>
+      </header>
 
       @if (projects.error(); as e) {
         <sr-state kind="error" [error]="e" (retry)="load()" />
@@ -136,7 +136,7 @@ export class ProjectDialogComponent {
                 <span class="status" [attr.data-status]="p.status">{{ p.status === 'OnHold' ? 'On hold' : p.status }}</span>
               </div>
               <h2>{{ p.title }}</h2>
-              <p class="sr-muted"><sr-icon name="location_on" [size]="16" /> {{ p.city || '—' }} · target {{ p.targetDate | day: 'long' }}</p>
+              <p class="sr-muted"><sr-icon name="location_on" [size]="14" /> {{ p.city || '—' }} · target <span class="sr-mono">{{ p.targetDate }}</span></p>
               <sr-meter [value]="p.percentComplete" [label]="p.title + ' completion'" [tone]="p.percentComplete === 100 ? 'good' : 'info'" />
               <dl class="stats">
                 <div><dt>Complete</dt><dd class="sr-num">{{ p.percentComplete }}%</dd></div>
@@ -154,23 +154,22 @@ export class ProjectDialogComponent {
     </div>
   `,
   styles: `
-    .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
     .search { width: 240px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-    .project { display: block; background: var(--sr-paper); border: 1px solid var(--sr-line); border-radius: var(--sr-radius-lg); padding: 18px; color: inherit; text-decoration: none; box-shadow: var(--sr-shadow); border-top: 4px solid var(--sr-safety); transition: transform 0.12s ease, box-shadow 0.12s ease; }
-    .project:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgb(19 23 29 / 12%); }
+    .project { display: block; background: var(--sr-surface); border: 1px solid var(--sr-line); border-radius: var(--sr-radius-lg); padding: 18px; color: inherit; text-decoration: none; transition: border-color var(--sr-fast) var(--sr-ease); }
+    .project:hover { border-color: var(--sr-ink-3); }
     .top { display: flex; justify-content: space-between; align-items: center; }
-    .code { font: 800 0.8rem/1 var(--sr-font-display); letter-spacing: 0.1em; background: var(--sr-ink); color: var(--sr-safety); padding: 4px 7px; border-radius: 4px; }
-    .status { font-size: 0.78rem; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--sr-info-soft); color: var(--sr-info); }
+    .code { font-family: var(--sr-font-mono); font-size: 0.75rem; color: var(--sr-ink-2); border: 1px solid var(--sr-line-strong); padding: 2px 6px; border-radius: var(--sr-radius-sm); }
+    .status { font-size: 0.75rem; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: var(--sr-info-soft); color: var(--sr-info); }
     .status[data-status='Completed'] { background: var(--sr-good-soft); color: var(--sr-good); }
-    .status[data-status='OnHold'] { background: var(--sr-warning-soft); color: var(--sr-warning); }
-    h2 { margin: 12px 0 4px; font-size: 1.15rem; }
+    .status[data-status='OnHold'] { background: var(--sr-warn-soft); color: var(--sr-warn); }
+    h2 { margin: 14px 0 4px; font-size: var(--sr-text-md); font-weight: 600; }
     p { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0 0; }
-    .stats div { background: var(--sr-concrete); border-radius: 6px; padding: 6px 8px; }
-    .stats dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--sr-ink-3); }
-    .stats dd { margin: 0; font-weight: 750; font-size: 1.05rem; }
-    .stats .bad dd { color: var(--sr-critical); }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); margin: 14px 0 0; border-top: 1px solid var(--sr-line); }
+    .stats div { padding: 8px 0 0; }
+    .stats dt { font-family: var(--sr-font-mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sr-ink-3); }
+    .stats dd { margin: 0; font-family: var(--sr-font-mono); font-weight: 500; font-size: 1rem; }
+    .stats .bad dd { color: var(--sr-accent-strong); }
     .role { display: inline-block; margin-top: 12px; font-size: 0.78rem; color: var(--sr-ink-3); }
   `,
 })

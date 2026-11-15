@@ -7,17 +7,21 @@ import { ActivityFeedComponent } from './activity-feed';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sr-page">
-      <p class="sr-kicker">Activity</p>
-      <h1>Activity and audit trail</h1>
-      <p class="sr-muted intro">
+      <header class="sr-page-head">
+        <div>
+          <p class="sr-kicker">Activity</p>
+          <h1>Activity and audit trail</h1>
+          <p>
         Every meaningful change is written to an append-only audit table in the same transaction as the change itself: who
         did it, when, and the before/after values of the fields that changed. You only see events for projects you can access.
-      </p>
+          </p>
+        </div>
+      </header>
       <section class="sr-card">
         <sr-activity-feed [pageSize]="30" />
       </section>
     </div>
   `,
-  styles: `.intro { max-width: 80ch; margin-bottom: 16px; }`,
+  styles: ``,
 })
 export class ActivityPage {}

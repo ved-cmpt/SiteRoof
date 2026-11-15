@@ -21,8 +21,12 @@ import { ConfirmDialogComponent } from './dialogs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sr-page">
-      <p class="sr-kicker">Admin</p>
-      <h1>Workspace settings</h1>
+      <header class="sr-page-head">
+        <div>
+          <p class="sr-kicker">Admin</p>
+          <h1>Workspace settings</h1>
+        </div>
+      </header>
       @if (tenant.error(); as e) {
         <sr-state kind="error" [error]="e" (retry)="load()" />
       } @else if (!tenant.data()) {
@@ -106,15 +110,15 @@ import { ConfirmDialogComponent } from './dialogs';
   styles: `
     .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     .wide { grid-column: 1 / -1; }
-    .demo { border-top: 4px solid var(--sr-safety); }
+    .demo { border-color: var(--sr-line-strong); }
     .row { display: flex; gap: 10px; align-items: center; }
     .row mat-form-field { flex: 1; }
     .small { font-size: 0.82rem; }
     .radios { display: grid; gap: 6px; }
     .usage { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 8px; }
-    .usage div { background: var(--sr-concrete); border-radius: 6px; padding: 6px 8px; }
+    .usage div { border-top: 1px solid var(--sr-line); padding: 6px 0; }
     .usage dt { font-size: 0.72rem; color: var(--sr-ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
-    .usage dd { margin: 0; font-weight: 750; }
+    .usage dd { margin: 0; font-family: var(--sr-font-mono); font-weight: 500; }
     @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
   `,
 })

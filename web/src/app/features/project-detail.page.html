@@ -2,17 +2,17 @@
   @if (project.error(); as e) {
     @if (forbidden(e)) {
       <section class="denied" data-testid="forbidden-page" role="alert">
-        <span class="code" aria-hidden="true">403</span>
+        <span class="code sr-mono" aria-hidden="true">ERROR 403</span>
         <h1>You don't have access to this project</h1>
         <p>{{ e.detail }} Membership is checked by the server on every request, so changing the address doesn't help.</p>
-        <a routerLink="/app/projects" class="sr-btn-safety">See your projects</a>
+        <a routerLink="/app/projects" class="sr-btn primary">See your projects</a>
       </section>
     } @else if (notFound(e)) {
       <section class="denied" data-testid="not-found-page">
-        <span class="code" aria-hidden="true">404</span>
+        <span class="code sr-mono" aria-hidden="true">ERROR 404</span>
         <h1>Project not found</h1>
         <p>It may belong to another workspace or no longer exist.</p>
-        <a routerLink="/app/projects" class="sr-btn-safety">See your projects</a>
+        <a routerLink="/app/projects" class="sr-btn primary">See your projects</a>
       </section>
     } @else {
       <sr-state kind="error" [error]="e" (retry)="ngOnInit()" />
@@ -35,7 +35,7 @@
         <p class="sr-muted meta">
           <sr-icon name="location_on" [size]="16" /> {{ p.siteAddress }}, {{ p.city }}
           <span aria-hidden="true">·</span> {{ p.clientName }}
-          <span aria-hidden="true">·</span> {{ p.startDate | day: 'long' }} → {{ p.targetDate | day: 'long' }}
+          <span aria-hidden="true">·</span> <span class="sr-mono">{{ p.startDate }} → {{ p.targetDate }}</span>
         </p>
       </div>
       @if (p.permissions.canSupervise && p.status !== 'Completed') {
@@ -112,7 +112,7 @@
             <div class="board" [attr.aria-busy]="board.loading()">
               @for (col of byColumn(); track col.status) {
                 <section class="col" [attr.aria-label]="(col.status | statusLabel) + ' work orders'" [attr.data-status]="col.status">
-                  <h2><sr-status [status]="col.status" /> <span class="sr-num">{{ col.items.length }}</span></h2>
+                  <h2><sr-status [status]="col.status" /> <span class="sr-mono n">{{ col.items.length }}</span></h2>
                   <ul>
                     @for (w of col.items; track w.id) {
                       <li>
@@ -128,7 +128,7 @@
                           }
                           <div class="card-foot">
                             <span [class.overdue]="w.isOverdue">
-                              <sr-icon name="event" [size]="14" /> {{ w.dueDate | day }}@if (w.isOverdue) { · overdue }
+                              <span class="sr-mono">{{ w.dueDate }}</span>@if (w.isOverdue) { · overdue }
                             </span>
                             <span>{{ w.assignee?.displayName || 'Unassigned' }}</span>
                           </div>
@@ -174,12 +174,12 @@
                   <tbody>
                     @for (w of board.data()!.items; track w.id) {
                       <tr>
-                        <td class="nowrap">{{ w.key }}</td>
+                        <td class="nowrap sr-mono">{{ w.key }}</td>
                         <td><a [routerLink]="['/app/work-orders', w.id]">{{ w.title }}</a></td>
                         <td>{{ w.workPackage }}</td>
                         <td><sr-status [status]="w.status" /></td>
                         <td><sr-priority [priority]="w.priority" /></td>
-                        <td class="nowrap" [class.overdue]="w.isOverdue">{{ w.dueDate | day }}@if (w.isOverdue) { · overdue }</td>
+                        <td class="nowrap sr-mono" [class.overdue]="w.isOverdue">{{ w.dueDate }}@if (w.isOverdue) { · overdue }</td>
                         <td>{{ w.assignee?.displayName || '—' }}</td>
                         <td class="sr-num">{{ w.percentComplete }}%</td>
                       </tr>
@@ -270,15 +270,15 @@
               </section>
 
               <section class="sr-card" aria-labelledby="od-title">
-                <div class="sr-card-title"><h2 id="od-title">Overdue work</h2><span class="sr-num badge">{{ d.kpis.overdue }}</span></div>
+                <div class="sr-card-title"><h2 id="od-title">Overdue work</h2><span class="sr-mono badge">{{ d.kpis.overdue }}</span></div>
                 @if (d.overdueWork.length === 0) {
                   <sr-state title="Nothing is overdue" />
                 } @else {
                   <ul class="list">
                     @for (w of d.overdueWork; track w.id) {
                       <li>
-                        <a [routerLink]="['/app/work-orders', w.id]"><strong>{{ w.key }}</strong> {{ w.title }}</a>
-                        <span class="sr-row"><sr-status [status]="w.status" /> <span class="overdue small">due {{ w.dueDate | day }}</span></span>
+                        <a [routerLink]="['/app/work-orders', w.id]"><span class="sr-mono">{{ w.key }}</span> {{ w.title }}</a>
+                        <span class="sr-row"><sr-status [status]="w.status" /> <span class="overdue small sr-mono">due {{ w.dueDate }}</span></span>
                       </li>
                     }
                   </ul>
@@ -296,8 +296,8 @@
                   <ul class="list">
                     @for (m of d.approvalBacklog; track m.id) {
                       <li>
-                        <span><strong>{{ m.quantity }} {{ m.unit }}</strong> {{ m.itemName }}</span>
-                        <span class="sr-muted small">{{ m.workOrderKey }} · {{ m.requestedBy }} · waiting {{ m.ageDays }} day(s)</span>
+                        <span><span class="sr-mono">{{ m.quantity }} {{ m.unit }}</span> {{ m.itemName }}</span>
+                        <span class="sr-muted small"><span class="sr-mono">{{ m.workOrderKey }}</span> · {{ m.requestedBy }} · waiting {{ m.ageDays }} day(s)</span>
                       </li>
                     }
                   </ul>
@@ -333,7 +333,7 @@
                   @for (m of p.milestones; track m.id) {
                     <tr>
                       <td>{{ m.name }}</td>
-                      <td class="nowrap" [class.overdue]="m.isOverdue">{{ m.dueDate | day: 'long' }}@if (m.isOverdue) { · overdue }</td>
+                      <td class="nowrap sr-mono" [class.overdue]="m.isOverdue">{{ m.dueDate }}@if (m.isOverdue) { · overdue }</td>
                       <td class="sr-num nowrap">{{ m.doneWorkOrderCount }}/{{ m.workOrderCount }} done</td>
                       <td>
                         @if (p.permissions.canManage) {
@@ -373,7 +373,7 @@
             <ul class="roster">
               @for (m of p.members; track m.userId) {
                 <li>
-                  <span class="avatar" aria-hidden="true">{{ m.displayName.charAt(0) }}</span>
+                  <span class="avatar sr-mono" aria-hidden="true">{{ m.displayName.charAt(0) }}</span>
                   <div>
                     <strong>{{ m.displayName }}</strong>
                     <span class="sr-muted small">{{ m.jobTitle }} · {{ m.trade }}</span>

@@ -2,10 +2,10 @@
   @if (wo.error(); as e) {
     @if (e.status === 403 || e.status === 404) {
       <section class="denied" [attr.data-testid]="e.status === 403 ? 'forbidden-page' : 'not-found-page'" role="alert">
-        <span class="code" aria-hidden="true">{{ e.status }}</span>
+        <span class="code sr-mono" aria-hidden="true">ERROR {{ e.status }}</span>
         <h1>{{ e.status === 403 ? "You don't have access to this work order" : 'Work order not found' }}</h1>
         <p>{{ e.detail }}</p>
-        <a routerLink="/app/projects" class="sr-btn-safety">See your projects</a>
+        <a routerLink="/app/projects" class="sr-btn primary">See your projects</a>
       </section>
     } @else {
       <sr-state kind="error" [error]="e" (retry)="reload()" />
@@ -19,17 +19,17 @@
       <sr-icon name="chevron_right" [size]="16" />
       <a [routerLink]="['/app/projects', w.projectId]">{{ w.projectCode }} · {{ w.projectTitle }}</a>
       <sr-icon name="chevron_right" [size]="16" />
-      <span>{{ w.key }}</span>
+      <span class="sr-mono">{{ w.key }}</span>
     </nav>
 
     <header class="whead">
       <div>
         <div class="sr-row">
-          <span class="key">{{ w.key }}</span>
+          <span class="key sr-mono">{{ w.key }}</span>
           <sr-status [status]="w.status" data-testid="wo-status" />
           <sr-priority [priority]="w.priority" />
           @if (w.isOverdue) {
-            <span class="late"><sr-icon name="schedule" [size]="15" /> Overdue since {{ w.dueDate | day }}</span>
+            <span class="late"><sr-icon name="schedule" [size]="14" /> Overdue since <span class="sr-mono">{{ w.dueDate }}</span></span>
           }
         </div>
         <h1>{{ w.title }}</h1>
@@ -162,7 +162,7 @@
               @for (p of w.progress; track p.id) {
                 <li [class.has-blocker]="p.blocker && !p.blockerResolvedAt">
                   <div class="log-head">
-                    <strong class="sr-num">{{ p.quantity }} {{ w.unit }}</strong>
+                    <strong class="sr-mono">{{ p.quantity }} {{ w.unit }}</strong>
                     <span class="sr-muted small">by {{ p.reporter.displayName }} · <time [attr.datetime]="p.createdAt">{{ p.createdAt | ago }}</time></span>
                     <span class="sr-spacer"></span>
                     @if (p.verifiedBy) {
@@ -197,7 +197,7 @@
           <ol class="comments">
             @for (c of w.comments; track c.id) {
               <li>
-                <span class="avatar" aria-hidden="true">{{ c.author.displayName.charAt(0) }}</span>
+                <span class="avatar sr-mono" aria-hidden="true">{{ c.author.displayName.charAt(0) }}</span>
                 <div>
                   <p class="meta"><strong>{{ c.author.displayName }}</strong> <time [attr.datetime]="c.createdAt">{{ c.createdAt | ago }}</time></p>
                   <p>{{ c.body }}</p>
@@ -224,7 +224,7 @@
           <h2 id="det-title" class="sr-kicker">Assignment</h2>
           <dl class="facts">
             <div><dt>Assignee</dt><dd data-testid="wo-assignee">{{ w.assignee?.displayName || 'Unassigned' }}</dd></div>
-            <div><dt>Due</dt><dd [class.late-text]="w.isOverdue">{{ w.dueDate | day: 'long' }}</dd></div>
+            <div><dt>Due</dt><dd class="sr-mono" [class.late-text]="w.isOverdue">{{ w.dueDate }}</dd></div>
             <div><dt>Milestone</dt><dd>{{ w.milestone?.name || '—' }}</dd></div>
             <div><dt>Work package</dt><dd>{{ w.workPackage }}</dd></div>
             @if (w.completedAt) {
@@ -233,7 +233,7 @@
           </dl>
           @if (w.plannedQuantity > 0) {
             <div class="qty">
-              <div class="sr-row"><strong class="sr-num">{{ w.reportedQuantity }} / {{ w.plannedQuantity }} {{ w.unit }}</strong><span class="sr-spacer"></span><span class="sr-num">{{ w.percentComplete }}%</span></div>
+              <div class="sr-row"><strong class="sr-mono">{{ w.reportedQuantity }} / {{ w.plannedQuantity }} {{ w.unit }}</strong><span class="sr-spacer"></span><span class="sr-mono">{{ w.percentComplete }}%</span></div>
               <sr-meter [value]="w.percentComplete" [label]="w.key + ' quantity complete'" [tone]="w.status === 'Blocked' ? 'critical' : w.percentComplete === 100 ? 'good' : 'info'" />
             </div>
           }
@@ -253,7 +253,7 @@
             <ul class="mats">
               @for (m of list; track m.id) {
                 <li>
-                  <strong>{{ m.quantity }} {{ m.unit }} {{ m.itemName }}</strong>
+                  <strong><span class="sr-mono">{{ m.quantity }} {{ m.unit }}</span> {{ m.itemName }}</strong>
                   <div class="sr-row">
                     <sr-mr-status [status]="m.status" />
                     @if (m.status === 'Approved') {
@@ -266,7 +266,7 @@
                   }
                   @if (m.canDecide) {
                     <div class="sr-row">
-                      <button mat-flat-button class="sm" (click)="decide(m, 'Approve')">Approve</button>
+                      <button mat-stroked-button class="sm" (click)="decide(m, 'Approve')">Approve</button>
                       <button mat-stroked-button class="sm" (click)="decide(m, 'Reject')">Reject</button>
                     </div>
                   }
@@ -284,7 +284,7 @@
           <ul class="deps">
             @for (d of w.dependencies; track d.id) {
               <li>
-                <a [routerLink]="['/app/work-orders', d.id]">{{ d.key }} · {{ d.title }}</a>
+                <a [routerLink]="['/app/work-orders', d.id]"><span class="sr-mono">{{ d.key }}</span> · {{ d.title }}</a>
                 <sr-status [status]="d.status" />
                 @if (w.permissions.canManageDependencies) {
                   <button type="button" class="x" (click)="removeDependency(d.id)" [attr.aria-label]="'Remove dependency on ' + d.key"><sr-icon name="link_off" [size]="16" /></button>
@@ -311,7 +311,7 @@
             <h3 class="small-h">Waiting on this</h3>
             <ul class="deps">
               @for (d of w.dependents; track d.id) {
-                <li><a [routerLink]="['/app/work-orders', d.id]">{{ d.key }} · {{ d.title }}</a><sr-status [status]="d.status" /></li>
+                <li><a [routerLink]="['/app/work-orders', d.id]"><span class="sr-mono">{{ d.key }}</span> · {{ d.title }}</a><sr-status [status]="d.status" /></li>
               }
             </ul>
           }
