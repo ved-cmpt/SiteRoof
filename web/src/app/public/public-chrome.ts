@@ -4,23 +4,34 @@ import { IconComponent } from '../shared/ui';
 
 export const GITHUB_URL = 'https://github.com/ved-cmpt/SiteRoof';
 
-/** Wordmark with a simple geometric mark (a roof line over a plan square). */
+/**
+ * SiteRoof mark: the plan view of a hip roof (four planes split by the ridge and hip lines) with the
+ * east hip end in the accent colour. Built on a 24-unit grid so it stays crisp at 16px; `mono` renders
+ * it in the current text colour only.
+ */
 @Component({
   selector: 'sr-logo',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-      <rect x="4.5" y="10.5" width="15" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.6" />
-      <path d="M2.5 11.5 12 3.5l9.5 8" fill="none" stroke="#d9480f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M10 20.5v-5h4v5" fill="none" stroke="currentColor" stroke-width="1.6" />
+    <svg viewBox="0 0 24 24" [attr.width]="size()" [attr.height]="size()" aria-hidden="true">
+      <path fill="currentColor" d="M1.5 4h21l-5.6 7.3H7.1z" />
+      <path fill="currentColor" d="M1.5 20h21l-5.6-7.3H7.1z" />
+      <path fill="currentColor" d="M1.5 5.6 5.9 12l-4.4 6.4z" />
+      <path [attr.fill]="mono() ? 'currentColor' : '#d9480f'" d="M22.5 5.6 18.1 12l4.4 6.4z" />
     </svg>
-    <span>SiteRoof</span>
+    @if (wordmark()) {
+      <span>SiteRoof</span>
+    }
   `,
   styles: `
     :host { display: inline-flex; align-items: center; gap: 8px; font: 600 1rem/1 var(--sr-font-sans); letter-spacing: -0.02em; color: var(--sr-ink); }
   `,
 })
-export class LogoComponent {}
+export class LogoComponent {
+  readonly size = input(20);
+  readonly mono = input(false);
+  readonly wordmark = input(true);
+}
 
 @Component({
   selector: 'sr-public-header',
