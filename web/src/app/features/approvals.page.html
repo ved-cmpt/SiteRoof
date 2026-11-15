@@ -1,144 +1,165 @@
 <div class="sr-page">
-  <header class="sr-page-head">
+  <header class="sr-head">
     <div>
-      <p class="sr-kicker">Approvals</p>
-      <h1>Material requests</h1>
-      <p>Each request is decided once by the project manager. Approval queues a requisition to the ERP through a transactional outbox.</p>
+      <nav class="crumbs" aria-label="Breadcrumb"><span>{{ session.user()?.tenant?.name }}</span></nav>
+      <h1>Approvals</h1>
+      @if (requests.data(); as r) {
+        <div class="meta"><span>{{ r.totalCount }} {{ filterLabel() }}</span></div>
+      }
     </div>
-    <mat-button-toggle-group [value]="filter()" (change)="setFilter($event.value)" aria-label="Filter by status" hideSingleSelectionIndicator>
-      <mat-button-toggle value="Submitted" data-testid="filter-pending">Pending</mat-button-toggle>
-      <mat-button-toggle value="Approved" data-testid="filter-approved">Approved</mat-button-toggle>
-      <mat-button-toggle value="Rejected">Rejected</mat-button-toggle>
-      <mat-button-toggle value="">All</mat-button-toggle>
-    </mat-button-toggle-group>
   </header>
 
-  <div class="grid">
-    <section aria-labelledby="req-title">
-      <h2 id="req-title" class="sr-only">Requests</h2>
+  <div class="sr-toolbar">
+    <div class="sr-seg" role="group" aria-label="Filter by status">
+      <button type="button" [attr.aria-pressed]="filter() === 'Submitted'" (click)="setFilter('Submitted')" data-testid="filter-pending">Pending</button>
+      <button type="button" [attr.aria-pressed]="filter() === 'Approved'" (click)="setFilter('Approved')" data-testid="filter-approved">Approved</button>
+      <button type="button" [attr.aria-pressed]="filter() === 'Rejected'" (click)="setFilter('Rejected')">Rejected</button>
+      <button type="button" [attr.aria-pressed]="filter() === ''" (click)="setFilter('')">All</button>
+    </div>
+  </div>
+
+  <section class="sr-section" aria-labelledby="req-title">
+    <h2 id="req-title" class="sr-only">Material requests</h2>
+    <div class="sr-panel">
       @if (requests.error(); as e) {
         <sr-state kind="error" [error]="e" (retry)="load()" />
       } @else if (!requests.data()) {
         <sr-state kind="loading" />
       } @else if (requests.data()!.items.length === 0) {
-        <sr-state [title]="filter() === 'Submitted' ? 'No requests waiting for approval' : 'No requests in this view'" message="Requests are submitted from a work order by its assignee or supervisor." />
+        <sr-state [title]="filter() === 'Submitted' ? 'No requests waiting for approval' : 'No requests in this view'" />
       } @else {
-        <ul class="requests" data-testid="approval-list">
-          @for (r of requests.data()!.items; track r.id) {
-            <li class="sr-card" [attr.data-testid]="'mr-' + r.workOrderKey">
-              <div class="top">
-                <div>
-                  <h3><span class="sr-mono qty">{{ r.quantity }} {{ r.unit }}</span> {{ r.itemName }}</h3>
-                  <p class="sr-muted small">
-                    <a [routerLink]="['/app/work-orders', r.workOrderId]"><span class="sr-mono">{{ r.workOrderKey }}</span> · {{ r.workOrderTitle }}</a>
-                  </p>
-                </div>
-                <div class="chips">
-                  <sr-mr-status [status]="r.status" />
+        <table class="sr-dt" data-testid="approval-list">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Work order</th>
+              <th scope="col" class="num">Quantity</th>
+              <th scope="col">Requested</th>
+              <th scope="col">Status</th>
+              <th scope="col">ERP</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of requests.data()!.items; track r.id) {
+              <tr [attr.data-testid]="'mr-' + r.workOrderKey">
+                <td class="c-title">
+                  <a [routerLink]="['/app/work-orders', r.workOrderId]">{{ r.itemName }}</a>
+                  @if (r.justification) {
+                    <span class="why sr-meta">{{ r.justification }}</span>
+                  }
+                  @if (r.decisionNote) {
+                    <span class="why sr-meta">Decision: {{ r.decisionNote }}</span>
+                  }
+                </td>
+                <td class="c-id">{{ r.workOrderKey }}</td>
+                <td class="num">{{ r.quantity }} {{ r.unit }}</td>
+                <td class="muted">
+                  {{ r.requestedBy.displayName }}, {{ r.requestedAt | ago }}
+                  @if (r.decidedBy) {
+                    <span class="m-hide"> · {{ r.status === 'Approved' ? 'approved' : 'rejected' }} by {{ r.decidedBy.displayName }}</span>
+                  }
+                </td>
+                <td class="c-status"><sr-mr-status [status]="r.status" /></td>
+                <td class="erp">
                   @if (r.status === 'Approved') {
                     <sr-erp-status [status]="r.erp.status" />
-                  }
-                </div>
-              </div>
-              @if (r.justification) {
-                <p class="just">“{{ r.justification }}”</p>
-              }
-              <p class="meta small">
-                Requested by {{ r.requestedBy.displayName }} {{ r.requestedAt | ago }}
-                @if (r.decidedBy) {
-                  · {{ r.status === 'Approved' ? 'approved' : 'rejected' }} by {{ r.decidedBy.displayName }} {{ r.decidedAt | ago }}
-                }
-              </p>
-              @if (r.decisionNote) {
-                <p class="note small">Decision note: {{ r.decisionNote }}</p>
-              }
-              @if (r.status === 'Approved') {
-                <div class="erp small" [attr.data-status]="r.erp.status">
-                  @switch (r.erp.status) {
-                    @case ('Sent') {
-                      <span><sr-icon name="cloud_done" [size]="16" /> ERP reference <strong class="sr-mono" data-testid="erp-reference">{{ r.erp.externalReference || r.externalReference }}</strong> after {{ r.erp.attempts }} attempt(s)</span>
-                    }
-                    @case ('Retrying') {
-                      <span><sr-icon name="sync" [size]="16" /> Attempt {{ r.erp.attempts }} returned {{ r.erp.lastError }}. Next retry {{ r.erp.nextRetryAt | ago }}.</span>
-                    }
-                    @case ('Queued') {
-                      <span><sr-icon name="schedule" [size]="16" /> Waiting for the integration worker…</span>
-                    }
-                    @case ('Failed') {
-                      <span><sr-icon name="error" [size]="16" /> Failed after {{ r.erp.attempts }} attempts: {{ r.erp.lastError }}</span>
-                      @if (r.canDecide || r.erp.outboxId) {
-                        <button mat-stroked-button class="sm" (click)="retry(r.erp.outboxId!)">Retry now</button>
+                    <span class="sr-meta erp-detail">
+                      @switch (r.erp.status) {
+                        @case ('Sent') {
+                          <span class="sr-mono" data-testid="erp-reference">{{ r.erp.externalReference || r.externalReference }}</span> after {{ r.erp.attempts }} attempt(s)
+                        }
+                        @case ('Retrying') {
+                          Attempt {{ r.erp.attempts }}: {{ r.erp.lastError }}. Next retry {{ r.erp.nextRetryAt | ago }}.
+                        }
+                        @case ('Queued') {
+                          Waiting for the integration worker
+                        }
+                        @case ('Failed') {
+                          Failed after {{ r.erp.attempts }} attempts: {{ r.erp.lastError }}
+                        }
                       }
-                    }
+                    </span>
+                  } @else {
+                    <span class="muted">—</span>
                   }
-                </div>
-              }
-              @if (r.canDecide) {
-                <div class="sr-row actions">
-                  <button mat-flat-button (click)="decide(r, 'Approve')" data-testid="approve">
-                    <sr-icon name="check_circle" [size]="18" /> Approve
-                  </button>
-                  <button mat-stroked-button (click)="decide(r, 'Reject')" data-testid="reject">Reject</button>
-                </div>
-              } @else if (r.status === 'Submitted') {
-                <p class="sr-muted small">Only this project's manager can decide. Your role can view it.</p>
-              }
-            </li>
-          }
-        </ul>
+                </td>
+                <td class="m-actions acts">
+                  @if (r.canDecide) {
+                    <button mat-flat-button class="act" (click)="decide(r, 'Approve')" data-testid="approve">Approve</button>
+                    <button mat-stroked-button class="act" (click)="decide(r, 'Reject')" data-testid="reject">Reject</button>
+                  } @else if (r.status === 'Approved' && r.erp.status === 'Failed' && r.erp.outboxId) {
+                    <button mat-stroked-button class="act" (click)="retry(r.erp.outboxId!)">Retry now</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       }
-    </section>
+    </div>
+  </section>
 
-    <aside class="sr-card health" aria-labelledby="int-title" data-testid="integration-panel">
-      <div class="sr-card-title">
-        <h2 id="int-title">ERP integration</h2>
-        @if (health.data(); as h) {
-          <span class="state" [attr.data-state]="h.status">{{ h.status }}</span>
-        }
-      </div>
+  <section class="sr-section" aria-labelledby="int-title" data-testid="integration-panel">
+    <header>
+      <h2 id="int-title">ERP integration</h2>
       @if (health.data(); as h) {
-        <dl class="counts">
-          <div><dt>Queued</dt><dd class="sr-num">{{ h.outbox.pending + h.outbox.processing }}</dd></div>
-          <div><dt>Retrying</dt><dd class="sr-num" data-testid="outbox-retrying">{{ h.outbox.retrying }}</dd></div>
-          <div><dt>Sent</dt><dd class="sr-num" data-testid="outbox-sent">{{ h.outbox.succeeded }}</dd></div>
-          <div><dt>Failed</dt><dd class="sr-num">{{ h.outbox.failed }}</dd></div>
-        </dl>
-        <ul class="facts small">
-          <li><sr-icon [name]="h.mockErpReachable ? 'check_circle' : 'error'" [size]="16" /> Mock ERP {{ h.mockErpReachable ? 'reachable' : 'unreachable' }}</li>
-          <li><sr-icon name="sync" [size]="16" /> Worker {{ h.dispatcherEnabled ? 'last ran ' + (h.dispatcherLastRunAt | ago) : 'disabled' }}</li>
-          <li><sr-icon name="tune" [size]="16" /> Simulator: {{ h.simulatorMode === 'FailFirstAttempt' ? 'first attempt returns 503' : h.simulatorMode === 'Unavailable' ? 'always 503' : 'always succeeds' }}</li>
-          <li><sr-icon name="rule" [size]="16" /> Up to {{ h.maxAttempts }} attempts with exponential backoff</li>
-        </ul>
-        <h3>Recent transmissions</h3>
-        <ol class="events">
-          @for (ev of h.recent; track ev.id) {
-            <li [attr.data-status]="ev.status">
-              <strong>{{ ev.description }}</strong>
-              <span class="small">
-                {{ ev.status === 'Succeeded' ? 'Sent · ' + ev.externalReference : ev.status === 'Failed' ? 'Failed' : ev.attempts > 0 ? 'Retry scheduled ' + (ev.nextRetryAt | ago) : 'Queued' }}
-                · {{ ev.attempts }} attempt(s)
-              </span>
-              @if (ev.lastError && ev.status !== 'Succeeded') {
-                <span class="small err">Last error: {{ ev.lastError }}</span>
-              }
-            </li>
-          } @empty {
-            <li class="sr-muted small">No transmissions yet.</li>
-          }
-        </ol>
-        <p class="sr-muted small">
-          @if (inFlight()) {
-            Refreshing every 3 seconds while transmissions are in flight.
-          } @else {
-            Updated {{ lastRefresh() | ago }}.
-          }
-          <button type="button" class="link" (click)="load()">Refresh</button>
-        </p>
-      } @else if (health.error(); as e) {
-        <sr-state kind="error" [error]="e" (retry)="load()" />
-      } @else {
-        <sr-state kind="loading" />
+        <span class="aside">{{ h.status === 'healthy' ? 'Healthy' : h.status === 'attention' ? 'Needs attention' : 'Degraded' }}</span>
       }
-    </aside>
-  </div>
+    </header>
+    @if (health.data(); as h) {
+      <sr-stats [items]="healthStats()" />
+      <div class="int">
+        <div class="sr-panel pad">
+          <dl class="sr-dl">
+            <dt>Mock ERP</dt>
+            <dd>{{ h.mockErpReachable ? 'Reachable' : 'Unreachable' }}</dd>
+            <dt>Worker</dt>
+            <dd>{{ h.dispatcherEnabled ? 'Last ran ' + (h.dispatcherLastRunAt | ago) : 'Disabled' }}</dd>
+            <dt>Simulator</dt>
+            <dd>{{ h.simulatorMode === 'FailFirstAttempt' ? 'First attempt returns 503' : h.simulatorMode === 'Unavailable' ? 'Always 503' : 'Always succeeds' }}</dd>
+            <dt>Retries</dt>
+            <dd>Up to {{ h.maxAttempts }} attempts, exponential backoff</dd>
+          </dl>
+          <p class="sr-meta refresh">
+            {{ inFlight() ? 'Refreshing every 3 seconds while transmissions are in flight.' : 'Updated ' + (lastRefresh() | ago) + '.' }}
+            <button type="button" class="sr-link-btn" (click)="load()">Refresh</button>
+          </p>
+        </div>
+        <div class="sr-panel">
+          <h3 class="sub">Recent transmissions</h3>
+          @if (h.recent.length === 0) {
+            <sr-state title="No transmissions yet" />
+          } @else {
+            <table class="sr-dt">
+              <thead><tr><th scope="col">Requisition</th><th scope="col">Result</th><th scope="col" class="num">Attempts</th></tr></thead>
+              <tbody>
+                @for (ev of h.recent; track ev.id) {
+                  <tr>
+                    <td class="c-title">{{ ev.description }}</td>
+                    <td class="muted">
+                      @if (ev.status === 'Succeeded') {
+                        <span class="sr-mono">{{ ev.externalReference }}</span>
+                      } @else if (ev.status === 'Failed') {
+                        <span class="fail">Failed: {{ ev.lastError }}</span>
+                      } @else if (ev.attempts > 0) {
+                        Retry {{ ev.nextRetryAt | ago }} ({{ ev.lastError }})
+                      } @else {
+                        Queued
+                      }
+                    </td>
+                    <td class="num m-label" data-label="Attempts">{{ ev.attempts }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </div>
+    } @else if (health.error(); as e) {
+      <div class="sr-panel"><sr-state kind="error" [error]="e" (retry)="load()" /></div>
+    } @else {
+      <div class="sr-panel"><sr-state kind="loading" /></div>
+    }
+  </section>
 </div>
