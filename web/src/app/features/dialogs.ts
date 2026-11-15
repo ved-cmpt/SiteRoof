@@ -110,7 +110,7 @@ export interface WorkOrderFormData {
           <mat-error>Enter a work package.</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Assignee (project team)</mat-label>
+          <mat-label>Assignee</mat-label>
           <mat-select formControlName="assigneeId" data-testid="wo-assignee">
             <mat-option [value]="null">Unassigned</mat-option>
             @for (m of data.members; track m.userId) {
@@ -164,10 +164,10 @@ export interface WorkOrderFormData {
     </form>
   `,
   styles: `
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; min-width: min(640px, 80vw); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--sr-s4); width: min(600px, 100%); }
     .full { grid-column: 1 / -1; }
     .err { color: var(--sr-critical); }
-    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; min-width: 0; } }
+    @media (max-width: 767px) { .grid { grid-template-columns: 1fr; width: 100%; } }
   `,
 })
 export class WorkOrderDialogComponent {
@@ -259,7 +259,7 @@ export class WorkOrderDialogComponent {
     </form>
   `,
   styles: `
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; min-width: min(520px, 80vw); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--sr-s4); width: min(520px, 100%); }
     .full { grid-column: 1 / -1; }
     .err { color: var(--sr-critical); }
   `,

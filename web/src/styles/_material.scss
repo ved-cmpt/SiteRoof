@@ -70,6 +70,7 @@ html {
     (
       container-shape: var(--sr-radius-lg),
       container-color: var(--sr-surface),
+      container-max-width: min(680px, calc(100vw - 32px)),
     )
   );
 
