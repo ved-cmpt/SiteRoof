@@ -42,7 +42,7 @@
 .sr-app .sr-page {
   max-width: 1280px;
   margin: 0 auto;
-  padding: var(--sr-s5) var(--sr-s6) var(--sr-s6);
+  padding: var(--sr-s4) var(--sr-s6) var(--sr-s6);
 
   @media (max-width: 767px) {
     padding: var(--sr-s4) var(--sr-s4) var(--sr-s6);
@@ -161,7 +161,9 @@
       }
     }
 
-    td {
+    td,
+    td:first-child,
+    td:last-child {
       padding: 0;
       border: 0;
       order: 3;
@@ -170,18 +172,23 @@
       width: auto !important;
     }
 
+    // Line 1: title + status (fixed slot); line 2: id first, then the other visible cells.
     .c-title {
       order: 0;
-      flex: 1 1 calc(100% - 160px);
+      flex: 1 1 calc(100% - 128px);
       min-width: 0;
       font-size: var(--sr-app-body);
       color: var(--sr-ink);
     }
 
+    .c-title:not(:has(~ .c-status)) {
+      flex-basis: 100%;
+    }
+
     .c-status {
       order: 1;
-      flex: 0 0 auto;
-      margin-left: auto;
+      flex: 0 0 120px;
+      text-align: right;
     }
 
     .c-id {
@@ -228,6 +235,17 @@
     padding: var(--sr-s2) var(--sr-s3);
     border-bottom: 1px solid var(--sr-line);
     vertical-align: middle;
+  }
+
+  // Outer cells share the 16px inset used by every panel, list and stat strip.
+  th:first-child,
+  td:first-child {
+    padding-left: var(--sr-s4);
+  }
+
+  th:last-child,
+  td:last-child {
+    padding-right: var(--sr-s4);
   }
 
   thead th {
