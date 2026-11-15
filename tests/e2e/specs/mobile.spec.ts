@@ -31,7 +31,7 @@ test('no /app route scrolls horizontally on a phone', async ({ page }) => {
   await startDemo(page);
   const { rbl, wo7 } = await ids(page);
   const routes = [
-    '/app/overview',
+    '/app/home',
     '/app/projects',
     `/app/projects/${rbl}`,
     `/app/projects/${rbl}?tab=dashboard`,
@@ -58,7 +58,7 @@ test('no /app route scrolls horizontally on a phone', async ({ page }) => {
   await expectNoHorizontalOverflow(page, 'work-order list');
 });
 
-test('the sidebar is a drawer and the switchers share one compact menu on a phone', async ({ page }) => {
+test('the sidebar is a drawer with projects and the profile at its bottom on a phone', async ({ page }) => {
   await startDemo(page);
   await expect(page.getByRole('navigation', { name: 'App' })).toBeHidden();
   await page.getByRole('button', { name: 'Navigation' }).click();
@@ -68,11 +68,22 @@ test('the sidebar is a drawer and the switchers share one compact menu on a phon
   await projects.click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Projects');
 
-  await page.getByTestId('persona-switcher').click();
-  await expect(page.getByRole('menuitem', { name: /Riverbend Library Renovation/ })).toBeVisible();
-  await expect(page.getByTestId('persona-crew')).toBeVisible();
-  await page.getByRole('menuitem', { name: /Northgate Transit Shelter/ }).click();
+  // The drawer closes after navigating; reopen it for the project list and the profile.
+  await expect(page.getByRole('navigation', { name: 'App' })).toBeHidden();
+  await page.getByRole('button', { name: 'Navigation' }).click();
+  const project = page.getByTestId('sidebar-projects').getByRole('link', { name: /Northgate Transit Shelter/ });
+  await expect(project).toBeVisible();
+  expect((await project.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  const profile = page.locator('#app-nav').getByTestId('persona-switcher');
+  await expect(profile).toBeInViewport();
+  const box = (await profile.boundingBox())!;
+  expect(box.y + box.height).toBeGreaterThan(812 - 80);
+  await project.click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Northgate Transit Shelter');
+
+  await switchPersona(page, 'crew');
+  await page.getByRole('button', { name: 'Navigation' }).click();
+  await expect(profile).toContainText('Leah Tremblay');
 });
 
 test('the work-order board shows one status column at a time on a phone', async ({ page }) => {
@@ -92,7 +103,7 @@ test('the work-order board shows one status column at a time on a phone', async 
 test('a crew member logs progress and a blocker from a phone', async ({ page }) => {
   await startDemo(page);
   await switchPersona(page, 'crew');
-  await page.goto('/app/overview');
+  await page.goto('/app/home');
 
   // Assigned work comes first for the crew and each row opens the work order.
   const mine = page.getByTestId('my-work');

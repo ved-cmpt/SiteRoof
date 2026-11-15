@@ -26,7 +26,12 @@ for (const [tag, viewport] of viewports) {
   const go = async (path) => {
     await page.goto(base + path, { waitUntil: 'networkidle' });
   };
+  const openDrawer = async () => {
+    const toggle = page.getByRole('button', { name: 'Navigation' });
+    if (await toggle.isVisible()) await toggle.click();
+  };
   const persona = async (key) => {
+    await openDrawer();
     await page.getByTestId('persona-switcher').click();
     await page.getByTestId(`persona-${key}`).click();
     await page.getByText(/You are now/).waitFor();
@@ -35,7 +40,7 @@ for (const [tag, viewport] of viewports) {
   const api = (path) => page.evaluate(async (p) => (await fetch(p)).json(), path);
 
   await go('/demo');
-  await page.waitForURL(/app\/overview/);
+  await page.waitForURL(/app\/home/);
   await page.waitForLoadState('networkidle');
   const close = page.getByRole('button', { name: 'Close guide' });
   if (await close.isVisible()) await close.click();
@@ -47,8 +52,9 @@ for (const [tag, viewport] of viewports) {
   const wo7 = board.items.find((w) => w.key === 'RBL-007').id;
   const wo6 = board.items.find((w) => w.key === 'RBL-006').id;
 
-  await go('/app/overview');
-  await shot('01-overview-manager', { full: true });
+  await go('/app/home');
+  await shot('01-home-manager', { full: true });
+  await openDrawer();
   await page.getByTestId('persona-switcher').click();
   await shot('02-persona-menu');
   await page.keyboard.press('Escape');
@@ -84,8 +90,8 @@ for (const [tag, viewport] of viewports) {
   await shot('13-empty-board');
 
   await persona('crew');
-  await go('/app/overview');
-  await shot('14-overview-crew', { full: true });
+  await go('/app/home');
+  await shot('14-home-crew', { full: true });
   await go(`/app/work-orders/${wo6}`);
   await shot('15-work-order-crew', { full: true });
   await page.getByTestId('request-materials').click();

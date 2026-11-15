@@ -53,7 +53,7 @@ test('recruiter demo scenario runs end to end on real data', async ({ page }) =>
   await expect(approved.getByTestId('erp-reference')).toHaveText(/^PR-\d{6}-[0-9A-F]{6}$/);
 
   // 6. Dashboards are recalculated from the database.
-  await page.getByRole('link', { name: 'Overview', exact: true }).click();
+  await page.getByRole('link', { name: 'Home', exact: true }).click();
   await expect(page.getByTestId('kpi-approvals')).toHaveText('4');
   await page.getByRole('link', { name: 'Activity', exact: true }).click();
   const feed = page.getByTestId('activity-feed');

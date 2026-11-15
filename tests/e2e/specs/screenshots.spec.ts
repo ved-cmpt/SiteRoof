@@ -21,8 +21,8 @@ test('capture product screenshots', async ({ page }) => {
   await page.getByRole('button', { name: 'Close guide' }).click().catch(() => undefined);
   await expect(page.getByTestId('attention-queue')).toBeVisible();
   await page.waitForTimeout(400);
-  await page.screenshot({ path: `${landing}/overview.png` });
-  await page.screenshot({ path: `${out}/overview.png` });
+  await page.screenshot({ path: `${landing}/home.png` });
+  await page.screenshot({ path: `${out}/home.png` });
 
   await page.getByRole('link', { name: /Riverbend Library Renovation/ }).first().click();
   await expect(page.getByTestId('wo-RBL-007')).toBeVisible();
@@ -50,9 +50,9 @@ test('capture product screenshots', async ({ page }) => {
 
   await switchPersona(page, 'crew');
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/app/overview');
+  await page.goto('/app/home');
   await expect(page.getByTestId('kpi-overdue')).toBeVisible();
-  await page.screenshot({ path: `${out}/mobile-overview.png` });
+  await page.screenshot({ path: `${out}/mobile-home.png` });
   await page.goto('/');
   await page.screenshot({ path: `${out}/mobile-landing.png` });
 
