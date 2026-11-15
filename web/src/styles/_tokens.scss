@@ -1,0 +1,80 @@
+// SiteRoof design tokens — "a clean product UI printed on a construction drawing".
+// Warm drawing-paper background, white surfaces, ink text, hairlines, one accent (construction orange).
+// Contrast notes (WCAG AA): ink-3 on bg 5.0:1; accent-strong on white 5.6:1 (used for text and filled
+// buttons); accent #D9480F is only used for non-text marks (focus ring, markers, rules) at >= 3:1.
+
+:root {
+  color-scheme: light;
+
+  // Surfaces
+  --sr-bg: #f6f4ef; // drawing paper
+  --sr-surface: #ffffff;
+  --sr-subtle: #f0ede6; // hover, table headers, inset wells
+  --sr-grid: rgb(22 24 29 / 4.5%); // faint drawing grid
+
+  // Ink
+  --sr-ink: #16181d;
+  --sr-ink-2: #3d4048;
+  --sr-ink-3: #67625a; // warm gray, secondary text
+  --sr-ink-4: #8d877d; // placeholders and disabled text (decorative only)
+
+  // Hairlines
+  --sr-line: #e2ded6;
+  --sr-line-strong: #cfc9bd;
+
+  // The one accent
+  --sr-accent: #d9480f;
+  --sr-accent-strong: #b93d0b;
+  --sr-accent-soft: #fbece4;
+
+  // Status (always paired with text or an icon)
+  --sr-good: #23704a;
+  --sr-good-soft: #e7f1ea;
+  --sr-warn: #8a5a00;
+  --sr-warn-soft: #f7efdc;
+  --sr-critical: #b3261e;
+  --sr-critical-soft: #f9e8e5;
+  --sr-info: #2c5f9e;
+  --sr-info-soft: #e8eef6;
+
+  // Work-order status: text/ink tones for pills and validated fills for charts.
+  --sr-st-open: #6b4f86;
+  --sr-st-open-bg: #f1ecf5;
+  --sr-st-progress: #2c5f9e;
+  --sr-st-progress-bg: #e8eef6;
+  --sr-st-blocked: #b3261e;
+  --sr-st-blocked-bg: #f9e8e5;
+  --sr-st-completed: #7d5a05;
+  --sr-st-completed-bg: #f6eedb;
+  --sr-st-closed: #23704a;
+  --sr-st-closed-bg: #e7f1ea;
+  // Chart fills (palette validated for lightness, chroma, CVD separation and contrast).
+  --sr-chart-open: #a07ac0;
+  --sr-chart-progress: #2d6cc9;
+  --sr-chart-blocked: #c53d33;
+  --sr-chart-completed: #be8510;
+  --sr-chart-closed: #24804b;
+
+  // Type
+  --sr-font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sr-font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --sr-text-xs: 0.75rem;
+  --sr-text-sm: 0.8125rem;
+  --sr-text-base: 0.9375rem;
+  --sr-text-md: 1.0625rem;
+  --sr-text-lg: 1.25rem;
+  --sr-text-xl: 1.625rem;
+  --sr-text-2xl: clamp(1.75rem, 2.6vw, 2.25rem);
+  --sr-text-hero: clamp(2.4rem, 5.2vw, 4rem);
+
+  // Shape and depth
+  --sr-radius-sm: 4px;
+  --sr-radius: 6px;
+  --sr-radius-lg: 8px;
+  --sr-shadow: 0 1px 2px rgb(22 24 29 / 5%);
+  --sr-focus: 0 0 0 2px var(--sr-surface), 0 0 0 4px var(--sr-accent);
+
+  // Motion
+  --sr-ease: cubic-bezier(0.2, 0, 0, 1);
+  --sr-fast: 150ms;
+}

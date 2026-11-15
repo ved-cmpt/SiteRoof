@@ -1,0 +1,388 @@
+// Global element styles, layout primitives and the drawing-set motifs (grid, sheet labels, dimension rules).
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--sr-bg);
+  color: var(--sr-ink);
+  font-family: var(--sr-font-sans);
+  font-size: var(--sr-text-base);
+  line-height: 1.55;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--sr-font-sans);
+  color: var(--sr-ink);
+  margin: 0 0 0.5em;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: var(--sr-text-2xl);
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  font-size: var(--sr-text-lg);
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-size: var(--sr-text-md);
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 0.75em;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--sr-line-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--sr-fast) var(--sr-ease);
+
+  &:hover {
+    text-decoration-color: currentcolor;
+  }
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--sr-font-mono);
+  font-size: 0.88em;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--sr-focus);
+  border-radius: var(--sr-radius-sm);
+}
+
+::selection {
+  background: var(--sr-accent-soft);
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: var(--sr-ink);
+  color: #fff;
+  font-weight: 600;
+  border-radius: var(--sr-radius);
+  text-decoration: none;
+
+  &:focus {
+    top: 12px;
+  }
+}
+
+// ---------------------------------------------------------------- type helpers
+.sr-mono,
+.sr-num {
+  font-family: var(--sr-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.sr-muted {
+  color: var(--sr-ink-3);
+}
+
+.sr-small {
+  font-size: var(--sr-text-sm);
+}
+
+// Title-block style label, e.g. "SHEET 02 · WORKFLOWS" or "OVERVIEW".
+.sr-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sr-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sr-ink-3);
+  margin: 0 0 6px;
+}
+
+// Thin dimension-line divider: |———————|
+.sr-dim {
+  position: relative;
+  height: 9px;
+  border: 0;
+  margin: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 4px;
+    border-top: 1px solid var(--sr-line-strong);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-left: 1px solid var(--sr-line-strong);
+    border-right: 1px solid var(--sr-line-strong);
+  }
+}
+
+// Faint drawing grid for heroes and section backgrounds.
+.sr-gridpaper {
+  background-color: var(--sr-bg);
+  background-image:
+    linear-gradient(var(--sr-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sr-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+// ---------------------------------------------------------------- layout primitives
+.sr-page {
+  padding: 28px clamp(16px, 3vw, 40px) 56px;
+  max-width: 1280px;
+  margin: 0 auto;
+  animation: sr-fade var(--sr-fast) var(--sr-ease);
+}
+
+.sr-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--sr-line);
+
+  h1 {
+    margin: 0;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: var(--sr-ink-3);
+    max-width: 72ch;
+  }
+}
+
+.sr-card {
+  background: var(--sr-surface);
+  border: 1px solid var(--sr-line);
+  border-radius: var(--sr-radius-lg);
+  padding: 16px 18px;
+}
+
+.sr-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  h2,
+  h3 {
+    margin: 0;
+    font-size: var(--sr-text-base);
+    font-weight: 600;
+  }
+}
+
+.sr-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sr-spacer {
+  flex: 1 1 auto;
+}
+
+.sr-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sr-text-sm);
+
+  th,
+  td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--sr-line);
+    vertical-align: middle;
+  }
+
+  thead th {
+    font-family: var(--sr-font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sr-ink-3);
+    font-weight: 500;
+    background: var(--sr-surface);
+  }
+
+  tbody tr:hover {
+    background: var(--sr-subtle);
+  }
+
+  tr:last-child td,
+  tr:last-child th {
+    border-bottom: 0;
+  }
+}
+
+// ---------------------------------------------------------------- buttons (non-Material links styled as buttons)
+.sr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--sr-radius);
+  border: 1px solid transparent;
+  font: 600 var(--sr-text-base) / 1 var(--sr-font-sans);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--sr-fast) var(--sr-ease),
+    border-color var(--sr-fast) var(--sr-ease);
+
+  &.primary {
+    background: var(--sr-accent-strong);
+    color: #fff;
+
+    &:hover {
+      background: #a33508;
+    }
+  }
+
+  &.secondary {
+    background: var(--sr-surface);
+    color: var(--sr-ink);
+    border-color: var(--sr-line-strong);
+
+    &:hover {
+      border-color: var(--sr-ink-3);
+    }
+  }
+
+  &.lg {
+    height: 46px;
+    padding: 0 20px;
+  }
+
+  &[disabled] {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+
+.sr-link-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--sr-line-strong);
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration-color: currentcolor;
+  }
+}
+
+// Material tweaks
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-snack-bar-container.sr-snack-error {
+  --mat-snack-bar-container-color: var(--sr-critical);
+  --mdc-snackbar-container-color: var(--sr-critical);
+}
+
+.mat-mdc-dialog-container h2 {
+  font-size: var(--sr-text-lg);
+}
+
+@keyframes sr-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .sr-card {
+    border: 1px solid CanvasText;
+  }
+}
+
+// Title-block labels used as card headings keep their label size.
+.sr-card-title .sr-kicker,
+.sr-card .sr-kicker {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  margin: 0;
+}

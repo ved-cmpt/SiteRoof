@@ -1,0 +1,127 @@
+@use '@angular/material' as mat;
+
+// Angular Material, re-skinned to the SiteRoof tokens: ink-neutral surfaces, hairline outlines,
+// small radii, and the construction-orange accent as the only primary colour.
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$orange-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: (
+        plain-family: 'Inter Variable',
+        brand-family: 'Inter Variable',
+      ),
+      density: -2,
+    )
+  );
+
+  // System colour overrides (used by every Material component).
+  --mat-sys-primary: var(--sr-accent-strong);
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: var(--sr-accent-soft);
+  --mat-sys-on-primary-container: var(--sr-ink);
+  --mat-sys-surface: var(--sr-surface);
+  --mat-sys-surface-container: var(--sr-surface);
+  --mat-sys-surface-container-low: var(--sr-surface);
+  --mat-sys-surface-container-high: var(--sr-surface);
+  --mat-sys-surface-container-highest: var(--sr-subtle);
+  --mat-sys-surface-container-lowest: var(--sr-surface);
+  --mat-sys-on-surface: var(--sr-ink);
+  --mat-sys-on-surface-variant: var(--sr-ink-3);
+  --mat-sys-outline: var(--sr-line-strong);
+  --mat-sys-outline-variant: var(--sr-line);
+  --mat-sys-secondary-container: var(--sr-subtle);
+  --mat-sys-on-secondary-container: var(--sr-ink);
+  --mat-sys-error: var(--sr-critical);
+  --mat-sys-inverse-surface: var(--sr-ink);
+  --mat-sys-inverse-on-surface: #ffffff;
+  --mat-sys-level1: var(--sr-shadow);
+  --mat-sys-level2: 0 4px 16px rgb(22 24 29 / 8%);
+  --mat-sys-level3: 0 8px 24px rgb(22 24 29 / 10%);
+
+  @include mat.button-overrides(
+    (
+      filled-container-shape: var(--sr-radius),
+      outlined-container-shape: var(--sr-radius),
+      text-container-shape: var(--sr-radius),
+      protected-container-shape: var(--sr-radius),
+      outlined-outline-color: var(--sr-line-strong),
+      outlined-label-text-color: var(--sr-ink),
+      text-label-text-color: var(--sr-ink),
+      filled-label-text-weight: 600,
+      outlined-label-text-weight: 500,
+      text-label-text-weight: 500,
+    )
+  );
+
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: var(--sr-radius),
+      outlined-outline-color: var(--sr-line-strong),
+      outlined-hover-outline-color: var(--sr-ink-3),
+      outlined-focus-outline-color: var(--sr-accent),
+    )
+  );
+
+  @include mat.dialog-overrides(
+    (
+      container-shape: var(--sr-radius-lg),
+      container-color: var(--sr-surface),
+    )
+  );
+
+  @include mat.menu-overrides(
+    (
+      container-shape: var(--sr-radius),
+      container-color: var(--sr-surface),
+    )
+  );
+
+  @include mat.select-overrides(
+    (
+      panel-background-color: var(--sr-surface),
+    )
+  );
+
+  @include mat.tabs-overrides(
+    (
+      active-indicator-color: var(--sr-accent),
+      active-focus-indicator-color: var(--sr-accent),
+      active-hover-indicator-color: var(--sr-accent),
+      active-label-text-color: var(--sr-ink),
+      active-focus-label-text-color: var(--sr-ink),
+      active-hover-label-text-color: var(--sr-ink),
+      inactive-label-text-color: var(--sr-ink-3),
+      label-text-weight: 500,
+      divider-color: var(--sr-line),
+    )
+  );
+
+  @include mat.button-toggle-overrides(
+    (
+      shape: var(--sr-radius),
+      selected-state-background-color: var(--sr-subtle),
+      divider-color: var(--sr-line-strong),
+    )
+  );
+
+  @include mat.snack-bar-overrides(
+    (
+      container-shape: var(--sr-radius),
+      container-color: var(--sr-ink),
+      supporting-text-color: #ffffff,
+      button-color: #ffb48f,
+    )
+  );
+
+  @include mat.sidenav-overrides(
+    (
+      container-shape: 0,
+      container-background-color: var(--sr-surface),
+      content-background-color: var(--sr-bg),
+    )
+  );
+}
