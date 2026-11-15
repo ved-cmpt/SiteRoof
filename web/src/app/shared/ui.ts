@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Pipe, PipeTransform, computed, input, output } from '@angular/core';
 import { ApiError } from '../core/api.service';
-import { MaterialRequestStatus, WorkOrderPriority, WorkOrderStatus, ErpTransmissionStatus } from '../core/models';
+import { MaterialRequestStatus, WorkOrderStatus, ErpTransmissionStatus } from '../core/models';
 import { ICONS, IconName } from './icons.generated';
 
 /** Inline SVG icon (Material Symbols outlined paths). Decorative unless `label` is given. */
