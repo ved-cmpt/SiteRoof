@@ -1,12 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -27,17 +22,7 @@ import {
 } from '../core/models';
 import { NotifyService } from '../core/notify.service';
 import { PackageChartComponent } from '../shared/charts';
-import {
-  AgoPipe,
-  DayPipe,
-  IconComponent,
-  KpiComponent,
-  MeterComponent,
-  PriorityComponent,
-  StateComponent,
-  StatusChipComponent,
-  StatusLabelPipe,
-} from '../shared/ui';
+import { AgoPipe, MeterComponent, StateComponent, StatItem, StatsComponent, StatusChipComponent, StatusLabelPipe } from '../shared/ui';
 import { ActivityFeedComponent } from './activity-feed';
 import { WorkOrderDialogComponent } from './dialogs';
 
@@ -51,21 +36,13 @@ const COLUMNS: WorkOrderStatus[] = ['Open', 'InProgress', 'Blocked', 'Completed'
     ReactiveFormsModule,
     MatTabsModule,
     MatButtonModule,
-    MatButtonToggleModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatSlideToggleModule,
-    IconComponent,
-    KpiComponent,
     StateComponent,
+    StatsComponent,
     StatusChipComponent,
-    PriorityComponent,
     MeterComponent,
     PackageChartComponent,
     ActivityFeedComponent,
     StatusLabelPipe,
-    DayPipe,
     AgoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -89,6 +66,9 @@ export class ProjectDetailPage implements OnInit {
 
   protected readonly tab = signal(0);
   protected readonly view = signal<'board' | 'list'>('board');
+  protected readonly filtersOpen = signal(false);
+  /** Column shown on narrow screens, where the board shows one status at a time. */
+  protected readonly column = signal<WorkOrderStatus | null>(null);
   protected readonly columns = COLUMNS;
 
   // Board filters
@@ -106,16 +86,30 @@ export class ProjectDetailPage implements OnInit {
     const items = this.board.data()?.items ?? [];
     return COLUMNS.map((status) => ({ status, items: items.filter((w) => w.status === status) }));
   });
+  /** Selected column, defaulting to the first non-empty one. */
+  protected readonly activeColumn = computed<WorkOrderStatus>(
+    () => this.column() ?? this.byColumn().find((c) => c.items.length > 0)?.status ?? 'Open',
+  );
   protected readonly cancelled = computed(() => (this.board.data()?.items ?? []).filter((w) => w.status === 'Cancelled'));
   protected readonly filterCount = computed(
     () =>
-      [this.fStatus(), this.fPackage(), this.fAssignee(), this.fPriority(), this.fSearch()].filter(Boolean).length +
+      [this.fStatus(), this.fPackage(), this.fAssignee(), this.fPriority()].filter(Boolean).length +
       (this.fOverdue() ? 1 : 0) +
       (this.fMine() ? 1 : 0),
   );
   protected readonly nonMembers = computed(() => {
     const members = new Set((this.project.data()?.members ?? []).map((m) => m.userId));
     return (this.users.data() ?? []).filter((u) => !members.has(u.id));
+  });
+  protected readonly dashStats = computed<StatItem[]>(() => {
+    const k = this.dashboard.data()?.kpis;
+    if (!k) return [];
+    return [
+      { label: 'Complete', value: `${k.percentComplete}%`, hint: `${k.done} of ${k.total} work orders`, testId: 'dash-percent' },
+      { label: 'Overdue', value: k.overdue, tone: k.overdue ? 'critical' : 'neutral', testId: 'dash-overdue' },
+      { label: 'Blocked', value: k.blocked, hint: `${k.openBlockers} open blocker(s)` },
+      { label: 'Approval backlog', value: k.pendingApprovals, testId: 'dash-approvals' },
+    ];
   });
 
   protected readonly milestoneForm = this.fb.nonNullable.group({
@@ -242,10 +236,6 @@ export class ProjectDetailPage implements OnInit {
     } catch (err) {
       this.notify.error(err);
     }
-  }
-
-  protected severityIcon(s: string) {
-    return s === 'critical' ? 'error' : s === 'warning' ? 'warning' : 'info';
   }
 
   protected evidenceLink(e: { type: string; id: string }, blockers: ProjectDashboard['openBlockers']): unknown[] | null {

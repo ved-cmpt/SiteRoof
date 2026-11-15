@@ -1,192 +1,199 @@
 <div class="sr-page">
   @if (project.error(); as e) {
-    @if (forbidden(e)) {
-      <section class="denied" data-testid="forbidden-page" role="alert">
-        <span class="code sr-mono" aria-hidden="true">ERROR 403</span>
+    <div class="sr-panel pad denied" [attr.data-testid]="forbidden(e) ? 'forbidden-page' : notFound(e) ? 'not-found-page' : null" role="alert">
+      @if (forbidden(e)) {
         <h1>You don't have access to this project</h1>
-        <p>{{ e.detail }} Membership is checked by the server on every request, so changing the address doesn't help.</p>
-        <a routerLink="/app/projects" class="sr-btn primary">See your projects</a>
-      </section>
-    } @else if (notFound(e)) {
-      <section class="denied" data-testid="not-found-page">
-        <span class="code sr-mono" aria-hidden="true">ERROR 404</span>
+        <p class="sr-meta">{{ e.detail }} Access is checked by the server on every request.</p>
+      } @else if (notFound(e)) {
         <h1>Project not found</h1>
-        <p>It may belong to another workspace or no longer exist.</p>
-        <a routerLink="/app/projects" class="sr-btn primary">See your projects</a>
-      </section>
-    } @else {
-      <sr-state kind="error" [error]="e" (retry)="ngOnInit()" />
-    }
+        <p class="sr-meta">It may belong to another workspace or no longer exist.</p>
+      } @else {
+        <sr-state kind="error" [error]="e" (retry)="ngOnInit()" />
+      }
+      <a routerLink="/app/projects" class="sr-btn secondary">Back to projects</a>
+    </div>
   } @else if (!project.data()) {
-    <sr-state kind="loading" message="Loading project…" />
+    <div class="sr-panel"><sr-state kind="loading" /></div>
   } @else {
     @let p = project.data()!;
-    <nav class="crumbs" aria-label="Breadcrumb"><a routerLink="/app/projects">Projects</a> <sr-icon name="chevron_right" [size]="16" /> <span>{{ p.code }}</span></nav>
-    <header class="phead">
+    <header class="sr-head">
       <div>
-        <div class="sr-row">
-          <span class="code-tag">{{ p.code }}</span>
-          <span class="status" [attr.data-status]="p.status">{{ p.status === 'OnHold' ? 'On hold' : p.status }}</span>
-          @if (p.myRole) {
-            <span class="sr-muted small">You are the {{ p.myRole.toLowerCase() }} on this project</span>
-          }
-        </div>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a routerLink="/app/projects">Projects</a><span class="sep" aria-hidden="true">/</span><span class="sr-mono">{{ p.code }}</span>
+        </nav>
         <h1>{{ p.title }}</h1>
-        <p class="sr-muted meta">
-          <sr-icon name="location_on" [size]="16" /> {{ p.siteAddress }}, {{ p.city }}
-          <span aria-hidden="true">·</span> {{ p.clientName }}
-          <span aria-hidden="true">·</span> <span class="sr-mono">{{ p.startDate }} → {{ p.targetDate }}</span>
-        </p>
+        <div class="meta">
+          <span>{{ p.status === 'OnHold' ? 'On hold' : p.status }}</span>
+          <span class="sr-mono">{{ p.startDate }} → {{ p.targetDate }}</span>
+          <span>{{ p.siteAddress }}, {{ p.city }}</span>
+          <span class="hide-sm">{{ p.clientName }}</span>
+        </div>
       </div>
       @if (p.permissions.canSupervise && p.status !== 'Completed') {
-        <button mat-flat-button (click)="newWorkOrder()" data-testid="new-work-order"><sr-icon name="add" [size]="18" /> New work order</button>
+        <div class="actions">
+          <button mat-flat-button (click)="newWorkOrder()" data-testid="new-work-order">New work order</button>
+        </div>
       }
     </header>
 
-    <mat-tab-group [selectedIndex]="tab()" (selectedIndexChange)="onTab($event)" animationDuration="0ms" mat-stretch-tabs="false">
-      <!-- ============================================================ BOARD -->
+    <mat-tab-group [selectedIndex]="tab()" (selectedIndexChange)="onTab($event)" animationDuration="0ms" mat-stretch-tabs="false" class="tabs">
+      <!-- ============================================================ WORK ORDERS -->
       <mat-tab label="Work orders">
         <div class="tab">
-          <div class="filters" role="search" aria-label="Filter work orders">
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="f-search">
-              <mat-label>Search</mat-label>
-              <input matInput [ngModel]="fSearch()" (ngModelChange)="fSearch.set($event)" (keyup.enter)="loadBoard()" placeholder="Title or number" />
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Status</mat-label>
-              <mat-select [ngModel]="fStatus()" (ngModelChange)="fStatus.set($event); loadBoard()">
-                <mat-option value="">Any</mat-option>
-                @for (s of statuses; track s) {
-                  <mat-option [value]="s">{{ s | statusLabel }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Work package</mat-label>
-              <mat-select [ngModel]="fPackage()" (ngModelChange)="fPackage.set($event); loadBoard()">
-                <mat-option value="">Any</mat-option>
-                @for (pk of packages(); track pk) {
-                  <mat-option [value]="pk">{{ pk }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Assignee</mat-label>
-              <mat-select [ngModel]="fAssignee()" (ngModelChange)="fAssignee.set($event); loadBoard()">
-                <mat-option value="">Anyone</mat-option>
-                @for (m of p.members; track m.userId) {
-                  <mat-option [value]="m.userId">{{ m.displayName }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Priority</mat-label>
-              <mat-select [ngModel]="fPriority()" (ngModelChange)="fPriority.set($event); loadBoard()">
-                <mat-option value="">Any</mat-option>
-                @for (pr of priorities; track pr) {
-                  <mat-option [value]="pr">{{ pr }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <mat-slide-toggle [checked]="fOverdue()" (change)="fOverdue.set($event.checked); loadBoard()" data-testid="filter-overdue">Overdue only</mat-slide-toggle>
-            <mat-slide-toggle [checked]="fMine()" (change)="fMine.set($event.checked); loadBoard()">Assigned to me</mat-slide-toggle>
+          <div class="sr-toolbar" role="search" aria-label="Filter work orders">
+            <label class="sr-field search">
+              <span class="sr-only">Search work orders</span>
+              <input type="search" placeholder="Search title or number" [ngModel]="fSearch()" (ngModelChange)="fSearch.set($event)" (keyup.enter)="loadBoard()" />
+            </label>
+            <button type="button" class="filters-btn" (click)="filtersOpen.set(!filtersOpen())" [attr.aria-expanded]="filtersOpen()" aria-controls="wo-filters">
+              Filters@if (filterCount() > 0) { <span class="sr-mono"> · {{ filterCount() }}</span> }
+            </button>
+            <div class="filters" id="wo-filters" [class.open]="filtersOpen()">
+              <label class="sr-field">
+                <span class="lbl">Status</span>
+                <select [ngModel]="fStatus()" (ngModelChange)="fStatus.set($event); loadBoard()">
+                  <option value="">Any</option>
+                  @for (s of statuses; track s) {
+                    <option [value]="s">{{ s | statusLabel }}</option>
+                  }
+                </select>
+              </label>
+              <label class="sr-field">
+                <span class="lbl">Package</span>
+                <select [ngModel]="fPackage()" (ngModelChange)="fPackage.set($event); loadBoard()">
+                  <option value="">Any</option>
+                  @for (pk of packages(); track pk) {
+                    <option [value]="pk">{{ pk }}</option>
+                  }
+                </select>
+              </label>
+              <label class="sr-field">
+                <span class="lbl">Assignee</span>
+                <select [ngModel]="fAssignee()" (ngModelChange)="fAssignee.set($event); loadBoard()">
+                  <option value="">Anyone</option>
+                  @for (m of p.members; track m.userId) {
+                    <option [value]="m.userId">{{ m.displayName }}</option>
+                  }
+                </select>
+              </label>
+              <label class="sr-field">
+                <span class="lbl">Priority</span>
+                <select [ngModel]="fPriority()" (ngModelChange)="fPriority.set($event); loadBoard()">
+                  <option value="">Any</option>
+                  @for (pr of priorities; track pr) {
+                    <option [value]="pr">{{ pr }}</option>
+                  }
+                </select>
+              </label>
+              <label class="sr-check">
+                <input type="checkbox" role="switch" [checked]="fOverdue()" (change)="fOverdue.set($any($event.target).checked); loadBoard()" data-testid="filter-overdue" />
+                Overdue only
+              </label>
+              <label class="sr-check">
+                <input type="checkbox" role="switch" [checked]="fMine()" (change)="fMine.set($any($event.target).checked); loadBoard()" />
+                Assigned to me
+              </label>
+              @if (filterCount() > 0) {
+                <button type="button" class="sr-link-btn clear" (click)="clearFilters()">Clear filters</button>
+              }
+            </div>
             <span class="sr-spacer"></span>
-            @if (filterCount() > 0) {
-              <button mat-button (click)="clearFilters()">Clear filters ({{ filterCount() }})</button>
-            }
-            <mat-button-toggle-group [value]="view()" (change)="view.set($event.value)" aria-label="Layout" hideSingleSelectionIndicator>
-              <mat-button-toggle value="board">Board</mat-button-toggle>
-              <mat-button-toggle value="list">List</mat-button-toggle>
-            </mat-button-toggle-group>
+            <div class="sr-seg view" role="group" aria-label="Layout">
+              <button type="button" [attr.aria-pressed]="view() === 'board'" (click)="view.set('board')">Board</button>
+              <button type="button" [attr.aria-pressed]="view() === 'list'" (click)="view.set('list')">List</button>
+            </div>
           </div>
 
           @if (board.error(); as e) {
-            <sr-state kind="error" [error]="e" (retry)="loadBoard()" />
+            <div class="sr-panel"><sr-state kind="error" [error]="e" (retry)="loadBoard()" /></div>
           } @else if (!board.data()) {
-            <sr-state kind="loading" message="Loading work orders…" />
+            <div class="sr-panel"><sr-state kind="loading" /></div>
           } @else if (board.data()!.items.length === 0) {
-            <sr-state title="No work orders match these filters" message="Clear the filters to see the whole board.">
-              <button mat-stroked-button (click)="clearFilters()">Clear filters</button>
-            </sr-state>
+            <div class="sr-panel">
+              <sr-state title="No work orders match these filters">
+                <button type="button" class="sr-btn secondary" (click)="clearFilters()">Clear filters</button>
+              </sr-state>
+            </div>
           } @else if (view() === 'board') {
+            <!-- On narrow screens the board shows one status column at a time. -->
+            <div class="sr-seg col-picker" role="tablist" aria-label="Status column">
+              @for (col of byColumn(); track col.status) {
+                <button type="button" role="tab" [attr.aria-selected]="activeColumn() === col.status" (click)="column.set(col.status)">
+                  {{ col.status | statusLabel }} <span class="sr-mono">{{ col.items.length }}</span>
+                </button>
+              }
+            </div>
             <div class="board" [attr.aria-busy]="board.loading()">
               @for (col of byColumn(); track col.status) {
-                <section class="col" [attr.aria-label]="(col.status | statusLabel) + ' work orders'" [attr.data-status]="col.status">
-                  <h2><sr-status [status]="col.status" /> <span class="sr-mono n">{{ col.items.length }}</span></h2>
+                <section class="col" [class.sel]="activeColumn() === col.status" [attr.aria-label]="(col.status | statusLabel) + ' work orders'">
+                  <h2><sr-status [status]="col.status" /><span class="sr-mono n">{{ col.items.length }}</span></h2>
                   <ul>
                     @for (w of col.items; track w.id) {
                       <li>
                         <a class="card" [routerLink]="['/app/work-orders', w.id]" [class.late]="w.isOverdue" [attr.data-testid]="'wo-' + w.key">
-                          <div class="card-top">
-                            <span class="key">{{ w.key }}</span>
-                            <sr-priority [priority]="w.priority" />
-                          </div>
-                          <strong>{{ w.title }}</strong>
-                          <span class="pkg">{{ w.workPackage }}</span>
+                          <span class="top">
+                            <span class="sr-mono key">{{ w.key }}</span>
+                            @if (w.priority === 'Critical' || w.priority === 'High') {
+                              <span class="prio" [class.crit]="w.priority === 'Critical'">{{ w.priority }}</span>
+                            }
+                          </span>
+                          <span class="title">{{ w.title }}</span>
+                          <span class="meta">{{ w.workPackage }} · {{ w.assignee?.displayName || 'Unassigned' }}</span>
+                          <span class="meta">
+                            <span class="sr-mono" [class.late-text]="w.isOverdue">{{ w.dueDate }}@if (w.isOverdue) { overdue }</span>
+                            @if (w.openBlockers > 0) {
+                              <span class="blocker"> · {{ w.openBlockers }} blocker</span>
+                            }
+                            @if (w.pendingMaterialRequests > 0) {
+                              <span> · {{ w.pendingMaterialRequests }} approval pending</span>
+                            }
+                          </span>
                           @if (w.plannedQuantity > 0 && w.status !== 'Closed') {
                             <sr-meter [value]="w.percentComplete" [label]="w.key + ' progress'" [tone]="w.status === 'Blocked' ? 'critical' : 'info'" />
-                          }
-                          <div class="card-foot">
-                            <span [class.overdue]="w.isOverdue">
-                              <span class="sr-mono">{{ w.dueDate }}</span>@if (w.isOverdue) { · overdue }
-                            </span>
-                            <span>{{ w.assignee?.displayName || 'Unassigned' }}</span>
-                          </div>
-                          @if (w.openBlockers > 0 || w.pendingMaterialRequests > 0) {
-                            <div class="flags">
-                              @if (w.openBlockers > 0) {
-                                <span class="flag bad"><sr-icon name="block" [size]="14" /> {{ w.openBlockers }} blocker</span>
-                              }
-                              @if (w.pendingMaterialRequests > 0) {
-                                <span class="flag warn"><sr-icon name="inventory_2" [size]="14" /> {{ w.pendingMaterialRequests }} awaiting approval</span>
-                              }
-                            </div>
                           }
                         </a>
                       </li>
                     } @empty {
-                      <li class="empty">None</li>
+                      <li class="empty sr-meta">No work orders</li>
                     }
                   </ul>
                 </section>
               }
             </div>
             @if (cancelled().length > 0) {
-              <p class="sr-muted small">{{ cancelled().length }} cancelled work order(s) hidden from the board; use List view or the status filter.</p>
+              <p class="sr-meta">{{ cancelled().length }} cancelled work order(s) are hidden from the board. Use List to see them.</p>
             }
           } @else {
-            <div class="sr-card flush">
-              <div class="sr-table-wrap">
-                <table class="sr-table">
-                  <caption class="sr-only">Work orders</caption>
-                  <thead>
+            <div class="sr-panel">
+              <table class="sr-dt">
+                <caption class="sr-only">Work orders</caption>
+                <thead>
+                  <tr>
+                    <th scope="col"><button type="button" class="sort" (click)="sort.set('number'); loadBoard()">ID</button></th>
+                    <th scope="col">Work order</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="m-hide"><button type="button" class="sort" (click)="sort.set('priority'); loadBoard()">Priority</button></th>
+                    <th scope="col"><button type="button" class="sort" (click)="sort.set('due'); loadBoard()">Due</button></th>
+                    <th scope="col">Assignee</th>
+                    <th scope="col" class="m-hide">Package</th>
+                    <th scope="col" class="num">Done</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (w of board.data()!.items; track w.id) {
                     <tr>
-                      <th scope="col"><button class="sort" (click)="sort.set('number'); loadBoard()">#</button></th>
-                      <th scope="col">Title</th>
-                      <th scope="col">Package</th>
-                      <th scope="col">Status</th>
-                      <th scope="col"><button class="sort" (click)="sort.set('priority'); loadBoard()">Priority</button></th>
-                      <th scope="col"><button class="sort" (click)="sort.set('due'); loadBoard()">Due</button></th>
-                      <th scope="col">Assignee</th>
-                      <th scope="col">Progress</th>
+                      <td class="c-id">{{ w.key }}</td>
+                      <td class="c-title"><a [routerLink]="['/app/work-orders', w.id]">{{ w.title }}</a></td>
+                      <td class="c-status"><sr-status [status]="w.status" /></td>
+                      <td class="m-hide">{{ w.priority }}</td>
+                      <td class="c-date" [class.late]="w.isOverdue">{{ w.dueDate }}@if (w.isOverdue) { overdue }</td>
+                      <td>{{ w.assignee?.displayName || '—' }}</td>
+                      <td class="m-hide">{{ w.workPackage }}</td>
+                      <td class="num">{{ w.percentComplete }}%</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    @for (w of board.data()!.items; track w.id) {
-                      <tr>
-                        <td class="nowrap sr-mono">{{ w.key }}</td>
-                        <td><a [routerLink]="['/app/work-orders', w.id]">{{ w.title }}</a></td>
-                        <td>{{ w.workPackage }}</td>
-                        <td><sr-status [status]="w.status" /></td>
-                        <td><sr-priority [priority]="w.priority" /></td>
-                        <td class="nowrap sr-mono" [class.overdue]="w.isOverdue">{{ w.dueDate }}@if (w.isOverdue) { · overdue }</td>
-                        <td>{{ w.assignee?.displayName || '—' }}</td>
-                        <td class="sr-num">{{ w.percentComplete }}%</td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
+                  }
+                </tbody>
+              </table>
             </div>
           }
         </div>
@@ -196,37 +203,34 @@
       <mat-tab label="Dashboard">
         <div class="tab">
           @if (dashboard.error(); as e) {
-            <sr-state kind="error" [error]="e" (retry)="loadDashboard()" />
+            <div class="sr-panel"><sr-state kind="error" [error]="e" (retry)="loadDashboard()" /></div>
           } @else if (!dashboard.data()) {
-            <sr-state kind="loading" />
+            <div class="sr-panel"><sr-state kind="loading" /></div>
           } @else {
             @let d = dashboard.data()!;
-            <section class="kpis" aria-label="Project key figures">
-              <sr-kpi label="Complete" [value]="d.kpis.percentComplete + '%'" icon="trending_up" tone="info" [hint]="d.kpis.done + ' of ' + d.kpis.total + ' work orders done'" testId="dash-percent" />
-              <sr-kpi label="Overdue" [value]="d.kpis.overdue" icon="schedule" [tone]="d.kpis.overdue ? 'critical' : 'good'" testId="dash-overdue" />
-              <sr-kpi label="Blocked" [value]="d.kpis.blocked" icon="block" [tone]="d.kpis.blocked ? 'critical' : 'good'" [hint]="d.kpis.openBlockers + ' open blocker(s)'" />
-              <sr-kpi label="Approval backlog" [value]="d.kpis.pendingApprovals" icon="fact_check" [tone]="d.kpis.pendingApprovals ? 'warning' : 'good'" testId="dash-approvals" />
-              <sr-kpi label="Days to target" [value]="d.kpis.daysToTarget" icon="flag" [tone]="d.kpis.daysToTarget < 0 ? 'critical' : 'neutral'" [hint]="'Target ' + (d.targetDate | day: 'long')" />
+            <section class="sr-section" aria-label="Project figures">
+              <sr-stats [items]="dashStats()" />
             </section>
 
-            <div class="dash">
-              <section class="sr-card summary-card" aria-labelledby="sum-title">
-                <div class="sr-card-title">
-                  <h2 id="sum-title">Open blockers</h2>
-                  @if (summary.data(); as s) {
-                    <span class="rules-label" data-testid="summary-label"><sr-icon name="rule" [size]="16" /> {{ s.label }}</span>
-                  }
-                </div>
+            <section class="sr-section" aria-labelledby="sum-title">
+              <header>
+                <h2 id="sum-title">Open blockers</h2>
+                @if (summary.data(); as s) {
+                  <span class="aside" data-testid="summary-label">{{ s.label }}</span>
+                }
+              </header>
+              <div class="sr-panel">
                 @if (summary.data(); as s) {
                   <p class="headline">{{ s.headline }}</p>
                   @if (s.points.length > 0) {
-                    <ul class="points">
+                    <ul class="sr-list points">
                       @for (pt of s.points; track $index) {
-                        <li [attr.data-severity]="pt.severity">
-                          <sr-icon [name]="severityIcon(pt.severity)" [size]="18" [label]="pt.severity" />
+                        <li>
+                          <span class="sev" [attr.data-severity]="pt.severity" aria-hidden="true"></span>
                           <div>
-                            <p>{{ pt.text }}</p>
-                            <p class="evidence">
+                            <span class="sr-only">{{ pt.severity }}: </span>
+                            <span>{{ pt.text }}</span>
+                            <p class="sr-meta evidence">
                               Evidence:
                               @for (ev of pt.evidence; track ev.id; let last = $last) {
                                 @if (evidenceLink(ev, d.openBlockers); as link) {
@@ -245,78 +249,96 @@
                     </ul>
                   }
                   @if (s.suggestedActions.length > 0) {
-                    <h3>Suggested next steps</h3>
-                    <ul class="actions">
-                      @for (a of s.suggestedActions; track a) {
-                        <li>{{ a }}</li>
-                      }
-                    </ul>
+                    <div class="next">
+                      <h3>Suggested next steps</h3>
+                      <ul>
+                        @for (a of s.suggestedActions; track a) {
+                          <li>{{ a }}</li>
+                        }
+                      </ul>
+                    </div>
                   }
-                  <p class="disclaimer">{{ s.disclaimer }}</p>
+                  <p class="sr-meta disclaimer">{{ s.disclaimer }}</p>
                 } @else if (summary.error(); as e) {
                   <sr-state kind="error" [error]="e" (retry)="loadDashboard()" />
                 } @else {
                   <sr-state kind="loading" />
                 }
-              </section>
+              </div>
+            </section>
 
-              <section class="sr-card" aria-labelledby="pkg-title">
-                <div class="sr-card-title"><h2 id="pkg-title">Completion by work package</h2></div>
-                @if (d.workPackages.length === 0) {
-                  <sr-state title="No work packages yet" />
-                } @else {
-                  <sr-package-chart [packages]="d.workPackages" />
-                }
-              </section>
-
-              <section class="sr-card" aria-labelledby="od-title">
-                <div class="sr-card-title"><h2 id="od-title">Overdue work</h2><span class="sr-mono badge">{{ d.kpis.overdue }}</span></div>
-                @if (d.overdueWork.length === 0) {
-                  <sr-state title="Nothing is overdue" />
-                } @else {
-                  <ul class="list">
-                    @for (w of d.overdueWork; track w.id) {
-                      <li>
-                        <a [routerLink]="['/app/work-orders', w.id]"><span class="sr-mono">{{ w.key }}</span> {{ w.title }}</a>
-                        <span class="sr-row"><sr-status [status]="w.status" /> <span class="overdue small sr-mono">due {{ w.dueDate }}</span></span>
-                      </li>
-                    }
-                  </ul>
-                }
-              </section>
-
-              <section class="sr-card" aria-labelledby="ab-title">
-                <div class="sr-card-title">
-                  <h2 id="ab-title">Approval backlog</h2>
-                  <a routerLink="/app/approvals" class="small">Open approvals</a>
-                </div>
-                @if (d.approvalBacklog.length === 0) {
-                  <sr-state title="No pending material requests" />
-                } @else {
-                  <ul class="list">
-                    @for (m of d.approvalBacklog; track m.id) {
-                      <li>
-                        <span><span class="sr-mono">{{ m.quantity }} {{ m.unit }}</span> {{ m.itemName }}</span>
-                        <span class="sr-muted small"><span class="sr-mono">{{ m.workOrderKey }}</span> · {{ m.requestedBy }} · waiting {{ m.ageDays }} day(s)</span>
-                      </li>
-                    }
-                  </ul>
-                }
-              </section>
-
-              <section class="sr-card" aria-labelledby="ra-title">
-                <div class="sr-card-title"><h2 id="ra-title">Recent activity</h2></div>
-                <ul class="list">
-                  @for (a of d.recentActivity; track a.id) {
-                    <li>
-                      <span><strong>{{ a.actorName }}</strong> {{ a.summary }}</span>
-                      <span class="sr-muted small">{{ a.createdAt | ago }}</span>
-                    </li>
+            <div class="two">
+              <section class="sr-section" aria-labelledby="od-title">
+                <header><h2 id="od-title">Overdue work</h2><span class="aside sr-mono">{{ d.kpis.overdue }}</span></header>
+                <div class="sr-panel">
+                  @if (d.overdueWork.length === 0) {
+                    <sr-state title="Nothing is overdue" />
+                  } @else {
+                    <table class="sr-dt">
+                      <thead><tr><th scope="col">ID</th><th scope="col">Work order</th><th scope="col">Status</th><th scope="col">Due</th></tr></thead>
+                      <tbody>
+                        @for (w of d.overdueWork; track w.id) {
+                          <tr>
+                            <td class="c-id">{{ w.key }}</td>
+                            <td class="c-title"><a [routerLink]="['/app/work-orders', w.id]">{{ w.title }}</a></td>
+                            <td class="c-status"><sr-status [status]="w.status" /></td>
+                            <td class="c-date late">{{ w.dueDate }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
                   }
-                </ul>
+                </div>
+              </section>
+
+              <section class="sr-section" aria-labelledby="pkg-title">
+                <header><h2 id="pkg-title">Completion by work package</h2></header>
+                <div class="sr-panel pad">
+                  @if (d.workPackages.length === 0) {
+                    <sr-state title="No work packages yet" />
+                  } @else {
+                    <sr-package-chart [packages]="d.workPackages" />
+                  }
+                </div>
+              </section>
+
+              <section class="sr-section" aria-labelledby="ab-title">
+                <header><h2 id="ab-title">Approval backlog</h2><a routerLink="/app/approvals" class="aside">Approvals</a></header>
+                <div class="sr-panel">
+                  @if (d.approvalBacklog.length === 0) {
+                    <sr-state title="No pending material requests" />
+                  } @else {
+                    <table class="sr-dt">
+                      <thead><tr><th scope="col">Item</th><th scope="col">Work order</th><th scope="col" class="num">Qty</th><th scope="col" class="num">Waiting</th></tr></thead>
+                      <tbody>
+                        @for (m of d.approvalBacklog; track m.id) {
+                          <tr>
+                            <td class="c-title"><a [routerLink]="['/app/work-orders', m.workOrderId]">{{ m.itemName }}</a></td>
+                            <td class="c-id">{{ m.workOrderKey }}</td>
+                            <td class="num">{{ m.quantity }} {{ m.unit }}</td>
+                            <td class="num m-label" data-label="Waiting">{{ m.ageDays }} d</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  }
+                </div>
+              </section>
+
+              <section class="sr-section" aria-labelledby="ra-title">
+                <header><h2 id="ra-title">Recent activity</h2></header>
+                <div class="sr-panel">
+                  <ul class="sr-list">
+                    @for (a of d.recentActivity; track a.id) {
+                      <li>
+                        <span>{{ a.summary }}</span>
+                        <span class="sr-meta"> · {{ a.actorName }} · {{ a.createdAt | ago }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
               </section>
             </div>
-            <p class="sr-muted small">Calculated from the database {{ d.generatedAt | ago }} (SQL views vw_ProjectWorkOrderRollup and vw_WorkPackageCompletion).</p>
           }
         </div>
       </mat-tab>
@@ -324,20 +346,20 @@
       <!-- ============================================================ MILESTONES & TEAM -->
       <mat-tab label="Milestones & team">
         <div class="tab two">
-          <section class="sr-card" aria-labelledby="ms-title">
-            <div class="sr-card-title"><h2 id="ms-title">Milestones</h2></div>
-            <div class="sr-table-wrap">
-              <table class="sr-table">
-                <thead><tr><th scope="col">Milestone</th><th scope="col">Due</th><th scope="col">Work</th><th scope="col">Status</th></tr></thead>
+          <section class="sr-section" aria-labelledby="ms-title">
+            <header><h2 id="ms-title">Milestones</h2></header>
+            <div class="sr-panel">
+              <table class="sr-dt">
+                <thead><tr><th scope="col">Milestone</th><th scope="col">Due</th><th scope="col" class="num">Done</th><th scope="col">Status</th></tr></thead>
                 <tbody>
                   @for (m of p.milestones; track m.id) {
                     <tr>
-                      <td>{{ m.name }}</td>
-                      <td class="nowrap sr-mono" [class.overdue]="m.isOverdue">{{ m.dueDate }}@if (m.isOverdue) { · overdue }</td>
-                      <td class="sr-num nowrap">{{ m.doneWorkOrderCount }}/{{ m.workOrderCount }} done</td>
-                      <td>
+                      <td class="c-title">{{ m.name }}</td>
+                      <td class="c-date" [class.late]="m.isOverdue">{{ m.dueDate }}@if (m.isOverdue) { overdue }</td>
+                      <td class="num m-label" data-label="Done">{{ m.doneWorkOrderCount }}/{{ m.workOrderCount }}</td>
+                      <td class="c-status">
                         @if (p.permissions.canManage) {
-                          <select class="native" [value]="m.status" (change)="setMilestoneStatus(m.id, $any($event.target).value)" [attr.aria-label]="'Status of ' + m.name">
+                          <select class="inline-select" [value]="m.status" (change)="setMilestoneStatus(m.id, $any($event.target).value)" [attr.aria-label]="'Status of ' + m.name">
                             @for (s of milestoneStatuses; track s) {
                               <option [value]="s">{{ s === 'InProgress' ? 'In progress' : s }}</option>
                             }
@@ -352,62 +374,55 @@
                   }
                 </tbody>
               </table>
+              @if (p.permissions.canManage) {
+                <form class="inline-form" [formGroup]="milestoneForm" (ngSubmit)="addMilestone()">
+                  <label class="sr-field grow"><span class="sr-only">Milestone name</span><input formControlName="name" maxlength="160" placeholder="New milestone" /></label>
+                  <label class="sr-field"><span class="sr-only">Due date</span><input type="date" formControlName="dueDate" /></label>
+                  <button mat-stroked-button type="submit">Add</button>
+                </form>
+              }
             </div>
-            @if (p.permissions.canManage) {
-              <form class="inline-form" [formGroup]="milestoneForm" (ngSubmit)="addMilestone()">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>New milestone</mat-label>
-                  <input matInput formControlName="name" maxlength="160" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Due date</mat-label>
-                  <input matInput type="date" formControlName="dueDate" />
-                </mat-form-field>
-                <button mat-stroked-button type="submit">Add</button>
-              </form>
-            }
           </section>
 
-          <section class="sr-card" aria-labelledby="team-title">
-            <div class="sr-card-title"><h2 id="team-title">Crew roster</h2></div>
-            <ul class="roster">
-              @for (m of p.members; track m.userId) {
-                <li>
-                  <span class="avatar sr-mono" aria-hidden="true">{{ m.displayName.charAt(0) }}</span>
-                  <div>
-                    <strong>{{ m.displayName }}</strong>
-                    <span class="sr-muted small">{{ m.jobTitle }} · {{ m.trade }}</span>
-                  </div>
-                  <span class="role">{{ m.role }}</span>
-                  <span class="sr-muted small nowrap">{{ m.openAssignments }} open</span>
-                </li>
+          <section class="sr-section" aria-labelledby="team-title">
+            <header><h2 id="team-title">Team</h2><span class="aside sr-mono">{{ p.members.length }}</span></header>
+            <div class="sr-panel">
+              <table class="sr-dt">
+                <thead><tr><th scope="col">Name</th><th scope="col">Role</th><th scope="col">Trade</th><th scope="col" class="num">Open</th></tr></thead>
+                <tbody>
+                  @for (m of p.members; track m.userId) {
+                    <tr>
+                      <td class="c-title">{{ m.displayName }}</td>
+                      <td class="c-status">{{ m.role }}</td>
+                      <td>{{ m.trade }}</td>
+                      <td class="num m-label" data-label="Open">{{ m.openAssignments }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              @if (p.permissions.canManage && nonMembers().length > 0) {
+                <form class="inline-form" [formGroup]="memberForm" (ngSubmit)="addMember()">
+                  <label class="sr-field grow">
+                    <span class="sr-only">Person</span>
+                    <select formControlName="userId">
+                      <option value="">Add a person…</option>
+                      @for (u of nonMembers(); track u.id) {
+                        <option [value]="u.id">{{ u.displayName }} · {{ u.jobTitle }}</option>
+                      }
+                    </select>
+                  </label>
+                  <label class="sr-field">
+                    <span class="sr-only">Role</span>
+                    <select formControlName="role">
+                      <option value="Crew">Crew</option>
+                      <option value="Supervisor">Supervisor</option>
+                      <option value="Manager">Manager</option>
+                    </select>
+                  </label>
+                  <button mat-stroked-button type="submit">Add</button>
+                </form>
               }
-            </ul>
-            @if (p.permissions.canManage && nonMembers().length > 0) {
-              <form class="inline-form" [formGroup]="memberForm" (ngSubmit)="addMember()">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Add person</mat-label>
-                  <mat-select formControlName="userId">
-                    @for (u of nonMembers(); track u.id) {
-                      <mat-option [value]="u.id">{{ u.displayName }} · {{ u.jobTitle }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Role</mat-label>
-                  <mat-select formControlName="role">
-                    <mat-option value="Crew">Crew</mat-option>
-                    <mat-option value="Supervisor">Supervisor</mat-option>
-                    <mat-option value="Manager">Manager</mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Trade</mat-label>
-                  <input matInput formControlName="trade" maxlength="60" />
-                </mat-form-field>
-                <button mat-stroked-button type="submit">Add</button>
-              </form>
-            }
+            </div>
           </section>
         </div>
       </mat-tab>
@@ -415,7 +430,7 @@
       <!-- ============================================================ ACTIVITY -->
       <mat-tab label="Activity">
         <ng-template matTabContent>
-          <div class="tab sr-card">
+          <div class="tab">
             <sr-activity-feed [projectId]="p.id" [showProject]="false" />
           </div>
         </ng-template>
