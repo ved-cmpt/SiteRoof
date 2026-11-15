@@ -5,36 +5,20 @@
   height: 100dvh;
 }
 
-// ---------------------------------------------------------------- top bar
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: var(--sr-s2);
-  height: 48px;
-  padding: 0 var(--sr-s4);
-  background: var(--sr-surface);
-  border-bottom: 1px solid var(--sr-line);
-  z-index: 3;
-
-  &.compact {
-    height: 52px;
-    padding: 0 var(--sr-s2);
-  }
+// Sidebar controls use a thin neutral focus ring (keyboard only), never an accent box.
+.side a:focus-visible,
+.side button:focus-visible,
+.mbar :focus-visible {
+  box-shadow: none;
+  outline: 2px solid var(--sr-ink-3);
+  outline-offset: -2px;
+  border-radius: var(--sr-radius);
 }
 
 .brand {
+  display: inline-flex;
   text-decoration: none;
-  padding: 0 var(--sr-s1);
-}
-
-.workspace {
-  font-size: var(--sr-app-small);
-  color: var(--sr-ink-3);
-  padding-left: var(--sr-s3);
-  border-left: 1px solid var(--sr-line);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  border-radius: var(--sr-radius);
 }
 
 .icon-btn {
@@ -53,107 +37,255 @@
   }
 }
 
-.switcher {
-  display: inline-flex;
+// ---------------------------------------------------------------- phone bar
+.mbar {
+  display: flex;
   align-items: center;
-  gap: var(--sr-s1);
-  height: 32px;
+  gap: var(--sr-s2);
+  height: 52px;
   padding: 0 var(--sr-s2);
-  border: 1px solid var(--sr-line);
-  border-radius: var(--sr-radius);
+  background: var(--sr-surface);
+  border-bottom: 1px solid var(--sr-line);
+  z-index: 3;
+}
+
+// ---------------------------------------------------------------- layout and canvas
+.layout {
+  flex: 1 1 auto;
+  background: var(--sr-bg);
+}
+
+// Same faint drawing grid as the landing page, behind the white panels.
+.canvas {
+  background-color: var(--sr-bg);
+  background-image:
+    linear-gradient(var(--sr-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sr-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.demo-note {
+  display: flex;
+  align-items: center;
+  gap: var(--sr-s2);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--sr-s3) var(--sr-s6) 0;
+  font-size: var(--sr-app-small);
   color: var(--sr-ink-3);
 
-  &:focus-within {
-    box-shadow: var(--sr-focus);
+  > span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  select {
-    appearance: none;
-    border: 0;
-    background: transparent;
-    font: inherit;
-    font-size: var(--sr-app-body);
-    color: var(--sr-ink);
-    max-width: 240px;
-    text-overflow: ellipsis;
-    cursor: pointer;
+  .sr-link-btn {
+    color: var(--sr-ink-2);
+  }
 
-    &:focus {
-      outline: none;
+  @media (max-width: 767px) {
+    padding: var(--sr-s3) var(--sr-s4) 0;
+  }
+}
+
+main {
+  outline: none;
+}
+
+// ---------------------------------------------------------------- sidebar
+.nav {
+  width: 248px;
+  background: var(--sr-surface);
+  border-right: 1px solid var(--sr-line);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--sr-s3) var(--sr-s2);
+  gap: var(--sr-s4);
+}
+
+.side-head {
+  display: grid;
+  gap: 2px;
+  padding: var(--sr-s1) var(--sr-s2) 0;
+
+  .brand {
+    justify-self: start;
+  }
+}
+
+.workspace {
+  font-size: var(--sr-app-small);
+  color: var(--sr-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 26px;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+}
+
+.side-nav a,
+.side-projects a,
+.row-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sr-s2);
+  width: 100%;
+  min-height: 32px;
+  padding: 0 var(--sr-s2);
+  border: 0;
+  border-radius: var(--sr-radius);
+  background: transparent;
+  color: var(--sr-ink-2);
+  font: inherit;
+  font-size: var(--sr-app-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--sr-fast) var(--sr-ease);
+
+  sr-icon {
+    color: var(--sr-ink-3);
+  }
+
+  &:hover {
+    background: var(--sr-subtle);
+    color: var(--sr-ink);
+  }
+
+  &.active {
+    background: var(--sr-subtle);
+    color: var(--sr-ink);
+    font-weight: 500;
+
+    sr-icon {
+      color: var(--sr-ink);
     }
   }
 }
 
-.tb-btn {
-  display: inline-flex;
+.side-projects {
+  h2 {
+    font-size: var(--sr-app-small);
+    font-weight: 500;
+    color: var(--sr-ink-3);
+    margin: 0 0 var(--sr-s1);
+    padding: 0 var(--sr-s2);
+  }
+
+  .code {
+    flex: none;
+    width: 28px;
+    font-family: var(--sr-font-mono);
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+  }
+
+  .name {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.side-foot {
+  margin-top: auto;
+  display: grid;
+  gap: var(--sr-s1);
+  padding-top: var(--sr-s2);
+  border-top: 1px solid var(--sr-line);
+
+  .count {
+    margin-left: auto;
+    font-family: var(--sr-font-mono);
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+  }
+
+  .row-btn[aria-expanded='true'] {
+    background: var(--sr-subtle);
+    color: var(--sr-ink);
+  }
+}
+
+.profile {
+  display: flex;
   align-items: center;
   gap: var(--sr-s2);
-  height: 32px;
-  padding: 0 var(--sr-s3);
-  background: var(--sr-surface);
-  border: 1px solid var(--sr-line);
-  color: var(--sr-ink);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--sr-s1) var(--sr-s2);
+  border: 0;
   border-radius: var(--sr-radius);
-  cursor: pointer;
+  background: transparent;
   font: inherit;
-  font-size: var(--sr-app-body);
+  text-align: left;
+  color: var(--sr-ink);
+  cursor: pointer;
 
   &:hover {
-    border-color: var(--sr-line-strong);
-  }
-
-  &[aria-expanded='true'] {
     background: var(--sr-subtle);
   }
-}
 
-.count {
-  font-size: var(--sr-app-small);
-  color: var(--sr-ink-3);
-}
-
-.persona {
-  padding: 0 var(--sr-s2) 0 var(--sr-s1);
-
-  .compact & {
-    height: 44px;
-    border-color: transparent;
+  > sr-icon {
+    margin-left: auto;
+    color: var(--sr-ink-3);
   }
 }
 
 .avatar {
   display: inline-grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  flex: none;
+  width: 28px;
+  height: 28px;
   border-radius: var(--sr-radius);
   background: var(--sr-ink);
   color: #fff;
+  font-family: var(--sr-font-mono);
   font-size: var(--sr-app-small);
 }
 
 .who {
-  white-space: nowrap;
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
+
+  .name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .role {
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+  }
 }
 
-// Menu content (rendered in the overlay)
-::ng-deep .sr-main-menu {
-  min-width: 260px !important;
-
-  .menu-who {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1.35;
-    opacity: 1 !important;
-    color: var(--sr-ink) !important;
-    border-bottom: 1px solid var(--sr-line);
-    min-height: 56px;
-  }
+// Profile menu (overlay)
+::ng-deep .sr-profile-menu {
+  min-width: 248px !important;
 
   .menu-label {
     min-height: 32px !important;
     opacity: 1 !important;
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3) !important;
   }
 
   .menu-persona {
@@ -162,117 +294,10 @@
     line-height: 1.3;
   }
 
-  .code {
-    color: var(--sr-ink-3);
-    margin-right: var(--sr-s1);
-  }
-}
-
-.demo-strip {
-  display: flex;
-  align-items: center;
-  gap: var(--sr-s3);
-  min-height: 32px;
-  padding: 0 var(--sr-s4);
-  background: var(--sr-bg);
-  border-bottom: 1px solid var(--sr-line);
-  color: var(--sr-ink-3);
-  font-size: var(--sr-app-small);
-
-  span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .sr-link-btn {
-    margin-left: auto;
-    color: var(--sr-ink);
-    min-height: 32px;
-  }
-}
-
-// ---------------------------------------------------------------- sidebar
-.layout {
-  flex: 1 1 auto;
-  background: var(--sr-bg);
-}
-
-.nav {
-  width: 208px;
-  background: var(--sr-surface);
-  border-right: 1px solid var(--sr-line);
-  display: flex;
-  flex-direction: column;
-
-  nav {
-    padding: var(--sr-s3) var(--sr-s2);
-  }
-
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 2px;
-  }
-
-  nav a {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: var(--sr-s3);
-    height: 36px;
-    padding: 0 var(--sr-s3);
-    border-radius: var(--sr-radius);
-    color: var(--sr-ink-2);
-    text-decoration: none;
-    font-size: var(--sr-app-body);
-    transition: background-color var(--sr-fast) var(--sr-ease);
-
-    sr-icon {
-      color: var(--sr-ink-3);
-    }
-
-    &:hover {
-      background: var(--sr-subtle);
-    }
-
-    &.active {
-      background: var(--sr-subtle);
-      color: var(--sr-ink);
-      font-weight: 500;
-
-      sr-icon {
-        color: var(--sr-ink);
-      }
-
-      &::before {
-        content: '';
-        position: absolute;
-        left: calc(-1 * var(--sr-s2));
-        top: var(--sr-s2);
-        bottom: var(--sr-s2);
-        width: 2px;
-        background: var(--sr-accent);
-      }
-    }
-  }
-}
-
-.nav-foot {
-  margin-top: auto;
-  padding: var(--sr-s3) var(--sr-s4);
-  border-top: 1px solid var(--sr-line);
-
-  a {
+  .muted {
+    font-size: var(--sr-app-small);
     color: var(--sr-ink-3);
   }
-}
-
-::ng-deep .nav .mat-drawer-inner-container {
-  display: flex;
-  flex-direction: column;
 }
 
 // ---------------------------------------------------------------- guide
@@ -298,6 +323,7 @@
   padding: 0;
   margin: var(--sr-s4) 0 0;
   border-top: 1px solid var(--sr-line);
+  display: block;
 
   li {
     display: grid;
@@ -350,14 +376,20 @@
   }
 }
 
-main {
-  outline: none;
-  min-height: 100%;
-}
-
+// ---------------------------------------------------------------- phones and tablets
 @media (max-width: 959px) {
-  .nav nav a {
-    height: 44px;
+  .nav {
+    width: min(300px, 86vw);
+  }
+
+  .side-nav a,
+  .side-projects a,
+  .row-btn {
+    min-height: 44px;
+  }
+
+  .profile {
+    min-height: 52px;
   }
 
   .guide {
@@ -366,11 +398,5 @@ main {
 
   .go {
     height: 44px;
-  }
-}
-
-@media (max-width: 639px) {
-  .hide-sm {
-    display: none;
   }
 }

@@ -63,12 +63,12 @@ export class ShellComponent implements OnInit {
   protected readonly guideOpen = signal(false);
   protected readonly switching = signal(false);
   protected readonly scenario = new Loader<Scenario>();
-  /** Projects for the top-bar switcher (only those the current persona can access). */
+  /** Projects listed in the sidebar (only those the current persona can access). */
   protected readonly projects = new Loader<ProjectSummary[]>();
   protected readonly currentProjectId = signal('');
 
   protected readonly nav: NavItem[] = [
-    { path: '/app/overview', label: 'Overview', icon: 'dashboard' },
+    { path: '/app/home', label: 'Home', icon: 'dashboard' },
     { path: '/app/projects', label: 'Projects', icon: 'apartment' },
     { path: '/app/approvals', label: 'Approvals', icon: 'fact_check' },
     { path: '/app/activity', label: 'Activity', icon: 'history' },
@@ -126,7 +126,7 @@ export class ShellComponent implements OnInit {
       const name = this.session.user()?.displayName;
       const url = target ?? this.router.url.split('?')[0];
       // Re-create the routed component so every view reloads with the new identity's permissions.
-      await this.router.navigateByUrl('/app/overview', { skipLocationChange: true });
+      await this.router.navigateByUrl('/app/home', { skipLocationChange: true });
       await this.router.navigateByUrl(url);
       if (!sameUser) this.notify.success(`You are now ${name}.`);
       this.scenario.load(this.api.scenario());
@@ -152,7 +152,7 @@ export class ShellComponent implements OnInit {
         try {
           await this.session.resetDemo();
           await this.router.navigateByUrl('/app', { skipLocationChange: true });
-          await this.router.navigateByUrl('/app/overview');
+          await this.router.navigateByUrl('/app/home');
           this.notify.success('Your demo workspace was reset.');
           this.scenario.load(this.api.scenario());
         } catch (err) {
