@@ -131,7 +131,7 @@ export class ProjectDialogComponent {
         } @else if (filtered().length === 0) {
           <sr-state [title]="search() ? 'No projects match “' + search() + '”' : 'No projects yet'" />
         } @else {
-          <table class="sr-dt">
+          <table class="sr-dt stack-md">
             <thead>
               <tr>
                 <th scope="col">Code</th>

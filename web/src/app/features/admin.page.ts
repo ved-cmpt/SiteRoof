@@ -74,7 +74,7 @@ import { ConfirmDialogComponent } from './dialogs';
         <section class="sr-section" aria-labelledby="users-title">
           <header><h2 id="users-title">People</h2><span class="aside sr-mono">{{ t.users.length }}</span></header>
           <div class="sr-panel">
-            <table class="sr-dt">
+            <table class="sr-dt stack-md">
               <thead><tr><th scope="col">Name</th><th scope="col">Title</th><th scope="col">Workspace roles</th><th scope="col" class="m-hide">Projects</th><th scope="col">Persona</th></tr></thead>
               <tbody>
                 @for (u of t.users; track u.id) {

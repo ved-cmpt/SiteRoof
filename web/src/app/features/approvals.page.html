@@ -28,7 +28,7 @@
       } @else if (requests.data()!.items.length === 0) {
         <sr-state [title]="filter() === 'Submitted' ? 'No requests waiting for approval' : 'No requests in this view'" />
       } @else {
-        <table class="sr-dt" data-testid="approval-list">
+        <table class="sr-dt stack-md" data-testid="approval-list">
           <thead>
             <tr>
               <th scope="col">Item</th>
