@@ -115,6 +115,10 @@
   align-items: start;
 }
 
+.pins {
+  position: relative;
+}
+
 .marker {
   position: absolute;
   transform: translate(-50%, -50%);

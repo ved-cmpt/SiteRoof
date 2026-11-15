@@ -45,6 +45,7 @@
 
       <div class="annotated">
         <figure class="shot callout-shot">
+          <div class="pins">
           <img
             src="screens/work-order.png"
             width="1440"
@@ -55,6 +56,7 @@
           @for (c of callouts; track c.n) {
             <span class="marker sr-mono" [style.left.%]="c.x" [style.top.%]="c.y" aria-hidden="true">{{ c.n }}</span>
           }
+          </div>
           <figcaption><span class="sr-mono">FIG. 2</span> Work order RBL-007 in the demo workspace.</figcaption>
         </figure>
         <ol class="legend">
