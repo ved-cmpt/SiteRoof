@@ -8,8 +8,8 @@ Specs in `specs/` drive the real app in Chromium against a real SQL Server:
 | `security.spec.ts` | Crew changing a project id in the URL gets 403; crew cannot approve via UI or API; 404 page; CSRF required |
 | `conflict.spec.ts` | Stale status change shows the 409 conflict banner and nothing is overwritten |
 | `work-order-lifecycle.spec.ts` | Supervisor creates and assigns work; crew completes it; dashboard and activity feed update |
-| `accessibility.spec.ts` | Skip link, single h1, landmarks, image alt text, mobile menu, labelled diagrams |
-| `screenshots.spec.ts` | Captures README/landing screenshots (separate `screenshots` project) |
+| `accessibility.spec.ts` | Skip link, single h1, landmarks, image alt text, mobile menu, labelled diagrams, top-bar project switcher |
+| `screenshots.spec.ts` | Captures README screenshots and the landing-page figures in `web/public/screens` (separate `screenshots` project) |
 
 ```powershell
 docker compose up -d db                 # SQL Server on 127.0.0.1:1434 (needs ../../.env)

@@ -24,7 +24,7 @@ test('capture product screenshots', async ({ page }) => {
   await page.screenshot({ path: `${landing}/overview.png` });
   await page.screenshot({ path: `${out}/overview.png` });
 
-  await page.getByRole('link', { name: /RBL · Riverbend/ }).first().click();
+  await page.getByRole('link', { name: /Riverbend Library Renovation/ }).first().click();
   await expect(page.getByTestId('wo-RBL-007')).toBeVisible();
   await page.screenshot({ path: `${out}/project-board.png` });
 
@@ -35,10 +35,13 @@ test('capture product screenshots', async ({ page }) => {
   await page.getByRole('tab', { name: 'Work orders' }).click();
   await page.getByTestId('wo-RBL-007').click();
   await expect(page.getByTestId('progress-history')).toBeVisible();
+  await page.screenshot({ path: `${landing}/work-order.png` });
   await page.screenshot({ path: `${out}/work-order.png`, fullPage: true });
 
   await page.goto('/app/approvals');
   await expect(page.getByTestId('approval-list')).toBeVisible();
+  await expect(page.getByTestId('integration-panel')).toContainText('Recent transmissions');
+  await page.screenshot({ path: `${landing}/approvals.png` });
   await page.screenshot({ path: `${out}/approvals.png` });
 
   await page.goto('/app/activity');

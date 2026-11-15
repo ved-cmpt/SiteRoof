@@ -35,3 +35,12 @@ test('case study renders its diagrams with accessible names', async ({ page }) =
   await expect(page.getByRole('img', { name: 'Deployment pipeline' })).toBeVisible();
   await expect(page.getByText('Independent portfolio project.').first()).toBeVisible();
 });
+
+test('top-bar project switcher lists only accessible projects and navigates', async ({ page }) => {
+  await startDemo(page);
+  const switcher = page.getByRole('combobox', { name: 'Switch project' });
+  await expect(switcher.locator('option')).toHaveCount(4); // "All projects" + three projects for the manager
+  await switcher.selectOption({ label: 'NTS · Northgate Transit Shelter' });
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Northgate Transit Shelter');
+  await expect(switcher).toHaveValue(/[0-9a-f-]{36}/);
+});
