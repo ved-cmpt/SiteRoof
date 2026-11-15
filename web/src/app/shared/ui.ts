@@ -111,26 +111,6 @@ export class StatusChipComponent {
   protected readonly icon = computed(() => STATUS_ICON[this.status()]);
 }
 
-@Component({
-  selector: 'sr-priority',
-  imports: [IconComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<span class="p" [attr.data-p]="priority()">
-    @if (priority() === 'Critical' || priority() === 'High') {
-      <sr-icon name="flag" [size]="12" />
-    }
-    {{ priority() }}</span
-  >`,
-  styles: `
-    .p { display: inline-flex; align-items: center; gap: 3px; font-size: 0.75rem; font-weight: 500; color: var(--sr-ink-3); }
-    [data-p='Critical'] { color: var(--sr-accent-strong); font-weight: 600; }
-    [data-p='High'] { color: var(--sr-ink); }
-  `,
-})
-export class PriorityComponent {
-  readonly priority = input.required<WorkOrderPriority>();
-}
-
 const MR_LABEL: Record<MaterialRequestStatus, string> = { Submitted: 'Pending approval', Approved: 'Approved', Rejected: 'Rejected' };
 const ERP_LABEL: Record<ErpTransmissionStatus, string> = {
   NotApplicable: 'Not sent',
@@ -187,44 +167,6 @@ const ERP_ICON: Record<ErpTransmissionStatus, IconName> = {
   Sent: 'cloud_done',
   Failed: 'error',
 };
-
-@Component({
-  selector: 'sr-kpi',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="kpi" [attr.data-tone]="tone()">
-      <div class="top">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="label">{{ label() }}</span>
-      </div>
-      <div class="value sr-num" [attr.data-testid]="testId() || null">{{ value() }}</div>
-      @if (hint()) {
-        <div class="hint">{{ hint() }}</div>
-      }
-    </div>
-  `,
-  styles: `
-    .kpi { height: 100%; padding: 14px 16px; background: var(--sr-surface); }
-    .top { display: flex; align-items: center; gap: 7px; }
-    .label { font-family: var(--sr-font-mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sr-ink-3); }
-    .dot { width: 6px; height: 6px; border-radius: 1px; background: var(--sr-line-strong); flex: none; }
-    .kpi[data-tone='critical'] .dot { background: var(--sr-accent); }
-    .kpi[data-tone='warning'] .dot { background: var(--sr-chart-completed); }
-    .kpi[data-tone='good'] .dot { background: var(--sr-good); }
-    .kpi[data-tone='info'] .dot { background: var(--sr-info); }
-    .value { font-family: var(--sr-font-mono); font-size: 1.75rem; font-weight: 500; line-height: 1.15; letter-spacing: -0.03em; margin-top: 10px; color: var(--sr-ink); }
-    .kpi[data-tone='critical'] .value { color: var(--sr-accent-strong); }
-    .hint { font-size: var(--sr-text-sm); color: var(--sr-ink-3); margin-top: 2px; }
-  `,
-})
-export class KpiComponent {
-  readonly label = input.required<string>();
-  readonly value = input.required<string | number>();
-  readonly icon = input<IconName>('info');
-  readonly hint = input<string>('');
-  readonly tone = input<'neutral' | 'critical' | 'warning' | 'good' | 'info'>('neutral');
-  readonly testId = input<string>('');
-}
 
 @Component({
   selector: 'sr-state',
@@ -353,10 +295,8 @@ export class MeterComponent {
 export const SHARED = [
   IconComponent,
   StatusChipComponent,
-  PriorityComponent,
   MaterialStatusComponent,
   ErpStatusComponent,
-  KpiComponent,
   StatsComponent,
   StateComponent,
   MeterComponent,
