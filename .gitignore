@@ -1,0 +1,38 @@
+# Build output
+bin/
+obj/
+dist/
+out/
+*.user
+*.suo
+.vs/
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Node / Angular
+node_modules/
+.angular/
+coverage/
+
+# API static hosting (populated from web/dist at build time)
+api/SiteRoof.Api/wwwroot/
+
+# Tests
+TestResults/
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+tests/e2e/.auth/
+tests/e2e/blob-report/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pfx
+*.key
+appsettings.*.local.json
+
+# OS
+.DS_Store
+Thumbs.db
