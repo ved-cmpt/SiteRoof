@@ -59,7 +59,7 @@ const COLOR: Record<string, string> = {
                   (mouseenter)="hover.set({ row: row.id, status: seg.status })"
                   [attr.title]="label[seg.status] + ': ' + seg.count"
                 >
-                  @if (seg.pct >= 9) {
+                  @if (seg.pct >= 12) {
                     <span class="seg-label" [class.dark]="seg.status === 'Completed'">{{ seg.count }}</span>
                   }
                   @if (hover()?.row === row.id && hover()?.status === seg.status) {
@@ -74,7 +74,7 @@ const COLOR: Record<string, string> = {
       </div>
     } @else {
       <div class="sr-table-wrap">
-        <table class="sr-table">
+        <table class="sr-dt">
           <caption class="sr-only">Work orders by status</caption>
           <thead>
             <tr>
@@ -90,9 +90,9 @@ const COLOR: Record<string, string> = {
               <tr>
                 <th scope="row">{{ row.label }}</th>
                 @for (seg of row.all; track seg.status) {
-                  <td class="sr-num">{{ seg.count }}</td>
+                  <td class="num">{{ seg.count }}</td>
                 }
-                <td class="sr-num">{{ row.total }}</td>
+                <td class="num">{{ row.total }}</td>
               </tr>
             }
           </tbody>
@@ -101,27 +101,27 @@ const COLOR: Record<string, string> = {
     }
   `,
   styles: `
-    .head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 12px; }
-    .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; list-style: none; margin: 0; padding: 0; font-size: 0.8rem; color: var(--sr-ink-2); }
-    .legend li { display: inline-flex; align-items: center; gap: 6px; }
-    .swatch { width: 12px; height: 12px; border-radius: 3px; }
-    .toggle { border: 1px solid var(--sr-line-strong); background: var(--sr-surface); border-radius: var(--sr-radius); height: 28px; padding: 0 10px; font: inherit; font-size: var(--sr-text-sm); cursor: pointer; color: var(--sr-ink-2); }
-    .rows { display: grid; gap: 12px; }
-    .row { display: grid; grid-template-columns: minmax(110px, 190px) 1fr 36px; gap: 12px; align-items: center; }
-    .row-label { display: flex; flex-direction: column; min-width: 0; }
-    .row-label strong { font-family: var(--sr-font-mono); font-weight: 500; font-size: 0.8125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .row-label span { font-size: 0.75rem; color: var(--sr-ink-3); }
-    .track { display: flex; gap: 2px; height: 22px; background: var(--sr-subtle); border-radius: 3px; position: relative; }
-    .seg { position: relative; height: 100%; min-width: 4px; display: flex; align-items: center; justify-content: center; cursor: default; }
-    .seg:first-child { border-radius: 4px 0 0 4px; }
-    .seg:last-child { border-radius: 0 4px 4px 0; }
-    .seg:only-child { border-radius: 4px; }
-    .seg-label { color: #fff; font-family: var(--sr-font-mono); font-size: 0.6875rem; font-weight: 500; }
+    .head { display: flex; justify-content: space-between; gap: var(--sr-s3); align-items: center; flex-wrap: wrap; margin-bottom: var(--sr-s3); }
+    .legend { display: flex; flex-wrap: wrap; gap: var(--sr-s1) var(--sr-s3); list-style: none; margin: 0; padding: 0; font-size: var(--sr-app-small); color: var(--sr-ink-3); }
+    .legend li { display: inline-flex; align-items: center; gap: var(--sr-s1); }
+    .swatch { width: 8px; height: 8px; border-radius: 2px; }
+    .toggle { border: 1px solid var(--sr-line-strong); background: var(--sr-surface); border-radius: var(--sr-radius); height: 32px; padding: 0 var(--sr-s3); font: inherit; font-size: var(--sr-app-small); cursor: pointer; color: var(--sr-ink-2); }
+    .rows { display: grid; gap: var(--sr-s3); }
+    .row { display: grid; grid-template-columns: 48px 1fr 32px; gap: var(--sr-s3); align-items: center; }
+    .row-label { min-width: 0; }
+    .row-label strong { font-family: var(--sr-font-mono); font-weight: 400; font-size: var(--sr-app-small); color: var(--sr-ink-3); }
+    .row-label span { display: none; }
+    .track { display: flex; gap: 2px; height: 16px; background: var(--sr-subtle); border-radius: 2px; position: relative; }
+    .seg { position: relative; height: 100%; min-width: 3px; display: flex; align-items: center; justify-content: center; cursor: default; }
+    .seg:first-child { border-radius: 2px 0 0 2px; }
+    .seg:last-child { border-radius: 0 2px 2px 0; }
+    .seg:only-child { border-radius: 2px; }
+    .seg-label { color: #fff; font-family: var(--sr-font-mono); font-size: var(--sr-app-small); line-height: 1; }
     .seg-label.dark { color: #0b0b0b; }
-    .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--sr-ink); color: #fff; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; z-index: 2; pointer-events: none; }
-    .none { font-size: 0.78rem; color: var(--sr-ink-3); padding: 4px 8px; }
-    .total { font-family: var(--sr-font-mono); font-weight: 500; text-align: right; }
-    @media (max-width: 560px) { .row { grid-template-columns: 1fr 32px; } .row-label { grid-column: 1 / -1; } }
+    .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--sr-ink); color: #fff; font-size: var(--sr-app-small); padding: var(--sr-s1) var(--sr-s2); border-radius: var(--sr-radius); white-space: nowrap; z-index: 2; pointer-events: none; }
+    .none { font-size: var(--sr-app-small); color: var(--sr-ink-3); padding: 0 var(--sr-s2); }
+    .total { font-family: var(--sr-font-mono); text-align: right; }
+    @media (max-width: 767px) { .toggle { height: 44px; } }
   `,
 })
 export class StatusChartComponent {
@@ -187,15 +187,17 @@ export class StatusChartComponent {
     </div>
   `,
   styles: `
-    .pk { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th[scope='row'] { text-align: left; font-weight: 500; padding: 6px 12px 6px 0; white-space: nowrap; }
-    td { padding: 6px 8px; }
-    .bar-cell { width: 55%; min-width: 120px; }
-    .track { height: 10px; background: var(--sr-subtle); border-radius: 3px; overflow: hidden; }
-    .fill { height: 100%; background: var(--sr-ink-2); border-radius: 0 3px 3px 0; }
-    .pct { font-family: var(--sr-font-mono); font-weight: 500; text-align: right; }
-    .meta { color: var(--sr-ink-3); white-space: nowrap; font-size: 0.8rem; font-family: var(--sr-font-mono); }
-    .late { color: var(--sr-accent-strong); font-weight: 500; }
+    .pk { width: 100%; border-collapse: collapse; font-size: var(--sr-app-body); }
+    th[scope='row'] { text-align: left; font-weight: 400; padding: var(--sr-s2) var(--sr-s3) var(--sr-s2) 0; white-space: nowrap; }
+    td { padding: var(--sr-s2) var(--sr-s2); }
+    tr + tr th, tr + tr td { border-top: 1px solid var(--sr-line); }
+    .bar-cell { width: 50%; min-width: 96px; }
+    .track { height: 8px; background: var(--sr-subtle); border-radius: 2px; overflow: hidden; }
+    .fill { height: 100%; background: var(--sr-ink-2); border-radius: 0 2px 2px 0; }
+    .pct { font-family: var(--sr-font-mono); text-align: right; }
+    .meta { color: var(--sr-ink-3); white-space: nowrap; font-size: var(--sr-app-small); font-family: var(--sr-font-mono); text-align: right; }
+    .late { color: var(--sr-accent-strong); }
+    @media (max-width: 639px) { .meta { display: none; } }
   `,
 })
 export class PackageChartComponent {
