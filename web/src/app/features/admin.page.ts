@@ -3,7 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDialog } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
+import { Router } from '@angular/router';
 import { firstValueFrom, tap } from 'rxjs';
 import { ApiService } from '../core/api.service';
 import { Loader } from '../core/loader';
@@ -11,6 +13,7 @@ import { ErpSimulatorMode, TenantSettings } from '../core/models';
 import { NotifyService } from '../core/notify.service';
 import { SessionService } from '../core/session.service';
 import { AgoPipe, StateComponent } from '../shared/ui';
+import { ConfirmDialogComponent } from './dialogs';
 
 @Component({
   selector: 'sr-admin',
@@ -66,6 +69,16 @@ import { AgoPipe, StateComponent } from '../shared/ui';
             <p class="sr-muted small">Demo workspaces allow up to {{ t.usage.maxWorkOrdersPerProject }} work orders per project; provisioning is rate-limited per visitor.</p>
           </section>
 
+          @if (t.isDemo) {
+            <section class="sr-card wide demo" aria-labelledby="demo-title">
+              <h2 id="demo-title">Demo controls</h2>
+              <p class="sr-muted small">
+                Reset replaces this workspace with a freshly seeded one and deletes the current data. It only affects your
+                workspace; other visitors have their own.
+              </p>
+              <button mat-stroked-button (click)="reset()" [disabled]="busy()" data-testid="admin-reset">Reset my demo</button>
+            </section>
+          }
           <section class="sr-card wide" aria-labelledby="users-title">
             <h2 id="users-title">People</h2>
             <div class="sr-table-wrap">
@@ -93,6 +106,7 @@ import { AgoPipe, StateComponent } from '../shared/ui';
   styles: `
     .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     .wide { grid-column: 1 / -1; }
+    .demo { border-top: 4px solid var(--sr-safety); }
     .row { display: flex; gap: 10px; align-items: center; }
     .row mat-form-field { flex: 1; }
     .small { font-size: 0.82rem; }
@@ -108,6 +122,8 @@ export class AdminPage implements OnInit {
   private readonly api = inject(ApiService);
   private readonly notify = inject(NotifyService);
   private readonly session = inject(SessionService);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
   protected readonly tenant = new Loader<TenantSettings>();
   protected readonly busy = signal(false);
   protected name = '';
@@ -127,6 +143,27 @@ export class AdminPage implements OnInit {
 
   protected setMode(mode: ErpSimulatorMode): void {
     void this.update({ erpSimulatorMode: mode }, 'ERP simulator updated.');
+  }
+
+  protected reset(): void {
+    this.dialog
+      .open(ConfirmDialogComponent, {
+        data: { title: 'Reset your demo workspace?', body: 'Everything you changed is discarded and a freshly seeded workspace replaces it.', confirm: 'Reset demo' },
+      })
+      .afterClosed()
+      .subscribe(async (ok) => {
+        if (!ok) return;
+        this.busy.set(true);
+        try {
+          await this.session.resetDemo();
+          this.notify.success('Your demo workspace was reset.');
+          await this.router.navigateByUrl('/app/overview');
+        } catch (err) {
+          this.notify.error(err);
+        } finally {
+          this.busy.set(false);
+        }
+      });
   }
 
   private async update(body: { name?: string; erpSimulatorMode?: ErpSimulatorMode }, message: string): Promise<void> {
