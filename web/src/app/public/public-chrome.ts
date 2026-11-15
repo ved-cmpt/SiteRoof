@@ -101,7 +101,7 @@ export class PublicHeaderComponent {
             <span class="lbl">Built with</span>
             <p class="small">Angular · TypeScript · ASP.NET Core · C# · EF Core · SQL Server · Playwright</p>
             <span class="lbl">Credits</span>
-            <p class="small">Type: Inter and JetBrains Mono (SIL OFL 1.1). Icons: Material Symbols (Apache 2.0). Code: MIT.</p>
+            <p class="small">Type: IBM Plex Sans and IBM Plex Mono (SIL OFL 1.1). Icons: Material Symbols (Apache 2.0). Code: MIT.</p>
           </div>
           <div class="cell dwg">
             <span class="lbl">Drawing no.</span>
