@@ -173,14 +173,14 @@ public sealed class DashboardService(
         attention.AddRange(urgentOverdue.Select(w => new AttentionItemDto("overdue",
             w.Priority is WorkOrderPriority.Critical or WorkOrderPriority.High || w.Status == WorkOrderStatus.Blocked ? "critical" : "warning",
             $"{WorkOrderService.Key(codes[w.ProjectId], w.Number)} overdue: {w.Title}",
-            $"Due {w.DueDate:MMM d} · {today.DayNumber - w.DueDate.DayNumber} day(s) late · {WorkOrderService.Label(w.Status)}",
+            $"Due {w.DueDate:MMM d} · {Text.Count(today.DayNumber - w.DueDate.DayNumber, "day")} late · {WorkOrderService.Label(w.Status)}",
             codes[w.ProjectId], "workOrder", w.Id, null)));
         attention.AddRange(openBlockers.Select(b => new AttentionItemDto("blocker", AgeDays(now, b.CreatedAt) >= 3 ? "critical" : "warning",
             $"Blocker on {WorkOrderService.Key(codes[b.ProjectId], b.Number)}: {b.Title}", Trim(b.Blocker!, 140),
             codes[b.ProjectId], "workOrder", b.WorkOrderId, b.CreatedAt)));
         attention.AddRange(pending.Select(m => new AttentionItemDto("approval", AgeDays(now, m.RequestedAt) >= 2 ? "warning" : "info",
             $"Approval needed: {m.Quantity:0.##} {m.Unit} {m.ItemName}",
-            $"For {WorkOrderService.Key(codes[m.ProjectId], m.Number)} · waiting {AgeDays(now, m.RequestedAt)} day(s)",
+            $"For {WorkOrderService.Key(codes[m.ProjectId], m.Number)} · waiting {Text.Count(AgeDays(now, m.RequestedAt), "day")}",
             codes[m.ProjectId], "approvals", m.Id, m.RequestedAt)));
         attention.AddRange(lateMilestones.Select(m => new AttentionItemDto("milestone", "warning",
             $"Milestone overdue: {m.Name}", $"Was due {m.DueDate:MMM d}", codes[m.ProjectId], "project", m.ProjectId, null)));

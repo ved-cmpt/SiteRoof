@@ -66,7 +66,7 @@
                     <span class="sr-meta erp-detail">
                       @switch (r.erp.status) {
                         @case ('Sent') {
-                          <span class="sr-mono" data-testid="erp-reference">{{ r.erp.externalReference || r.externalReference }}</span> after {{ r.erp.attempts }} attempt(s)
+                          <span class="sr-mono" data-testid="erp-reference">{{ r.erp.externalReference || r.externalReference }}</span> after {{ r.erp.attempts }} {{ r.erp.attempts === 1 ? 'attempt' : 'attempts' }}
                         }
                         @case ('Retrying') {
                           Attempt {{ r.erp.attempts }}: {{ r.erp.lastError }}. Next retry {{ r.erp.nextRetryAt | ago }}.

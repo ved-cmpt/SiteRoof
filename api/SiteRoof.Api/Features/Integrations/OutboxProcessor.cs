@@ -113,7 +113,7 @@ public sealed class OutboxProcessor(
                 msg.LastError = error;
                 msg.ProcessedAt = now;
                 audit.Record(msg.TenantId, projectId, "MaterialRequest", msg.AggregateId, AuditActions.ErpFailed,
-                    $"ERP transmission for {label} failed after {msg.Attempts} attempt(s): {error}",
+                    $"ERP transmission for {label} failed after {Text.Count(msg.Attempts, "attempt")}: {error}",
                     after: new Dictionary<string, object?> { ["attempts"] = msg.Attempts, ["error"] = error });
                 logger.LogError("Outbox {OutboxId} failed permanently after {Attempts} attempts: {Error}", msg.Id, msg.Attempts, error);
                 heartbeat.LastError = error;

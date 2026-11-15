@@ -107,7 +107,7 @@ export class ProjectDetailPage implements OnInit {
     return [
       { label: 'Complete', value: `${k.percentComplete}%`, hint: `${k.done} of ${k.total} work orders`, testId: 'dash-percent' },
       { label: 'Overdue', value: k.overdue, tone: k.overdue ? 'critical' : 'neutral', testId: 'dash-overdue' },
-      { label: 'Blocked', value: k.blocked, hint: `${k.openBlockers} open blocker(s)` },
+      { label: 'Blocked', value: k.blocked, hint: `${k.openBlockers} open ${k.openBlockers === 1 ? 'blocker' : 'blockers'}` },
       { label: 'Approval backlog', value: k.pendingApprovals, testId: 'dash-approvals' },
     ];
   });

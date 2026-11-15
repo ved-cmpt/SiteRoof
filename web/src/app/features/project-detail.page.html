@@ -161,7 +161,7 @@
               }
             </div>
             @if (cancelled().length > 0) {
-              <p class="sr-meta">{{ cancelled().length }} cancelled work order(s) are hidden from the board. Use List to see them.</p>
+              <p class="sr-meta">{{ cancelled().length }} cancelled {{ cancelled().length === 1 ? 'work order is' : 'work orders are' }} hidden from the board. Use List to see {{ cancelled().length === 1 ? 'it' : 'them' }}.</p>
             }
           } @else {
             <div class="sr-panel">

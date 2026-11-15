@@ -49,7 +49,7 @@ test('recruiter demo scenario runs end to end on real data', async ({ page }) =>
   await page.getByTestId('filter-approved').click();
   const approved = page.getByTestId('mr-RBL-007');
   await expect(approved.getByTestId('erp-Sent')).toBeVisible({ timeout: 45_000 });
-  await expect(approved).toContainText('after 2 attempt(s)');
+  await expect(approved).toContainText('after 2 attempts');
   await expect(approved.getByTestId('erp-reference')).toHaveText(/^PR-\d{6}-[0-9A-F]{6}$/);
 
   // 6. Dashboards are recalculated from the database.

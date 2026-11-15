@@ -150,7 +150,7 @@ public sealed class DemoCleanupService(IServiceScopeFactory scopes, IOptions<Dem
             try
             {
                 var removed = await RunOnceAsync(scopes, time, stoppingToken);
-                if (removed > 0) logger.LogInformation("Demo cleanup removed {Count} expired tenant(s)", removed);
+                if (removed > 0) logger.LogInformation("Demo cleanup removed {Count} expired demo tenants", removed);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

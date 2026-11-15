@@ -323,9 +323,9 @@ public sealed class WorkOrderService(
                 var blockers = await db.ProgressLogs.CountAsync(p => p.WorkOrderId == id && p.Blocker != null && p.BlockerResolvedAt == null, ct);
                 var pending = await db.MaterialRequests.CountAsync(m => m.WorkOrderId == id && m.Status == MaterialRequestStatus.Submitted, ct);
                 var problems = new List<string>();
-                if (unverified > 0) problems.Add($"{unverified} unverified progress log(s)");
-                if (blockers > 0) problems.Add($"{blockers} open blocker(s)");
-                if (pending > 0) problems.Add($"{pending} pending material request(s)");
+                if (unverified > 0) problems.Add($"{Text.Count(unverified, "unverified progress log")}");
+                if (blockers > 0) problems.Add($"{Text.Count(blockers, "open blocker")}");
+                if (pending > 0) problems.Add($"{Text.Count(pending, "pending material request")}");
                 if (problems.Count > 0)
                 {
                     throw new BusinessRuleException("close-preconditions", $"{key} cannot be closed yet: {string.Join(", ", problems)}.");
