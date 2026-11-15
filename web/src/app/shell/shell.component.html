@@ -1,79 +1,102 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
-<header class="topbar">
+<header class="topbar" [class.compact]="isHandset()">
   @if (isHandset()) {
     <button type="button" class="icon-btn" (click)="navOpen.set(!navOpen())" [attr.aria-expanded]="navOpen()" aria-controls="app-nav">
       <sr-icon name="menu" [size]="20" /><span class="sr-only">Navigation</span>
     </button>
   }
   <a routerLink="/app/overview" class="brand" aria-label="SiteRoof overview"><sr-logo /></a>
-  <span class="workspace sr-mono">{{ session.user()?.tenant?.name }}</span>
+  @if (!isHandset()) {
+    <span class="workspace">{{ session.user()?.tenant?.name }}</span>
+  }
 
   <span class="sr-spacer"></span>
 
-  @if (projects.data(); as list) {
-    @if (list.length > 0) {
-      <div class="switcher">
-        <sr-icon name="apartment" [size]="16" />
-        <select aria-label="Switch project" [value]="currentProjectId()" (change)="openProject($any($event.target).value)" data-testid="topbar-project-switcher">
-          <option value="">All projects</option>
-          @for (p of list; track p.id) {
-            <option [value]="p.id" [selected]="p.id === currentProjectId()">{{ p.code }} · {{ p.title }}</option>
-          }
-        </select>
-        <sr-icon name="keyboard_arrow_down" [size]="16" />
-      </div>
+  @if (!isHandset()) {
+    @if (projects.data(); as list) {
+      @if (list.length > 0) {
+        <div class="switcher">
+          <select aria-label="Switch project" [value]="currentProjectId()" (change)="openProject($any($event.target).value)" data-testid="topbar-project-switcher">
+            <option value="">All projects</option>
+            @for (p of list; track p.id) {
+              <option [value]="p.id" [selected]="p.id === currentProjectId()">{{ p.code }} · {{ p.title }}</option>
+            }
+          </select>
+          <sr-icon name="keyboard_arrow_down" [size]="16" />
+        </div>
+      }
+    }
+    @if (session.isDemo()) {
+      <button type="button" class="tb-btn" (click)="guideOpen.set(!guideOpen())" [attr.aria-expanded]="guideOpen()" data-testid="guide-toggle">
+        Guided demo
+        @if (scenario.data(); as s) {
+          <span class="count sr-mono">{{ stepsDone() }}/{{ s.steps.length }}</span>
+        }
+      </button>
     }
   }
 
-  @if (session.isDemo()) {
-    <button type="button" class="tb-btn" (click)="guideOpen.set(!guideOpen())" [attr.aria-expanded]="guideOpen()" data-testid="guide-toggle">
-      <sr-icon name="playlist_add_check" [size]="16" />
-      <span class="hide-sm">Guided demo</span>
-      @if (scenario.data(); as s) {
-        <span class="count sr-mono">{{ stepsDone() }}/{{ s.steps.length }}</span>
+  <button
+    type="button"
+    class="tb-btn persona"
+    [matMenuTriggerFor]="mainMenu"
+    data-testid="persona-switcher"
+    [disabled]="switching()"
+    [attr.aria-label]="isHandset() ? 'Workspace menu: ' + session.user()?.displayName : null"
+  >
+    <span class="avatar sr-mono" aria-hidden="true">{{ initials() }}</span>
+    @if (!isHandset()) {
+      <span class="who">{{ session.user()?.displayName }}</span>
+    }
+    <sr-icon name="keyboard_arrow_down" [size]="16" />
+    <span class="sr-only">Switch persona</span>
+  </button>
+  <mat-menu #mainMenu="matMenu" xPosition="before" class="sr-main-menu">
+    <div class="menu-who" mat-menu-item disabled>
+      <span>{{ session.user()?.displayName }}</span>
+      <span class="sr-meta">{{ session.user()?.jobTitle }} · {{ session.user()?.tenant?.name }}</span>
+    </div>
+    @if (isHandset()) {
+      @if (projects.data(); as list) {
+        <div class="menu-label sr-meta" mat-menu-item disabled>Projects</div>
+        @for (p of list; track p.id) {
+          <button mat-menu-item (click)="openProject(p.id)" [attr.aria-current]="p.id === currentProjectId()">
+            <span class="sr-mono code">{{ p.code }}</span> {{ p.title }}
+          </button>
+        }
       }
-    </button>
-
-    <button type="button" class="tb-btn persona" [matMenuTriggerFor]="personaMenu" data-testid="persona-switcher" [disabled]="switching()">
-      <span class="avatar sr-mono" aria-hidden="true">{{ initials() }}</span>
-      <span class="who hide-sm">
-        <strong>{{ session.user()?.displayName }}</strong>
-        <small>{{ session.user()?.jobTitle }}</small>
-      </span>
-      <sr-icon name="keyboard_arrow_down" [size]="16" />
-      <span class="sr-only">Switch persona</span>
-    </button>
-    <mat-menu #personaMenu="matMenu" xPosition="before" class="sr-persona-menu">
-      <div class="menu-head" mat-menu-item disabled>Act as someone in this workspace</div>
+      @if (session.isDemo()) {
+        <button mat-menu-item (click)="guideOpen.set(true)" data-testid="guide-toggle-compact">
+          Guided demo
+          @if (scenario.data(); as s) {
+            <span class="sr-mono sr-meta">&nbsp;{{ stepsDone() }}/{{ s.steps.length }}</span>
+          }
+        </button>
+      }
+    }
+    @if (session.isDemo()) {
+      <div class="menu-label sr-meta" mat-menu-item disabled>Act as</div>
       @for (p of scenario.data()?.personas ?? []; track p.key) {
         <button mat-menu-item (click)="switchTo(p.key)" [attr.data-testid]="'persona-' + p.key" [attr.aria-current]="p.active">
           <span class="menu-persona">
-            <strong>{{ p.displayName }} @if (p.active) { <em>· current</em> }</strong>
-            <small>{{ p.roleLabel }} — {{ p.summary }}</small>
+            <span>{{ p.displayName }}@if (p.active) { <span class="sr-meta"> · current</span> }</span>
+            <span class="sr-meta">{{ p.roleLabel }}</span>
           </span>
         </button>
       }
-      <button mat-menu-item (click)="resetDemo()" data-testid="reset-demo">
-        <sr-icon name="restart_alt" [size]="16" /> <span>Reset my demo</span>
-      </button>
-      <button mat-menu-item (click)="logout()"><sr-icon name="logout" [size]="16" /> <span>Leave the demo</span></button>
-    </mat-menu>
-  } @else {
-    <button type="button" class="tb-btn persona" [matMenuTriggerFor]="userMenu">
-      <span class="avatar sr-mono" aria-hidden="true">{{ initials() }}</span>
-      <span class="who hide-sm"><strong>{{ session.user()?.displayName }}</strong></span>
-    </button>
-    <mat-menu #userMenu="matMenu" xPosition="before">
-      <button mat-menu-item (click)="logout()"><sr-icon name="logout" [size]="16" /> <span>Sign out</span></button>
-    </mat-menu>
-  }
+      <button mat-menu-item (click)="resetDemo()" data-testid="reset-demo">Reset my demo</button>
+      <button mat-menu-item (click)="logout()">Leave the demo</button>
+    } @else {
+      <button mat-menu-item (click)="logout()">Sign out</button>
+    }
+  </mat-menu>
 </header>
 
 @if (session.isDemo() && session.user()?.tenant?.expiresAt; as expires) {
-  <div class="demo-strip sr-mono" role="note">
-    <span>Demo workspace · fictional data · expires {{ expires | ago }}</span>
-    <button type="button" class="sr-link-btn" (click)="resetDemo()">Reset my demo</button>
+  <div class="demo-strip" role="note">
+    <span>Demo workspace<span class="hide-sm"> with fictional data</span> · expires {{ expires | ago }}</span>
+    <button type="button" class="sr-link-btn" (click)="resetDemo()">Reset</button>
   </div>
 }
 
@@ -86,7 +109,6 @@
     class="nav"
   >
     <nav aria-label="App">
-      <p class="nav-label sr-mono">Workspace</p>
       <ul>
         @for (item of visibleNav(); track item.path) {
           <li>
@@ -98,43 +120,31 @@
         }
       </ul>
     </nav>
-    <div class="nav-foot">
-      <a routerLink="/case-study">Case study</a>
-      <a routerLink="/">Home</a>
-      <p>Independent portfolio project. All data is fictional.</p>
+    <div class="nav-foot sr-meta">
+      <a routerLink="/case-study">Case study</a> · <a routerLink="/">Home</a>
     </div>
   </mat-sidenav>
 
   <mat-sidenav position="end" [mode]="isHandset() ? 'over' : 'side'" [opened]="guideOpen()" (closedStart)="guideOpen.set(false)" class="guide">
     <section aria-labelledby="guide-title" data-testid="guide-panel">
       <div class="guide-head">
-        <div>
-          <p class="sr-kicker">Guided demo</p>
-          <h2 id="guide-title">Riverbend, behind on drywall</h2>
-        </div>
+        <h2 id="guide-title">Guided demo</h2>
         <button type="button" class="icon-btn" (click)="guideOpen.set(false)"><sr-icon name="close" [size]="18" /><span class="sr-only">Close guide</span></button>
       </div>
-      <p class="intro">Checkmarks come from the records you create, not from clicks.</p>
+      <p class="sr-meta">Riverbend is behind on drywall. Steps are checked off from the records you create.</p>
       @if (scenario.data(); as s) {
         <ol class="steps">
           @for (step of s.steps; track step.order) {
             <li [class.done]="step.done === true">
-              <span class="mark sr-mono" aria-hidden="true">
-                @if (step.done === true) {
-                  <sr-icon name="check_circle" [size]="16" />
-                } @else {
-                  {{ step.order }}
-                }
-              </span>
+              <span class="mark sr-mono" aria-hidden="true">{{ step.done === true ? '✓' : step.order }}</span>
               <div>
-                <strong>{{ step.title }}</strong>
+                <span class="title">{{ step.title }}</span>
                 @if (step.done === true) {
                   <span class="sr-only">(done)</span>
                 }
-                <p>{{ step.description }}</p>
+                <p class="sr-meta">{{ step.description }}</p>
                 <button type="button" class="go" (click)="switchTo(step.persona, step.link)" [disabled]="switching()">
                   {{ session.persona() === step.persona ? 'Go' : 'Switch to ' + step.persona + ' and go' }}
-                  <sr-icon name="arrow_forward" [size]="14" />
                 </button>
               </div>
             </li>

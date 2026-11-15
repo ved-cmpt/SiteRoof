@@ -27,6 +27,7 @@ interface NavItem {
 
 @Component({
   selector: 'sr-shell',
+  host: { class: 'sr-app' },
   imports: [
     RouterOutlet,
     RouterLink,
