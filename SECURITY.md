@@ -1,6 +1,6 @@
 # Security
 
-SiteRoof is an independent portfolio project. It holds only fictional demo data, but it is built as if it
+SiteRoof is a personal project. It holds only fictional demo data, but it is built as if it
 held real project records.
 
 ## Reporting a vulnerability

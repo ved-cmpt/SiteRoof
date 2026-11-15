@@ -6,11 +6,11 @@ SiteRoof is a construction operations platform for coordinating projects, milest
 site progress and limited material approvals across office and field teams. It has a public landing page, a
 case study, and a working demo where each visitor gets a private, seeded workspace.
 
-> **Independent portfolio project.** Not affiliated with, endorsed by, or built for any construction company.
-> Every project, person, company, address and record is fictional.
+> **A personal project.** Not affiliated with any construction company. Every project, person, company,
+> address and record is fictional.
 > **Hosting status: not deployed yet.** See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-![Overview dashboard](docs/screenshots/overview.png)
+![Home: overdue work, open blockers, pending approvals and ERP issues](docs/screenshots/home.png)
 
 | Project board | Work order | Approvals and ERP status |
 | --- | --- | --- |
@@ -18,11 +18,12 @@ case study, and a working demo where each visitor gets a private, seeded workspa
 
 | On a phone (crew member) | Landing page |
 | --- | --- |
-| ![Phone overview for a crew member](docs/screenshots/mobile-overview.png) | ![Landing page](docs/screenshots/landing.png) |
+| ![Home on a phone for a crew member](docs/screenshots/mobile-home.png) | ![Landing page](docs/screenshots/landing.png) |
 
 Screenshots were captured from the running app by `tests/e2e/specs/screenshots.spec.ts`. The app is
-usable at 375px: tables become stacked rows, the board shows one status column at a time, dialogs open as
-full-screen sheets and the crew's progress form has a sticky submit button.
+usable at 375px: the sidebar becomes a drawer (with the profile and guide at its bottom), tables become
+stacked rows, the board shows one status column at a time, dialogs open as full-screen sheets and the crew's
+progress form has a sticky submit button.
 
 ## What it does
 
@@ -38,12 +39,12 @@ full-screen sheets and the crew's progress form has a sticky submit button.
 - **Dashboards**: overdue work, completion by work package, open blockers, approval backlog and recent
   activity, all queried from SQL Server (two documented T-SQL views) on every load.
 - **Activity and audit trail**: actor, timestamp and before/after values of changed fields.
-- **Rules-based blocker summary**: deterministic, evidence-linked, clearly labelled. An optional AI provider
-  interface exists and is disabled.
+- **Rule-based blocker summary**: deterministic, evidence-linked, clearly labelled. An interface for an
+  optional language-model provider is defined but has no implementation and is off.
 - **Guest demo**: one click provisions an isolated tenant; switch between manager, supervisor and crew;
   reset any time; workspaces expire automatically.
 
-The guided recruiter scenario: *Open Riverbend → inspect delayed work → submit progress → approve material
+The guided demo scenario: *Open Riverbend → inspect delayed work → submit progress → approve material
 request → see the dashboard and ERP status update.*
 
 ## Stack
@@ -64,7 +65,7 @@ dotnet tool restore
 ./scripts/dev-web.ps1            # in another terminal: Angular on http://localhost:4200 (proxies /api)
 ```
 
-Open http://localhost:4200 and click **Try Demo**.
+Open http://localhost:4200 and click **Try the demo**.
 
 Production-like single container on http://localhost:8080:
 
@@ -90,7 +91,7 @@ level and in the browser. Latest recorded results: [docs/STATUS.md](docs/STATUS.
 api/SiteRoof.Api        ASP.NET Core modular monolith (Domain, Data, Auth, Features/*, Infrastructure)
 web                     Angular app (public pages + /app)
 tests/SiteRoof.Api.Tests xUnit unit and integration tests
-tests/e2e               Playwright specs
+tests/e2e               Playwright specs and screenshot scripts
 scripts                 PowerShell helpers
 docs                    Spec, status, architecture, database, API, deployment, screenshots
 ```
@@ -104,4 +105,4 @@ docs                    Spec, status, architecture, database, API, deployment, s
 
 ## License
 
-[MIT](LICENSE). Icons: Material Symbols (Apache 2.0). Fonts: IBM Plex Sans and IBM Plex Mono (SIL OFL 1.1).
+Code: [MIT](LICENSE). Third-party fonts and icons keep their own licenses; see [NOTICE.md](NOTICE.md).
