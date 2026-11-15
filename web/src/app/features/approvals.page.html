@@ -86,7 +86,7 @@
                 </td>
                 <td class="m-actions acts">
                   @if (r.canDecide) {
-                    <button mat-flat-button class="act" (click)="decide(r, 'Approve')" data-testid="approve">Approve</button>
+                    <button mat-stroked-button class="act" (click)="decide(r, 'Approve')" data-testid="approve">Approve</button>
                     <button mat-stroked-button class="act" (click)="decide(r, 'Reject')" data-testid="reject">Reject</button>
                   } @else if (r.status === 'Approved' && r.erp.status === 'Failed' && r.erp.outboxId) {
                     <button mat-stroked-button class="act" (click)="retry(r.erp.outboxId!)">Retry now</button>

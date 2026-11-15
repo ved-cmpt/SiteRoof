@@ -172,7 +172,8 @@
 
     .c-title {
       order: 0;
-      flex: 1 1 calc(100% - 120px);
+      flex: 1 1 calc(100% - 160px);
+      min-width: 0;
       font-size: var(--sr-app-body);
       color: var(--sr-ink);
     }
