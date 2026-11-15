@@ -2,9 +2,6 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, si
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { RouterLink } from '@angular/router';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ApiError, ApiService } from '../core/api.service';
@@ -20,56 +17,28 @@ import {
 } from '../core/models';
 import { NotifyService } from '../core/notify.service';
 import { SessionService } from '../core/session.service';
-import { IconName } from '../shared/icons.generated';
-import {
-  AgoPipe,
-  ErpStatusComponent,
-  IconComponent,
-  MaterialStatusComponent,
-  MeterComponent,
-  PriorityComponent,
-  StateComponent,
-  StatusChipComponent,
-} from '../shared/ui';
+import { AgoPipe, MaterialStatusComponent, MeterComponent, StateComponent, StatusChipComponent } from '../shared/ui';
 import { DecisionDialogComponent, MaterialDialogComponent, ReasonDialogComponent, ReasonData } from './dialogs';
 
 interface TransitionUi {
   label: string;
-  icon: IconName;
   primary?: boolean;
   reason?: ReasonData;
 }
 
 const TRANSITIONS: Record<WorkOrderTransition, TransitionUi> = {
-  Start: { label: 'Start work', icon: 'trending_up', primary: true },
-  Block: { label: 'Mark blocked', icon: 'block', reason: { title: 'Mark as blocked', label: 'What is blocking the work?', confirm: 'Mark blocked', required: false } },
-  Unblock: { label: 'Resume work', icon: 'trending_up', primary: true },
-  Complete: { label: 'Mark complete', icon: 'task_alt', primary: true },
-  Reopen: { label: 'Reopen', icon: 'lock_open', reason: { title: 'Reopen work order', label: 'Why is it being reopened?', confirm: 'Reopen', required: true } },
-  Close: { label: 'Close out', icon: 'lock', primary: true },
-  Cancel: { label: 'Cancel work order', icon: 'close', reason: { title: 'Cancel work order', label: 'Reason for cancelling', confirm: 'Cancel work order', required: true } },
+  Start: { label: 'Start work', primary: true },
+  Block: { label: 'Mark blocked', reason: { title: 'Mark as blocked', label: 'What is blocking the work?', confirm: 'Mark blocked', required: false } },
+  Unblock: { label: 'Resume work', primary: true },
+  Complete: { label: 'Mark complete', primary: true },
+  Reopen: { label: 'Reopen', reason: { title: 'Reopen work order', label: 'Why is it being reopened?', confirm: 'Reopen', required: true } },
+  Close: { label: 'Close out', primary: true },
+  Cancel: { label: 'Cancel work order', reason: { title: 'Cancel work order', label: 'Reason for cancelling', confirm: 'Cancel work order', required: true } },
 };
 
 @Component({
   selector: 'sr-work-order',
-  imports: [
-    RouterLink,
-    FormsModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    IconComponent,
-    StateComponent,
-    StatusChipComponent,
-    PriorityComponent,
-    MeterComponent,
-    MaterialStatusComponent,
-    ErpStatusComponent,
-    AgoPipe,
-
-  ],
+  imports: [RouterLink, FormsModule, ReactiveFormsModule, MatButtonModule, StateComponent, StatusChipComponent, MeterComponent, MaterialStatusComponent, AgoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './work-order.page.html',
   styleUrl: './work-order.page.scss',
