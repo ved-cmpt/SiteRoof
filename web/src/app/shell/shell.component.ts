@@ -10,7 +10,7 @@ import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive, Ro
 import { filter, map } from 'rxjs';
 import { ApiService } from '../core/api.service';
 import { Loader } from '../core/loader';
-import { Persona, Scenario } from '../core/models';
+import { Persona, ProjectSummary, Scenario } from '../core/models';
 import { NotifyService } from '../core/notify.service';
 import { SessionService } from '../core/session.service';
 import { ConfirmDialogComponent } from '../features/dialogs';
@@ -62,6 +62,9 @@ export class ShellComponent implements OnInit {
   protected readonly guideOpen = signal(false);
   protected readonly switching = signal(false);
   protected readonly scenario = new Loader<Scenario>();
+  /** Projects for the top-bar switcher (only those the current persona can access). */
+  protected readonly projects = new Loader<ProjectSummary[]>();
+  protected readonly currentProjectId = signal('');
 
   protected readonly nav: NavItem[] = [
     { path: '/app/overview', label: 'Overview', icon: 'dashboard' },
@@ -82,16 +85,33 @@ export class ShellComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.session.isDemo()) this.scenario.load(this.api.scenario());
+    this.projects.load(this.api.projects());
+    this.trackProject(this.router.url);
     if (this.route.snapshot.queryParamMap.has('guide') || this.router.url.includes('guide=1')) this.guideOpen.set(true);
+    let identity = this.session.identityVersion();
     this.router.events
       .pipe(
-        filter((e) => e instanceof NavigationEnd),
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(() => {
+      .subscribe((e) => {
         this.navOpen.set(false);
+        this.trackProject(e.urlAfterRedirects);
         if (this.session.isDemo()) this.scenario.load(this.api.scenario());
+        if (identity !== this.session.identityVersion()) {
+          identity = this.session.identityVersion();
+          this.projects.load(this.api.projects());
+        }
       });
+  }
+
+  private trackProject(url: string): void {
+    const match = /\/app\/projects\/([0-9a-f-]{36})/i.exec(url);
+    this.currentProjectId.set(match?.[1] ?? '');
+  }
+
+  protected openProject(id: string): void {
+    if (id) void this.router.navigate(['/app/projects', id]);
   }
 
   protected async switchTo(persona: Persona, target?: string): Promise<void> {
