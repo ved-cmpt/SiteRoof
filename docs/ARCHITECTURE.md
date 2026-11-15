@@ -111,20 +111,36 @@ To add an AI-backed provider later (disabled by default, never required):
 | `core/` | `ApiService` (typed calls, `ApiError`), `SessionService` (signals), guards, interceptor, `Loader` |
 | `shared/` | Icons (inline SVG generated from Material Symbols), status chips, KPI tiles, states, charts |
 | `public/` | Landing, case study, demo start, sign-in, 403/404 |
-| `shell/` | Authenticated layout: navigation, persona switcher, demo banner, guided-demo panel |
+| `shell/` | Authenticated layout: navigation, project switcher, persona switcher, demo strip, guided-demo panel |
 | `features/` | Overview, projects, project detail (board / dashboard / milestones & team / activity), work order, approvals, activity, admin, dialogs |
 
 Standalone components, OnPush change detection, signals, zoneless change detection, lazy-loaded routes,
 strict TypeScript and strict templates. Fonts and icons are bundled (no third-party requests), which keeps
 the Content-Security-Policy strict.
 
+### Design system
+
+The visual language is "a calm product UI printed on a construction drawing". Tokens live in
+`web/src/styles/_tokens.scss`; `_material.scss` re-skins Angular Material to them; `_base.scss` holds element
+styles and shared primitives.
+
+| Token group | Values |
+| --- | --- |
+| Surfaces | Drawing-paper background `#F6F4EF`, white surfaces, subtle wells `#F0EDE6`, 1px hairlines `#E2DED6` / `#CFC9BD` |
+| Ink | Text `#16181D`, secondary `#3D4048`, warm-gray tertiary `#67625A` (5.5:1 on the background) |
+| Accent | Construction orange `#D9480F` for non-text marks (focus ring, active nav marker, overdue rules, callouts); `#B93D0B` for filled buttons and accent text (5.6:1 on white, WCAG AA) |
+| Type | Inter (UI and headings, 400/500/600, tight tracking on large headings) and JetBrains Mono (codes, ids, quantities, dates, numbers, sheet labels), both self-hosted |
+| Motifs | Faint 24px drawing grid behind heroes, mono "sheet" labels, title-block footer, dimension-line divider; no gradients or heavy shadows |
+| Motion | 150 ms fades and colour transitions only, disabled under `prefers-reduced-motion` |
+
+Status pills use muted tinted backgrounds with an icon and a text label, so colour is never the only signal.
+
 ### Chart colours
 
 The work-order status chart uses a categorical palette validated for lightness band, chroma, colour-vision
-deficiency separation and contrast (Open `#a77bca`, In progress `#2a6fdb`, Blocked `#d03b3b`,
-Completed `#c98a00`, Closed `#1f7a45`). Because two colours sit below 3:1 contrast on the light surface,
-every chart has a legend, visible counts, hover tooltips and a table view; status chips always pair colour
-with an icon and a label.
+deficiency separation, normal-vision separation and contrast (Open `#A07AC0`, In progress `#2D6CC9`, Blocked
+`#C53D33`, Completed `#BE8510`, Closed `#24804B`): the most muted set tried that passes every check. Every chart
+also has a legend, direct counts, hover tooltips and a table view.
 
 ## Trade-offs
 

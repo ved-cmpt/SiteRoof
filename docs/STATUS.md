@@ -1,6 +1,6 @@
 # SiteRoof — Status
 
-_Last updated: 2026-11-15. Phases 1, 2 and 3 are complete locally. **Not deployed.**_
+_Last updated: 2026-11-15. Phases 1, 2 and 3 plus the visual redesign are complete locally. **Not deployed.**_
 
 ## Done
 
@@ -46,7 +46,22 @@ _Last updated: 2026-11-15. Phases 1, 2 and 3 are complete locally. **Not deploye
 - Docs: README with real screenshots, `ARCHITECTURE.md`, `DATABASE.md`, `API.md`, `DEPLOYMENT.md` (NOT DEPLOYED),
   final `/case-study` with SVG architecture, data model and deployment diagrams, MIT `LICENSE`.
 
-## Verification (run on 2026-11-15, Windows 11, Docker Desktop)
+**Visual redesign (2026-11-15)**
+- One design system for the whole app ("a calm product UI printed on a construction drawing"): tokens in
+  `web/src/styles/_tokens.scss`, Angular Material re-skinned in `_material.scss`, shared primitives in `_base.scss`.
+  Warm drawing-paper background, hairlines, one construction-orange accent, Inter + JetBrains Mono (self-hosted),
+  muted status pills with icons and labels, re-validated chart palette. Details in `docs/ARCHITECTURE.md`.
+- Landing page rebuilt as a short drawing set: hero with a real screenshot, an annotated work-order screenshot with
+  numbered callouts, a schedule-style capability table, an ERP split section, a verification strip with recorded
+  numbers only, and a title-block footer. Case study, sign-in, demo start and 403/404 restyled to match.
+- App shell: light sidebar with line icons and an accent marker, compact top bar with a new project switcher and
+  the persona switcher, quieter demo strip. Overview, projects, board, dashboard, work order, approvals, activity
+  and admin restyled (hairline KPI strips, mono ids/dates/quantities, hairline board cards).
+- New browser test for the project switcher. A Playwright run exposed that the switcher's accessible name included
+  option text; fixed with an explicit `aria-label` (no test assertion was relaxed).
+- Screenshots in `docs/screenshots` and `web/public/screens` recaptured from the redesigned app.
+
+## Verification (run on 2026-11-15 after the redesign, Windows 11, Docker Desktop)
 
 | Command | Result |
 | --- | --- |
@@ -54,13 +69,15 @@ _Last updated: 2026-11-15. Phases 1, 2 and 3 are complete locally. **Not deploye
 | `dotnet test SiteRoof.slnx` | **60 passed**, 0 failed (xUnit; SQL Server 2022 via Testcontainers) |
 | `cd web; npm run lint` | All files pass linting |
 | `cd web; npm test` | **14 passed** (3 files, Vitest) |
-| `cd web; npm run build` | Succeeded; initial bundle 315.70 kB raw / 85.26 kB estimated transfer |
-| `cd tests/e2e; npx playwright test --project=chromium` (API on :5080 started by Playwright) | **9 passed** |
-| `docker compose --profile full up -d --build` then `E2E_BASE_URL=http://127.0.0.1:8080 npx playwright test --project=chromium` (with `DEMO_PROVISION_PERMITS=500`) | **9 passed** against the production container |
+| `cd web; npm run build` | Succeeded, no warnings; initial bundle 323.74 kB raw / 86.46 kB estimated transfer |
+| `cd tests/e2e; npx playwright test --project=chromium` (API on :5080 serving the production build) | **10 passed** |
+| `docker compose --profile full up -d --build` then `E2E_BASE_URL=http://127.0.0.1:8080 npx playwright test --project=chromium` (with `DEMO_PROVISION_PERMITS=500`) | **10 passed** against the rebuilt production container |
 | `docker run rhysd/actionlint:1.7.12` on `.github/workflows` | No findings |
 | `docker run zricethezav/gitleaks:v8.30.1 git /repo` | No leaks found |
 
-Local latency, measured with `node scripts/measure-latency.mjs http://127.0.0.1:8080 30` against the
+The `actionlint` and `gitleaks` rows above are from the pre-redesign run; the redesign did not touch the workflow.
+
+Local latency (pre-redesign; backend unchanged since), measured with `node scripts/measure-latency.mjs http://127.0.0.1:8080 30` against the
 production container and SQL Server 2022 in Docker on the development machine (not a hosted environment):
 
 | Request | Median | p95 |

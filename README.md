@@ -42,7 +42,7 @@ request → see the dashboard and ERP status update.*
 
 ## Stack
 
-Angular 22 (standalone, signals, strict TypeScript, SCSS, Angular Material) · ASP.NET Core on .NET 10 ·
+Angular 22 (standalone, signals, strict TypeScript, SCSS, Angular Material re-skinned to a small token-based design system) · ASP.NET Core on .NET 10 ·
 EF Core 10 · SQL Server 2022 · xUnit + Testcontainers · Vitest · Playwright · Docker · GitHub Actions.
 One container: the API serves the Angular build from the same origin (cookie auth + CSRF, no CORS).
 
@@ -98,4 +98,4 @@ docs                    Spec, status, architecture, database, API, deployment, s
 
 ## License
 
-[MIT](LICENSE). Icons: Material Symbols (Apache 2.0). Fonts: Inter and Archivo (SIL OFL 1.1).
+[MIT](LICENSE). Icons: Material Symbols (Apache 2.0). Fonts: Inter and JetBrains Mono (SIL OFL 1.1).
