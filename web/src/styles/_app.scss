@@ -532,3 +532,114 @@
     }
   }
 }
+
+// ---------------------------------------------------------------- forms (labels above, inline errors)
+.sr-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sr-s3);
+
+  .full {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 767px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.sr-f {
+  display: grid;
+  gap: var(--sr-s1);
+  min-width: 0;
+
+  > .l {
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    height: 36px;
+    padding: 0 var(--sr-s3);
+    border: 1px solid var(--sr-line-strong);
+    border-radius: var(--sr-radius);
+    background: var(--sr-surface);
+    color: var(--sr-ink);
+    font: inherit;
+    transition: border-color var(--sr-fast) var(--sr-ease);
+
+    &:hover {
+      border-color: var(--sr-ink-3);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--sr-ink-3);
+      box-shadow: var(--sr-focus);
+    }
+
+    &[aria-invalid='true'] {
+      border-color: var(--sr-critical);
+    }
+  }
+
+  textarea {
+    height: auto;
+    min-height: 72px;
+    padding: var(--sr-s2) var(--sr-s3);
+    resize: vertical;
+  }
+
+  input[type='number'],
+  input[type='date'] {
+    font-family: var(--sr-font-mono);
+  }
+
+  .err {
+    font-size: var(--sr-app-small);
+    color: var(--sr-critical);
+  }
+
+  @media (max-width: 767px) {
+    input,
+    select {
+      height: 44px;
+    }
+  }
+}
+
+// Notice row (conflict, locked) — text with a left rule, no icons.
+.sr-notice {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sr-s2) var(--sr-s4);
+  padding: var(--sr-s3) var(--sr-s4);
+  margin-bottom: var(--sr-s4);
+  background: var(--sr-surface);
+  border: 1px solid var(--sr-line);
+  border-left: 2px solid var(--sr-line-strong);
+  border-radius: var(--sr-radius);
+
+  &.warn {
+    border-left-color: var(--sr-accent);
+  }
+
+  .text {
+    flex: 1 1 280px;
+    display: grid;
+    gap: 2px;
+  }
+
+  .text strong {
+    font-weight: 500;
+  }
+
+  .text span {
+    font-size: var(--sr-app-small);
+    color: var(--sr-ink-3);
+  }
+}
