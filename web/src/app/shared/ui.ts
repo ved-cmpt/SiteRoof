@@ -94,25 +94,15 @@ export class DayPipe implements PipeTransform {
   selector: 'sr-status',
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<span class="chip" [attr.data-status]="status()"><sr-icon [name]="icon()" [size]="15" />{{ label() }}</span>`,
+  template: `<span class="chip" [attr.data-status]="status()"><sr-icon [name]="icon()" [size]="13" />{{ label() }}</span>`,
   styles: `
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 2px 9px 2px 7px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 650;
-      white-space: nowrap;
-      border: 1px solid transparent;
-    }
-    [data-status='Open'] { background: #f3ecf8; color: #5b3b78; border-color: #e0cdee; }
-    [data-status='InProgress'] { background: var(--sr-info-soft); color: #1a4fa8; border-color: #c7d6fb; }
-    [data-status='Blocked'] { background: var(--sr-critical-soft); color: var(--sr-critical); border-color: #f6c5c0; }
-    [data-status='Completed'] { background: var(--sr-warning-soft); color: var(--sr-warning); border-color: #f1dca3; }
-    [data-status='Closed'] { background: var(--sr-good-soft); color: var(--sr-good); border-color: #bfe3cc; }
-    [data-status='Cancelled'] { background: var(--sr-concrete-2); color: var(--sr-ink-2); }
+    .chip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
+    [data-status='Open'] { background: var(--sr-st-open-bg); color: var(--sr-st-open); border-color: transparent; }
+    [data-status='InProgress'] { background: var(--sr-st-progress-bg); color: var(--sr-st-progress); border-color: transparent; }
+    [data-status='Blocked'] { background: var(--sr-st-blocked-bg); color: var(--sr-st-blocked); border-color: transparent; }
+    [data-status='Completed'] { background: var(--sr-st-completed-bg); color: var(--sr-st-completed); border-color: transparent; }
+    [data-status='Closed'] { background: var(--sr-st-closed-bg); color: var(--sr-st-closed); border-color: transparent; }
+    [data-status='Cancelled'] { color: var(--sr-ink-3); }
   `,
 })
 export class StatusChipComponent {
@@ -127,14 +117,14 @@ export class StatusChipComponent {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<span class="p" [attr.data-p]="priority()">
     @if (priority() === 'Critical' || priority() === 'High') {
-      <sr-icon name="flag" [size]="14" />
+      <sr-icon name="flag" [size]="13" />
     }
     {{ priority() }}</span
   >`,
   styles: `
-    .p { display: inline-flex; align-items: center; gap: 3px; font-size: 0.78rem; font-weight: 650; color: var(--sr-ink-3); }
-    [data-p='Critical'] { color: var(--sr-critical); }
-    [data-p='High'] { color: #a4470b; }
+    .p { display: inline-flex; align-items: center; gap: 3px; font-size: 0.75rem; font-weight: 500; color: var(--sr-ink-3); }
+    [data-p='Critical'] { color: var(--sr-accent-strong); font-weight: 600; }
+    [data-p='High'] { color: var(--sr-ink); }
   `,
 })
 export class PriorityComponent {
@@ -155,13 +145,13 @@ const ERP_LABEL: Record<ErpTransmissionStatus, string> = {
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<span class="chip" [attr.data-s]="status()">
-    <sr-icon [name]="status() === 'Approved' ? 'check_circle' : status() === 'Rejected' ? 'block' : 'hourglass_top'" [size]="15" />{{ label() }}
+    <sr-icon [name]="status() === 'Approved' ? 'check_circle' : status() === 'Rejected' ? 'block' : 'hourglass_top'" [size]="13" />{{ label() }}
   </span>`,
   styles: `
-    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 7px; border-radius: 999px; font-size: 0.78rem; font-weight: 650; white-space: nowrap; }
-    [data-s='Submitted'] { background: var(--sr-warning-soft); color: var(--sr-warning); }
-    [data-s='Approved'] { background: var(--sr-good-soft); color: var(--sr-good); }
-    [data-s='Rejected'] { background: var(--sr-critical-soft); color: var(--sr-critical); }
+    .chip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
+    [data-s='Submitted'] { background: var(--sr-warn-soft); color: var(--sr-warn); border-color: transparent; }
+    [data-s='Approved'] { background: var(--sr-good-soft); color: var(--sr-good); border-color: transparent; }
+    [data-s='Rejected'] { background: var(--sr-critical-soft); color: var(--sr-critical); border-color: transparent; }
   `,
 })
 export class MaterialStatusComponent {
@@ -174,14 +164,14 @@ export class MaterialStatusComponent {
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<span class="chip" [attr.data-s]="status()" [attr.data-testid]="'erp-' + status()">
-    <sr-icon [name]="icon()" [size]="15" />{{ label() }}
+    <sr-icon [name]="icon()" [size]="13" />{{ label() }}
   </span>`,
   styles: `
-    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 7px; border-radius: 999px; font-size: 0.78rem; font-weight: 650; white-space: nowrap; background: var(--sr-concrete-2); color: var(--sr-ink-2); }
-    [data-s='Queued'] { background: var(--sr-info-soft); color: var(--sr-info); }
-    [data-s='Retrying'] { background: var(--sr-warning-soft); color: var(--sr-warning); }
-    [data-s='Sent'] { background: var(--sr-good-soft); color: var(--sr-good); }
-    [data-s='Failed'] { background: var(--sr-critical-soft); color: var(--sr-critical); }
+    .chip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
+    [data-s='Queued'] { background: var(--sr-info-soft); color: var(--sr-info); border-color: transparent; }
+    [data-s='Retrying'] { background: var(--sr-warn-soft); color: var(--sr-warn); border-color: transparent; }
+    [data-s='Sent'] { background: var(--sr-good-soft); color: var(--sr-good); border-color: transparent; }
+    [data-s='Failed'] { background: var(--sr-critical-soft); color: var(--sr-critical); border-color: transparent; }
   `,
 })
 export class ErpStatusComponent {
@@ -200,13 +190,12 @@ const ERP_ICON: Record<ErpTransmissionStatus, IconName> = {
 
 @Component({
   selector: 'sr-kpi',
-  imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="kpi" [attr.data-tone]="tone()">
       <div class="top">
-        <span class="sr-kicker">{{ label() }}</span>
-        <sr-icon [name]="icon()" [size]="20" />
+        <span class="dot" aria-hidden="true"></span>
+        <span class="label">{{ label() }}</span>
       </div>
       <div class="value sr-num" [attr.data-testid]="testId() || null">{{ value() }}</div>
       @if (hint()) {
@@ -215,14 +204,17 @@ const ERP_ICON: Record<ErpTransmissionStatus, IconName> = {
     </div>
   `,
   styles: `
-    .kpi { background: var(--sr-paper); border: 1px solid var(--sr-line); border-radius: var(--sr-radius-lg); padding: 14px 16px; height: 100%; border-top: 4px solid var(--sr-line-strong); box-shadow: var(--sr-shadow); }
-    .kpi[data-tone='critical'] { border-top-color: var(--sr-critical); }
-    .kpi[data-tone='warning'] { border-top-color: var(--sr-safety); }
-    .kpi[data-tone='good'] { border-top-color: var(--sr-good); }
-    .kpi[data-tone='info'] { border-top-color: var(--sr-blueprint); }
-    .top { display: flex; justify-content: space-between; align-items: center; color: var(--sr-ink-3); }
-    .value { font: 750 2rem/1.1 var(--sr-font-display); margin-top: 6px; color: var(--sr-ink); }
-    .hint { font-size: 0.82rem; color: var(--sr-ink-3); margin-top: 4px; }
+    .kpi { height: 100%; padding: 14px 16px; background: var(--sr-surface); }
+    .top { display: flex; align-items: center; gap: 7px; }
+    .label { font-family: var(--sr-font-mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sr-ink-3); }
+    .dot { width: 6px; height: 6px; border-radius: 1px; background: var(--sr-line-strong); flex: none; }
+    .kpi[data-tone='critical'] .dot { background: var(--sr-accent); }
+    .kpi[data-tone='warning'] .dot { background: var(--sr-chart-completed); }
+    .kpi[data-tone='good'] .dot { background: var(--sr-good); }
+    .kpi[data-tone='info'] .dot { background: var(--sr-info); }
+    .value { font-family: var(--sr-font-mono); font-size: 1.75rem; font-weight: 500; line-height: 1.15; letter-spacing: -0.03em; margin-top: 10px; color: var(--sr-ink); }
+    .kpi[data-tone='critical'] .value { color: var(--sr-accent-strong); }
+    .hint { font-size: var(--sr-text-sm); color: var(--sr-ink-3); margin-top: 2px; }
   `,
 })
 export class KpiComponent {
@@ -248,7 +240,7 @@ export class KpiComponent {
       }
       @case ('error') {
         <div class="state error" role="alert">
-          <sr-icon name="error" [size]="28" />
+          <sr-icon name="error" [size]="20" />
           <div>
             <strong>{{ error()?.title || 'Something went wrong' }}</strong>
             <p>{{ error()?.detail || message() }}</p>
@@ -260,7 +252,7 @@ export class KpiComponent {
       }
       @default {
         <div class="state empty">
-          <sr-icon [name]="'checklist'" [size]="28" />
+          <sr-icon [name]="'checklist'" [size]="20" />
           <div>
             <strong>{{ title() || 'Nothing here yet' }}</strong>
             @if (message()) {
@@ -273,13 +265,14 @@ export class KpiComponent {
     }
   `,
   styles: `
-    .state { display: flex; align-items: center; gap: 14px; padding: 22px; color: var(--sr-ink-2); flex-wrap: wrap; }
-    .state p { margin: 2px 0 0; color: var(--sr-ink-3); }
-    .error { background: var(--sr-critical-soft); border-radius: var(--sr-radius); color: var(--sr-critical); }
-    .error p { color: var(--sr-ink-2); }
-    .empty { justify-content: flex-start; border: 1px dashed var(--sr-line-strong); border-radius: var(--sr-radius); }
-    .retry { margin-left: auto; padding: 8px 14px; border-radius: var(--sr-radius); border: 1px solid currentColor; background: white; color: inherit; font-weight: 600; cursor: pointer; }
-    .spinner { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--sr-line); border-top-color: var(--sr-blueprint); animation: spin 0.8s linear infinite; }
+    .state { display: flex; align-items: center; gap: 12px; padding: 18px; color: var(--sr-ink-2); flex-wrap: wrap; }
+    .state p { margin: 2px 0 0; color: var(--sr-ink-3); font-size: var(--sr-text-sm); }
+    .state sr-icon { color: var(--sr-ink-4); }
+    .error { background: var(--sr-surface); border: 1px solid var(--sr-line); border-left: 2px solid var(--sr-critical); border-radius: var(--sr-radius); }
+    .error sr-icon { color: var(--sr-critical); }
+    .empty { border: 1px dashed var(--sr-line-strong); border-radius: var(--sr-radius); background: var(--sr-surface); }
+    .retry { margin-left: auto; height: 32px; padding: 0 12px; border-radius: var(--sr-radius); border: 1px solid var(--sr-line-strong); background: var(--sr-surface); color: var(--sr-ink); font: inherit; font-weight: 500; cursor: pointer; }
+    .spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--sr-line); border-top-color: var(--sr-ink-2); animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   `,
 })
@@ -302,10 +295,10 @@ export class StateComponent {
     </div>
   `,
   styles: `
-    .meter { height: 8px; background: var(--sr-concrete-2); border-radius: 999px; overflow: hidden; }
-    .fill { height: 100%; background: var(--sr-blueprint); border-radius: 999px; transition: width 0.4s ease; }
+    .meter { height: 4px; background: var(--sr-subtle); border-radius: 2px; overflow: hidden; }
+    .fill { height: 100%; background: var(--sr-ink-2); border-radius: 2px; transition: width 200ms var(--sr-ease); }
     .fill[data-tone='good'] { background: var(--sr-good); }
-    .fill[data-tone='critical'] { background: var(--sr-st-blocked); }
+    .fill[data-tone='critical'] { background: var(--sr-accent); }
   `,
 })
 export class MeterComponent {

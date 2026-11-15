@@ -11,11 +11,11 @@ export interface StatusRow {
 
 const ORDER: WorkOrderStatus[] = ['Open', 'InProgress', 'Blocked', 'Completed', 'Closed'];
 const COLOR: Record<string, string> = {
-  Open: 'var(--sr-st-open)',
-  InProgress: 'var(--sr-st-inprogress)',
-  Blocked: 'var(--sr-st-blocked)',
-  Completed: 'var(--sr-st-completed)',
-  Closed: 'var(--sr-st-closed)',
+  Open: 'var(--sr-chart-open)',
+  InProgress: 'var(--sr-chart-progress)',
+  Blocked: 'var(--sr-chart-blocked)',
+  Completed: 'var(--sr-chart-completed)',
+  Closed: 'var(--sr-chart-closed)',
 };
 
 /**
@@ -105,22 +105,22 @@ const COLOR: Record<string, string> = {
     .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; list-style: none; margin: 0; padding: 0; font-size: 0.8rem; color: var(--sr-ink-2); }
     .legend li { display: inline-flex; align-items: center; gap: 6px; }
     .swatch { width: 12px; height: 12px; border-radius: 3px; }
-    .toggle { border: 1px solid var(--sr-line-strong); background: var(--sr-paper); border-radius: var(--sr-radius); padding: 4px 10px; font-size: 0.8rem; cursor: pointer; color: var(--sr-ink-2); }
+    .toggle { border: 1px solid var(--sr-line-strong); background: var(--sr-surface); border-radius: var(--sr-radius); height: 28px; padding: 0 10px; font: inherit; font-size: var(--sr-text-sm); cursor: pointer; color: var(--sr-ink-2); }
     .rows { display: grid; gap: 12px; }
     .row { display: grid; grid-template-columns: minmax(110px, 190px) 1fr 36px; gap: 12px; align-items: center; }
     .row-label { display: flex; flex-direction: column; min-width: 0; }
-    .row-label strong { font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-label strong { font-family: var(--sr-font-mono); font-weight: 500; font-size: 0.8125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row-label span { font-size: 0.75rem; color: var(--sr-ink-3); }
-    .track { display: flex; gap: 2px; height: 26px; background: var(--sr-concrete); border-radius: 4px; position: relative; }
+    .track { display: flex; gap: 2px; height: 22px; background: var(--sr-subtle); border-radius: 3px; position: relative; }
     .seg { position: relative; height: 100%; min-width: 4px; display: flex; align-items: center; justify-content: center; cursor: default; }
     .seg:first-child { border-radius: 4px 0 0 4px; }
     .seg:last-child { border-radius: 0 4px 4px 0; }
     .seg:only-child { border-radius: 4px; }
-    .seg-label { color: #fff; font-size: 0.75rem; font-weight: 700; }
+    .seg-label { color: #fff; font-family: var(--sr-font-mono); font-size: 0.6875rem; font-weight: 500; }
     .seg-label.dark { color: #0b0b0b; }
     .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--sr-ink); color: #fff; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; z-index: 2; pointer-events: none; }
     .none { font-size: 0.78rem; color: var(--sr-ink-3); padding: 4px 8px; }
-    .total { font-weight: 700; text-align: right; }
+    .total { font-family: var(--sr-font-mono); font-weight: 500; text-align: right; }
     @media (max-width: 560px) { .row { grid-template-columns: 1fr 32px; } .row-label { grid-column: 1 / -1; } }
   `,
 })
@@ -188,14 +188,14 @@ export class StatusChartComponent {
   `,
   styles: `
     .pk { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th[scope='row'] { text-align: left; font-weight: 600; padding: 6px 12px 6px 0; white-space: nowrap; }
+    th[scope='row'] { text-align: left; font-weight: 500; padding: 6px 12px 6px 0; white-space: nowrap; }
     td { padding: 6px 8px; }
     .bar-cell { width: 55%; min-width: 120px; }
-    .track { height: 14px; background: var(--sr-concrete); border-radius: 4px; overflow: hidden; }
-    .fill { height: 100%; background: var(--sr-blueprint); border-radius: 0 4px 4px 0; }
-    .pct { font-weight: 700; text-align: right; }
-    .meta { color: var(--sr-ink-3); white-space: nowrap; font-size: 0.8rem; }
-    .late { color: var(--sr-critical); font-weight: 650; }
+    .track { height: 10px; background: var(--sr-subtle); border-radius: 3px; overflow: hidden; }
+    .fill { height: 100%; background: var(--sr-ink-2); border-radius: 0 3px 3px 0; }
+    .pct { font-family: var(--sr-font-mono); font-weight: 500; text-align: right; }
+    .meta { color: var(--sr-ink-3); white-space: nowrap; font-size: 0.8rem; font-family: var(--sr-font-mono); }
+    .late { color: var(--sr-accent-strong); font-weight: 500; }
   `,
 })
 export class PackageChartComponent {
