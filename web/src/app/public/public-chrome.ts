@@ -78,7 +78,7 @@ export class PublicHeaderComponent {
   protected readonly github = GITHUB_URL;
 }
 
-/** Footer laid out like a drawing title block. */
+/** Minimal footer: mark, one line, three links. */
 @Component({
   selector: 'sr-public-footer',
   imports: [RouterLink, LogoComponent],
@@ -86,66 +86,25 @@ export class PublicHeaderComponent {
   template: `
     <footer>
       <div class="inner">
-        <div class="block">
-          <div class="cell brand-cell">
-            <sr-logo />
-            <p>Keep site work, decisions, and progress in one place.</p>
-          </div>
-          <div class="cell">
-            <span class="lbl">Project</span>
-            <span class="val">Independent portfolio project</span>
-            <p class="small">
-              Not affiliated with, endorsed by, or built for any construction company. All projects, people, companies,
-              addresses and records are fictional.
-            </p>
-          </div>
-          <div class="cell">
-            <span class="lbl">Sheets</span>
-            <ul>
-              <li><a routerLink="/demo">Live demo</a></li>
-              <li><a routerLink="/case-study">Case study</a></li>
-              <li><a [href]="github" rel="noopener" target="_blank">Source on GitHub</a></li>
-              <li><a href="/openapi/v1.json">OpenAPI document</a></li>
-            </ul>
-          </div>
-          <div class="cell">
-            <span class="lbl">Built with</span>
-            <p class="small">Angular · TypeScript · ASP.NET Core · C# · EF Core · SQL Server · Playwright</p>
-            <span class="lbl">Credits</span>
-            <p class="small">Type: IBM Plex Sans and IBM Plex Mono (SIL OFL 1.1). Icons: Material Symbols (Apache 2.0). Code: MIT.</p>
-          </div>
-          <div class="cell dwg">
-            <span class="lbl">Drawing no.</span>
-            <span class="val sr-mono">SR-{{ sheet() }}</span>
-            <span class="lbl">Rev</span>
-            <span class="val sr-mono">2026-11</span>
-          </div>
-        </div>
+        <sr-logo [size]="18" />
+        <p>A personal project · all data is fictional</p>
+        <nav aria-label="Footer">
+          <a routerLink="/demo">Try the demo</a>
+          <a routerLink="/case-study">Case study</a>
+          <a [href]="github" rel="noopener" target="_blank">GitHub</a>
+        </nav>
       </div>
     </footer>
   `,
   styles: `
     footer { border-top: 1px solid var(--sr-line); background: var(--sr-bg); }
-    .inner { max-width: 1200px; margin: 0 auto; padding: 40px 24px 48px; }
-    .block { display: grid; grid-template-columns: 1.3fr 1.4fr 1fr 1.4fr 0.8fr; border: 1px solid var(--sr-ink); background: var(--sr-surface); }
-    .cell { padding: 14px 16px; border-right: 1px solid var(--sr-line-strong); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .cell:last-child { border-right: 0; }
-    .lbl { font-family: var(--sr-font-mono); font-size: 0.625rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sr-ink-3); }
-    .lbl:not(:first-child) { margin-top: 8px; }
-    .val { font-size: var(--sr-text-sm); font-weight: 500; }
-    p { margin: 6px 0 0; font-size: var(--sr-text-sm); color: var(--sr-ink-2); }
-    .small { font-size: 0.78rem; color: var(--sr-ink-3); line-height: 1.5; margin: 0; }
-    ul { list-style: none; margin: 2px 0 0; padding: 0; display: grid; gap: 4px; font-size: var(--sr-text-sm); }
-    @media (max-width: 960px) {
-      .block { grid-template-columns: 1fr 1fr; }
-      .cell { border-bottom: 1px solid var(--sr-line-strong); }
-      .brand-cell { grid-column: 1 / -1; }
-    }
-    @media (max-width: 520px) { .block { grid-template-columns: 1fr; } .cell { border-right: 0; } }
+    .inner { max-width: 1200px; margin: 0 auto; padding: 28px 24px; display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
+    p { margin: 0; font-size: var(--sr-text-sm); color: var(--sr-ink-3); }
+    nav { margin-left: auto; display: flex; gap: 20px; font-size: var(--sr-text-sm); }
+    nav a { color: var(--sr-ink-2); }
+    @media (max-width: 640px) { nav { margin-left: 0; width: 100%; } }
   `,
 })
 export class PublicFooterComponent {
-  /** Drawing number shown in the title block (e.g. "A-001" on the landing page). */
-  readonly sheet = input('A-001');
   protected readonly github = GITHUB_URL;
 }
