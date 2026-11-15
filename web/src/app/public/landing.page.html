@@ -3,39 +3,65 @@
 <main id="main">
   <!-- SHEET 01 · Overview -->
   <section class="hero sr-gridpaper" aria-labelledby="hero-title">
-    <div class="wrap">
-      <p class="sr-kicker">Sheet 01 · Construction operations</p>
-      <h1 id="hero-title">Keep site work, decisions, and progress in one place.</h1>
-      <p class="lede">
-        SiteRoof connects the office and the field: work orders that respect the schedule, progress a supervisor
-        verifies, and material approvals that reach purchasing exactly once.
-      </p>
-      <div class="ctas">
-        <a routerLink="/demo" class="sr-btn primary lg" data-testid="hero-try-demo">Try the demo <sr-icon name="arrow_forward" [size]="18" /></a>
-        <a routerLink="/case-study" class="sr-btn secondary lg">Read the case study</a>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="sr-kicker">Sheet 01 · Construction operations</p>
+        <h1 id="hero-title">Keep site work, decisions, and progress in one place.</h1>
+        <p class="lede">
+          SiteRoof connects the office and the field: work orders that respect the schedule, progress a supervisor
+          verifies, and material approvals that reach purchasing exactly once.
+        </p>
+        <div class="ctas">
+          <a routerLink="/demo" class="sr-btn primary lg" data-testid="hero-try-demo">Try the demo <sr-icon name="arrow_forward" [size]="18" /></a>
+          <a routerLink="/case-study" class="sr-btn secondary lg">Read the case study</a>
+        </div>
+        <p class="note sr-mono">No sign-up · private workspace · fictional data · resets on demand</p>
       </div>
-      <p class="note sr-mono">No sign-up · private workspace · fictional data · resets on demand</p>
-
       <figure class="shot hero-shot">
         <img
-          src="screens/overview.png"
+          src="screens/home.png"
           width="1440"
           height="900"
-          alt="SiteRoof overview: open, overdue and blocked work counts, work orders by status for three projects and an attention queue."
+          alt="SiteRoof Home: overdue work, open blockers, pending approvals and ERP issues, a needs-attention table and a projects table."
           fetchpriority="high"
         />
-        <figcaption>
-          <span class="sr-mono">FIG. 1</span> Overview of a seeded demo workspace, captured from the running app.
-        </figcaption>
+        <figcaption><span class="sr-mono">FIG. 1</span> Home in a seeded demo workspace, captured from the running app.</figcaption>
       </figure>
     </div>
   </section>
 
-  <!-- SHEET 02 · Workflow -->
-  <section class="sheet" id="workflow" aria-labelledby="workflow-title">
+  <!-- SHEET 02 · Problem -->
+  <section class="sheet" id="problem" aria-labelledby="problem-title">
+    <div class="wrap problem">
+      <div>
+        <p class="sr-kicker">Sheet 02 · The problem</p>
+        <h2 id="problem-title">Coordination breaks down between the office and the site</h2>
+        <p>
+          On a renovation, the schedule lives in the office and the facts live on site. A crew finds the drywall is 40
+          sheets short, the supervisor sends a text, the material is approved in an email thread, and the weekly report
+          is updated by hand. Work stalls while the information catches up.
+        </p>
+        <p>
+          SiteRoof keeps each work order, progress report, blocker and approval in one record that everyone on the
+          project sees, and derives every dashboard number from those records.
+        </p>
+      </div>
+      <dl class="roles" aria-label="Who it is for">
+        @for (r of roles; track r.role) {
+          <div>
+            <dt>{{ r.role }}</dt>
+            <dd>{{ r.does }}</dd>
+          </div>
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- SHEET 03 · Workflow -->
+  <section class="sheet alt" id="workflow" aria-labelledby="workflow-title">
     <div class="wrap">
       <header class="sheet-head">
-        <p class="sr-kicker">Sheet 02 · Workflow</p>
+        <p class="sr-kicker">Sheet 03 · Workflow</p>
         <h2 id="workflow-title">One work order, from assignment to close-out</h2>
         <p>
           A supervisor assigns work to someone on the project roster. The crew reports what was installed and what is in
@@ -74,11 +100,11 @@
     </div>
   </section>
 
-  <!-- SHEET 03 · Capabilities -->
-  <section class="sheet alt" id="capabilities" aria-labelledby="cap-title">
+  <!-- SHEET 04 · Capabilities -->
+  <section class="sheet" id="capabilities" aria-labelledby="cap-title">
     <div class="wrap">
       <header class="sheet-head">
-        <p class="sr-kicker">Sheet 03 · Schedule of capabilities</p>
+        <p class="sr-kicker">Sheet 04 · Schedule of capabilities</p>
         <h2 id="cap-title">What is implemented, and where the rule is enforced</h2>
       </header>
       <div class="sr-table-wrap">
@@ -107,11 +133,11 @@
     </div>
   </section>
 
-  <!-- SHEET 04 · Integration -->
-  <section class="sheet" id="integration" aria-labelledby="int-title">
+  <!-- SHEET 05 · Integration -->
+  <section class="sheet alt" id="integration" aria-labelledby="int-title">
     <div class="wrap split">
       <div class="split-text">
-        <p class="sr-kicker">Sheet 04 · ERP handoff</p>
+        <p class="sr-kicker">Sheet 05 · ERP handoff</p>
         <h2 id="int-title">Approved once, delivered once, even when the ERP is down</h2>
         <p>
           Approving a request writes the decision, the audit entry and an outbox message in one database transaction. A
@@ -138,11 +164,11 @@
     </div>
   </section>
 
-  <!-- SHEET 05 · Verification -->
-  <section class="sheet alt" aria-labelledby="ver-title">
+  <!-- SHEET 06 · Verification -->
+  <section class="sheet" aria-labelledby="ver-title">
     <div class="wrap">
       <header class="sheet-head">
-        <p class="sr-kicker">Sheet 05 · Verification</p>
+        <p class="sr-kicker">Sheet 06 · Verification</p>
         <h2 id="ver-title">Tested against a real database and a real browser</h2>
       </header>
       <dl class="metrics">
@@ -164,28 +190,6 @@
     </div>
   </section>
 
-  <!-- SHEET 06 · About -->
-  <section class="sheet" aria-labelledby="about-title">
-    <div class="wrap about">
-      <div>
-        <p class="sr-kicker">Sheet 06 · About</p>
-        <h2 id="about-title">Why this exists</h2>
-      </div>
-      <div>
-        <p>
-          SiteRoof is an independent portfolio project, built while applying for a software developer student role at a
-          general contractor in Edmonton. It shows, with working code, the internal software construction teams rely
-          on: secure web apps, clear APIs, careful relational data, reliable integrations and tests that check the
-          business rules.
-        </p>
-        <p class="sr-muted">It is not affiliated with or endorsed by any company. Every project, person and record in it is fictional.</p>
-        <div class="ctas">
-          <a routerLink="/demo" class="sr-btn primary">Try the demo</a>
-          <a [href]="github" class="sr-btn secondary" rel="noopener" target="_blank">Source <sr-icon name="open_in_new" [size]="16" /></a>
-        </div>
-      </div>
-    </div>
-  </section>
 </main>
 
-<sr-public-footer sheet="A-001" />
+<sr-public-footer />

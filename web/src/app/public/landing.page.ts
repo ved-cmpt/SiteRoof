@@ -41,6 +41,21 @@ export class LandingPage {
     { area: 'Blocker summary', what: 'A short summary of open blockers with links to the records behind each statement.', how: 'Deterministic rules, labelled “Rules-based summary”. No AI model is used.' },
   ];
 
+  protected readonly roles = [
+    {
+      role: 'Project managers',
+      does: 'See overdue work, open blockers and the approval backlog for every project, and approve materials once, with a record of who decided.',
+    },
+    {
+      role: 'Site supervisors',
+      does: 'Create work orders, assign them to the project team, verify reported progress and clear blockers.',
+    },
+    {
+      role: 'Crews',
+      does: 'See assigned work on a phone, log quantities and blockers from the field, and request materials against the work order.',
+    },
+  ];
+
   /** Real results from docs/STATUS.md. Update both together. */
   protected readonly metrics = [
     { value: '60', label: 'backend tests', detail: 'xUnit against SQL Server 2022 in a disposable container' },

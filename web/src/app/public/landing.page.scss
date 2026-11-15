@@ -18,17 +18,24 @@
 
 // ---------------------------------------------------------------- hero
 .hero {
-  padding: 88px 0 72px;
+  padding: 80px 0 72px;
   border-bottom: 1px solid var(--sr-line);
 
   h1 {
-    font-size: var(--sr-text-hero);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
     font-weight: 600;
-    letter-spacing: -0.04em;
-    line-height: 1.04;
+    letter-spacing: -0.035em;
+    line-height: 1.06;
     max-width: 15ch;
     margin: 14px 0 20px;
   }
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 48px;
+  align-items: center;
 }
 
 .lede {
@@ -75,7 +82,7 @@
 }
 
 .hero-shot {
-  margin-top: 56px;
+  margin: 0;
 }
 
 // ---------------------------------------------------------------- sheets
@@ -306,15 +313,37 @@
   max-width: 80ch;
 }
 
-.about {
+// Problem and who it is for
+.problem {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 56px;
+  align-items: start;
 
   p:not(.sr-kicker) {
     font-size: var(--sr-text-md);
     color: var(--sr-ink-2);
-    max-width: 62ch;
+    max-width: 60ch;
+  }
+}
+
+.roles {
+  margin: 0;
+  border-top: 1px solid var(--sr-ink);
+
+  div {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--sr-line);
+  }
+
+  dt {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--sr-ink-3);
   }
 }
 
@@ -346,16 +375,14 @@
     padding: 56px 0 48px;
   }
 
-  .hero-shot {
-    margin-top: 40px;
-  }
 
   .sheet {
     padding: 64px 0;
   }
 
   .split,
-  .about {
+  .problem,
+  .hero-grid {
     grid-template-columns: 1fr;
     gap: 32px;
   }
