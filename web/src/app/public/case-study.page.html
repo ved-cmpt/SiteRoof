@@ -1,9 +1,9 @@
 <sr-public-header />
 
 <main id="main">
-  <header class="hero">
+  <header class="hero sr-gridpaper">
     <div class="wrap">
-      <p class="sr-kicker on-dark">Case study</p>
+      <p class="sr-kicker">Case study · Drawing set SR-B</p>
       <h1>SiteRoof: coordinating site work, decisions and progress</h1>
       <p class="lede">
         How a small modular monolith handles the parts of construction software that are easy to get wrong: who may see
@@ -11,8 +11,8 @@
         derived from the records.
       </p>
       <div class="ctas">
-        <a routerLink="/demo" class="sr-btn-safety">Try the live demo <sr-icon name="arrow_forward" [size]="18" /></a>
-        <a [href]="github" class="sr-btn-ghost" rel="noopener" target="_blank">Source on GitHub <sr-icon name="open_in_new" [size]="16" /></a>
+        <a routerLink="/demo" class="sr-btn primary">Try the demo <sr-icon name="arrow_forward" [size]="18" /></a>
+        <a [href]="github" class="sr-btn secondary" rel="noopener" target="_blank">Source on GitHub <sr-icon name="open_in_new" [size]="16" /></a>
       </div>
     </div>
   </header>
@@ -38,6 +38,7 @@
       </p>
 
       <section id="problem">
+        <p class="sheet-no">B-01</p>
         <h2>The problem</h2>
         <p>
           On a commercial renovation, the schedule lives in the office and the facts live on site. A drywall crew
@@ -53,6 +54,7 @@
       </section>
 
       <section id="users">
+        <p class="sheet-no">B-02</p>
         <h2>Who it is for</h2>
         <div class="cards">
           <div><h3>Project manager</h3><p>Creates projects and milestones, approves or rejects material requests, watches overdue work and the approval backlog.</p></div>
@@ -63,6 +65,7 @@
       </section>
 
       <section id="rules">
+        <p class="sheet-no">B-03</p>
         <h2>Business rules the code enforces</h2>
         <ul class="checks">
           <li>Every work order belongs to a project, and can only be assigned to a member of that project's roster.</li>
@@ -77,6 +80,7 @@
       </section>
 
       <section id="architecture">
+        <p class="sheet-no">B-04</p>
         <h2>Architecture</h2>
         <p>
           One deployable: the ASP.NET Core API serves the compiled Angular app from the same origin, which keeps cookie
@@ -140,6 +144,7 @@
       </section>
 
       <section id="data">
+        <p class="sheet-no">B-05</p>
         <h2>Data model</h2>
         <p>
           Business tables carry a <code>TenantId</code> (directly or through their project) with EF Core global query filters,
@@ -187,6 +192,7 @@
       </section>
 
       <section id="integration">
+        <p class="sheet-no">B-06</p>
         <h2>ERP integration: transactional outbox</h2>
         <ol class="steps">
           <li>The manager approves. In one <code>SaveChanges</code> (one database transaction) SiteRoof updates the request, writes the audit event and inserts an outbox row keyed <code>mr-approved:&#123;id&#125;</code>.</li>
@@ -198,6 +204,7 @@
       </section>
 
       <section id="stack">
+        <p class="sheet-no">B-07</p>
         <h2>Why this stack</h2>
         <ul class="checks">
           <li><strong>Angular + TypeScript (strict) + Angular Material</strong>: typed forms, standalone components and signals; accessible components out of the box for internal business apps.</li>
@@ -209,6 +216,7 @@
       </section>
 
       <section id="security">
+        <p class="sheet-no">B-08</p>
         <h2>Security decisions</h2>
         <ul class="checks">
           <li>Cookie authentication (HttpOnly, SameSite=Lax, Secure when hosted) and antiforgery tokens validated on every unsafe <code>/api</code> request.</li>
@@ -220,6 +228,7 @@
       </section>
 
       <section id="testing">
+        <p class="sheet-no">B-09</p>
         <h2>Testing</h2>
         <p>
           Backend integration tests boot the real API (middleware, auth, CSRF, EF Core) against SQL Server 2022 in a
@@ -237,6 +246,7 @@
       </section>
 
       <section id="deployment">
+        <p class="sheet-no">B-10</p>
         <h2>Deployment</h2>
         <figure class="diagram">
           <svg viewBox="0 0 880 210" role="img" aria-labelledby="dep-title dep-desc">
@@ -269,6 +279,7 @@
       </section>
 
       <section id="walkthrough">
+        <p class="sheet-no">B-11</p>
         <h2>Demo walkthrough</h2>
         <ol class="steps">
           <li><strong>Open Riverbend.</strong> As Marcus (site supervisor), open Riverbend Library Renovation and turn on "Overdue only": the drywall work orders are late and RBL-007 is blocked by a 40-sheet shortage.</li>
@@ -278,10 +289,11 @@
           <li><strong>Watch the ERP.</strong> The requisition shows "Retrying" after the simulated 503, then "Acknowledged by ERP" with a reference number.</li>
           <li><strong>Check the dashboard.</strong> Overview and the project dashboard recalculate from the database: approval backlog down by one, progress up.</li>
         </ol>
-        <a routerLink="/demo" class="sr-btn-safety">Run it yourself <sr-icon name="arrow_forward" [size]="18" /></a>
+        <a routerLink="/demo" class="sr-btn primary">Run it yourself <sr-icon name="arrow_forward" [size]="18" /></a>
       </section>
 
       <section id="limits">
+        <p class="sheet-no">B-12</p>
         <h2>Known limitations</h2>
         <ul class="checks warn">
           <li>Not yet deployed; hosting steps are documented for the owner.</li>
@@ -295,4 +307,4 @@
   </div>
 </main>
 
-<sr-public-footer />
+<sr-public-footer sheet="B-001" />

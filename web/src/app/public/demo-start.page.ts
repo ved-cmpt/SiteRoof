@@ -17,6 +17,7 @@ import { LogoComponent } from './public-chrome';
       @if (!error()) {
         <section class="card" role="status" aria-live="polite">
           <span class="spinner" aria-hidden="true"></span>
+          <p class="sr-kicker">Provisioning</p>
           <h1>Preparing your private workspace…</h1>
           <p>
             Seeding three fictional projects, nine people, thirty work orders and a pending ERP retry. This usually takes a
@@ -25,11 +26,11 @@ import { LogoComponent } from './public-chrome';
         </section>
       } @else {
         <section class="card error" role="alert">
-          <sr-icon name="error" [size]="32" />
+          <sr-icon name="error" [size]="22" />
           <h1>We couldn't start the demo</h1>
           <p>{{ error()!.detail }}</p>
           <div class="row">
-            <button type="button" class="sr-btn-safety" (click)="start()">Try again</button>
+            <button type="button" class="sr-btn primary" (click)="start()">Try again</button>
             <a routerLink="/">Back to the home page</a>
           </div>
         </section>
@@ -37,14 +38,16 @@ import { LogoComponent } from './public-chrome';
     </main>
   `,
   styles: `
-    :host { display: block; min-height: 100vh; background: var(--sr-steel); color: #fff; }
-    .wrap { max-width: 640px; margin: 0 auto; padding: 48px 20px; }
-    .home { color: #fff; text-decoration: none; }
-    .card { margin-top: 64px; background: var(--sr-paper); color: var(--sr-ink); border-radius: 12px; padding: 32px; border-top: 6px solid var(--sr-safety); }
-    .card p { color: var(--sr-ink-2); }
+    :host { display: block; min-height: 100vh; }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 32px 24px; }
+    .home { text-decoration: none; }
+    .card { margin-top: 96px; background: var(--sr-surface); border: 1px solid var(--sr-line); border-radius: var(--sr-radius-lg); padding: 28px; }
+    h1 { font-size: var(--sr-text-xl); letter-spacing: -0.025em; margin: 14px 0 8px; }
+    .card p { color: var(--sr-ink-3); margin: 0; }
+    .error { border-left: 2px solid var(--sr-critical); }
     .error sr-icon { color: var(--sr-critical); }
-    .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
-    .spinner { display: block; width: 32px; height: 32px; border-radius: 50%; border: 4px solid var(--sr-line); border-top-color: var(--sr-safety); animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+    .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+    .spinner { display: block; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--sr-line); border-top-color: var(--sr-accent); animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   `,
 })

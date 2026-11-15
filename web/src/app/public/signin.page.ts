@@ -23,7 +23,7 @@ import { LogoComponent } from './public-chrome';
           }
           <h1>Explore SiteRoof</h1>
           <p>Start a private demo workspace with fictional projects. No account or password needed.</p>
-          <a routerLink="/demo" class="sr-btn-safety">Start the demo <sr-icon name="arrow_forward" [size]="18" /></a>
+          <a routerLink="/demo" class="sr-btn primary">Start the demo <sr-icon name="arrow_forward" [size]="18" /></a>
         </section>
 
         <section class="card">
@@ -50,16 +50,18 @@ import { LogoComponent } from './public-chrome';
     </main>
   `,
   styles: `
-    :host { display: block; min-height: 100vh; background: var(--sr-steel); }
-    .wrap { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
-    .home { color: #fff; text-decoration: none; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 48px; }
-    .card { background: var(--sr-paper); border-radius: 12px; padding: 28px; }
-    .demo { border-top: 6px solid var(--sr-safety); }
-    .notice { display: flex; gap: 8px; align-items: center; background: var(--sr-info-soft); color: var(--sr-info); padding: 8px 12px; border-radius: 6px; }
+    :host { display: block; min-height: 100vh; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 32px 24px; }
+    .home { text-decoration: none; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 72px; }
+    .card { background: var(--sr-surface); border: 1px solid var(--sr-line); border-radius: var(--sr-radius-lg); padding: 24px; }
+    h1 { font-size: var(--sr-text-xl); letter-spacing: -0.025em; }
+    h2 { font-size: var(--sr-text-lg); }
+    .card > p { color: var(--sr-ink-3); }
+    .notice { display: flex; gap: 8px; align-items: center; background: var(--sr-info-soft); color: var(--sr-info); padding: 8px 12px; border-radius: var(--sr-radius); font-size: var(--sr-text-sm); }
     form { display: grid; gap: 4px; margin-top: 12px; }
-    .err { color: var(--sr-critical); }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .err { color: var(--sr-critical); font-size: var(--sr-text-sm); }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; margin-top: 40px; } }
   `,
 })
 export class SignInPage {

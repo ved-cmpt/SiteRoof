@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../shared/ui';
-import { IconName } from '../shared/icons.generated';
 import { GITHUB_URL, PublicFooterComponent, PublicHeaderComponent } from './public-chrome';
 
-interface Feature {
-  icon: IconName;
+interface Callout {
+  n: number;
+  /** Position on the screenshot, in percent of its width/height. */
+  x: number;
+  y: number;
   title: string;
   body: string;
 }
@@ -20,114 +22,30 @@ interface Feature {
 export class LandingPage {
   protected readonly github = GITHUB_URL;
 
-  protected readonly problems = [
-    {
-      title: 'The schedule lives in the office, the truth lives on site',
-      body: 'Supervisors know drywall is short 40 sheets; the project manager finds out at the weekly meeting.',
-    },
-    {
-      title: 'Approvals stall in inboxes',
-      body: 'Material requests arrive by text and email, get approved twice or not at all, and never reach purchasing cleanly.',
-    },
-    {
-      title: 'Dashboards are rebuilt by hand',
-      body: 'Overdue counts and completion percentages are copied into spreadsheets and are stale the moment they are shared.',
-    },
+  /** Numbered callouts over the work-order screenshot (positions match docs/screenshots/work-order.png). */
+  protected readonly callouts: Callout[] = [
+    { n: 1, x: 66, y: 23.5, title: 'Status follows a state machine', body: 'Start, block, complete, close. Closed work is locked; reopening needs a manager and a reason.' },
+    { n: 2, x: 19, y: 46, title: 'Crew report from the field', body: 'Quantity installed, a note and an optional blocker. A blocker moves the work order to Blocked.' },
+    { n: 3, x: 58.6, y: 75.5, title: 'Someone else verifies', body: 'Progress is verified by a supervisor who did not report it. Blockers are resolved explicitly.' },
+    { n: 4, x: 66.5, y: 64.6, title: 'Materials, approved once', body: 'Requests are tied to the work order and decided once by the project manager, with an audit entry.' },
   ];
 
-  protected readonly workflows = [
-    {
-      role: 'Site Supervisor',
-      icon: 'engineering' as IconName,
-      steps: [
-        'Create a work order and assign it to someone on the project roster',
-        'Set priority, due date, milestone and finish-to-start dependencies',
-        'Verify crew progress and resolve blockers so work resumes',
-      ],
-    },
-    {
-      role: 'Crew Member',
-      icon: 'construction' as IconName,
-      steps: [
-        'See only the work assigned to you, on the projects you belong to',
-        'Report quantities installed, notes and blockers from the field',
-        'Request missing materials against the work order',
-      ],
-    },
-    {
-      role: 'Project Manager',
-      icon: 'fact_check' as IconName,
-      steps: [
-        'Approve or reject material requests — once, with an audit entry',
-        'Watch the approval reach the ERP, including retries',
-        'Track overdue work, blockers and completion by work package',
-      ],
-    },
+  protected readonly capabilities = [
+    { area: 'Work orders', what: 'Assign within the project roster, prioritize, set due dates and milestones, add finish-to-start dependencies.', how: 'Server-side roster check; dependency cycles rejected; completion blocked until predecessors are done.' },
+    { area: 'Progress', what: 'Quantities, notes and blockers reported by the crew.', how: 'Non-negative quantities enforced in the API and by CHECK constraints; verification by a different person.' },
+    { area: 'Approvals', what: 'Material requests submitted once and approved or rejected by the project manager.', how: 'Client idempotency key with a unique index; repeated decisions are no-ops; contradictions return 409.' },
+    { area: 'Concurrency', what: 'Two people editing the same work order.', how: 'SQL Server rowversion; a stale edit returns 409 and the UI says so instead of overwriting.' },
+    { area: 'Dashboards', what: 'Overdue work, completion by work package, open blockers, approval backlog.', how: 'Two documented T-SQL views, queried on every load. Nothing is cached or typed in.' },
+    { area: 'Audit', what: 'Activity feed for every meaningful change.', how: 'Actor, time and before/after values written in the same transaction as the change.' },
+    { area: 'Isolation', what: 'Each demo visitor gets a private workspace.', how: 'Tenant query filters plus per-project membership checks on every read and write.' },
+    { area: 'Blocker summary', what: 'A short summary of open blockers with links to the records behind each statement.', how: 'Deterministic rules, labelled “Rules-based summary”. No AI model is used.' },
   ];
 
-  protected readonly features: Feature[] = [
-    {
-      icon: 'checklist',
-      title: 'Work-order board with real rules',
-      body: 'Status transitions, dependencies with cycle detection, closure checks, and closed work that cannot be silently edited.',
-    },
-    {
-      icon: 'verified',
-      title: 'Progress that is verified',
-      body: 'Field quantities and blockers are logged by the crew and verified by someone other than the reporter.',
-    },
-    {
-      icon: 'inventory_2',
-      title: 'Material approvals, audited',
-      body: 'Submitted once, decided once by the project manager. Every change records actor, time and before/after values.',
-    },
-    {
-      icon: 'sync',
-      title: 'Resilient ERP handoff',
-      body: 'Approvals write a transactional outbox event. A background worker delivers it with bounded backoff and an idempotency key.',
-    },
-    {
-      icon: 'dashboard',
-      title: 'Dashboards from live records',
-      body: 'Overdue work, completion by work package, open blockers and approval backlog are queried from SQL Server on every load.',
-    },
-    {
-      icon: 'rule',
-      title: 'Rules-based blocker summary',
-      body: 'A deterministic summary of open blockers, every statement linked to its evidence. Clearly labelled; no AI involved.',
-    },
-    {
-      icon: 'shield',
-      title: 'Isolation by design',
-      body: 'Tenant and project-membership checks on every API read and write. A crew member cannot open another project by editing the URL.',
-    },
-    {
-      icon: 'history',
-      title: 'Activity and audit trail',
-      body: 'A readable activity feed backed by an append-only audit table, filterable by project and event type.',
-    },
-  ];
-
-  protected readonly demoSteps = [
-    { title: 'Click Try Demo', body: 'A private workspace is created for you with three fictional Edmonton-area projects. No sign-up, no passwords.' },
-    { title: 'Switch roles', body: 'Use the persona switcher to act as the project manager, the site supervisor or a drywall crew lead.' },
-    { title: 'Run the scenario', body: 'Riverbend Library is behind on drywall. Report progress, verify it, approve the missing board.' },
-    { title: 'Watch it propagate', body: 'The ERP simulator rejects the first attempt; the retry succeeds. Dashboards update from the database.' },
-  ];
-
-  protected readonly stack = [
-    'Angular 22',
-    'TypeScript (strict)',
-    'Angular Material',
-    'ASP.NET Core 10',
-    'C#',
-    'EF Core 10',
-    'SQL Server 2022',
-    'T-SQL views',
-    'xUnit',
-    'Testcontainers',
-    'Playwright',
-    'Docker',
-    'GitHub Actions',
+  /** Real results from docs/STATUS.md. Update both together. */
+  protected readonly metrics = [
+    { value: '60', label: 'backend tests', detail: 'xUnit against SQL Server 2022 in a disposable container' },
+    { value: '14', label: 'frontend unit tests', detail: 'Angular services and components' },
+    { value: '10', label: 'browser tests', detail: 'Playwright, including the full demo scenario' },
+    { value: '33 ms', label: 'dashboard median', detail: 'Measured locally against the Docker container, not a hosted service' },
   ];
 }
