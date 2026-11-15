@@ -1,7 +1,6 @@
 <div class="sr-page">
   <header class="sr-head">
     <div>
-      <nav class="crumbs" aria-label="Breadcrumb"><span>{{ session.user()?.tenant?.name }}</span></nav>
       <h1>Approvals</h1>
       @if (requests.data(); as r) {
         <div class="meta"><span>{{ r.totalCount }} {{ filterLabel() }}</span></div>

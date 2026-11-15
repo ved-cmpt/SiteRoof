@@ -7,7 +7,6 @@ import { ApiService } from '../core/api.service';
 import { Loader } from '../core/loader';
 import { IntegrationHealth, MaterialRequest, MaterialRequestStatus, Paged } from '../core/models';
 import { NotifyService } from '../core/notify.service';
-import { SessionService } from '../core/session.service';
 import { AgoPipe, ErpStatusComponent, MaterialStatusComponent, StateComponent, StatItem, StatsComponent } from '../shared/ui';
 import { DecisionDialogComponent } from './dialogs';
 
@@ -24,7 +23,6 @@ export class ApprovalsPage implements OnInit {
   private readonly api = inject(ApiService);
   private readonly dialog = inject(MatDialog);
   private readonly notify = inject(NotifyService);
-  protected readonly session = inject(SessionService);
   protected readonly requests = new Loader<Paged<MaterialRequest>>();
   protected readonly health = new Loader<IntegrationHealth>();
   protected readonly filter = signal<Filter>('Submitted');

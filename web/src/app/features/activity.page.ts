@@ -9,7 +9,6 @@ import { ActivityFeedComponent } from './activity-feed';
     <div class="sr-page">
       <header class="sr-head">
         <div>
-          <nav class="crumbs" aria-label="Breadcrumb"><span>Audit trail</span></nav>
           <h1>Activity</h1>
           <div class="meta"><span>Every change with actor, time and before/after values, for projects you can access</span></div>
         </div>

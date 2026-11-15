@@ -105,7 +105,6 @@ export class ProjectDialogComponent {
     <div class="sr-page">
       <header class="sr-head">
         <div>
-          <nav class="crumbs" aria-label="Breadcrumb"><span>{{ session.user()?.tenant?.name }}</span></nav>
           <h1>Projects</h1>
           @if (projects.data(); as list) {
             <div class="meta"><span>{{ list.length }} projects</span></div>
