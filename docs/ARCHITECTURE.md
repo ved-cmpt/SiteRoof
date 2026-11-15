@@ -33,7 +33,7 @@ SQL Server 2022 / Azure SQL (tables, constraints, T-SQL views, mockerp schema)
 | `Features/WorkOrders` | Work orders, pure `WorkOrderStateMachine`, comments, dependencies, progress |
 | `Features/Materials` | Material requests and decisions (writes the outbox row) |
 | `Features/Integrations` | `HttpErpClient`, `OutboxProcessor`, `OutboxDispatcher`, `MockErpController`, health |
-| `Features/Dashboard` | Overview and project dashboards (from the SQL views) |
+| `Features/Dashboard` | Home and project dashboards (from the SQL views) |
 | `Features/Activity` | Audit feed |
 | `Features/Insights` | `IBlockerSummaryProvider`, rules-based provider, evidence filter |
 | `Features/Demo` | Provisioner, seeder, tenant deleter, cleanup worker, demo endpoints |
@@ -111,8 +111,8 @@ To add an AI-backed provider later (disabled by default, never required):
 | `core/` | `ApiService` (typed calls, `ApiError`), `SessionService` (signals), guards, interceptor, `Loader` |
 | `shared/` | Icons (inline SVG generated from Material Symbols), status chips, KPI tiles, states, charts |
 | `public/` | Landing, case study, demo start, sign-in, 403/404 |
-| `shell/` | Authenticated layout: navigation, project switcher, persona switcher, demo strip, guided-demo panel |
-| `features/` | Overview, projects, project detail (board / dashboard / milestones & team / activity), work order, approvals, activity, admin, dialogs |
+| `shell/` | Authenticated layout: sidebar (navigation, project list, guided-demo entry and profile menu with the persona switcher at the bottom; a drawer on phones), demo notice, guided-demo panel |
+| `features/` | Home, projects, project detail (board / dashboard / milestones & team / activity), work order, approvals, activity, admin, dialogs |
 
 Standalone components, OnPush change detection, signals, zoneless change detection, lazy-loaded routes,
 strict TypeScript and strict templates. Fonts and icons are bundled (no third-party requests), which keeps
