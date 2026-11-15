@@ -24,10 +24,15 @@ using SiteRoof.Api.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-// Hosts such as Render inject PORT; honour it so the single container listens where the platform expects.
-if (Environment.GetEnvironmentVariable("PORT") is { Length: > 0 } port && string.IsNullOrEmpty(config["ASPNETCORE_HTTP_PORTS"]))
+// Hosts such as Render inject PORT; honour it so the single container listens where the platform expects,
+// and point the outbox worker at this process's own mock ERP on that port unless configured explicitly.
+if (Environment.GetEnvironmentVariable("PORT") is { Length: > 0 } port)
 {
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+    if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Erp__BaseUrl")))
+    {
+        config["Erp:BaseUrl"] = $"http://localhost:{port}";
+    }
 }
 
 if (!builder.Environment.IsDevelopment())

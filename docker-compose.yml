@@ -37,15 +37,13 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__SiteRoof: "Server=db,1433;Database=SiteRoof;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=True"
       Erp__BaseUrl: http://localhost:8080
-      # Plain HTTP on localhost: allow non-Secure cookies. Hosted deployments keep the default (Secure).
+      # Plain HTTP on localhost: allow non-Secure cookies and no proxy headers. Hosted deployments keep the defaults.
       Security__SecureCookies: "false"
+      ForwardedHeaders__Enabled: "false"
+      # Guest workspaces a single client may create per 15 minutes (raise for local end-to-end runs).
+      Demo__ProvisionPermitsPerWindow: ${DEMO_PROVISION_PERMITS:-6}
     ports:
       - "127.0.0.1:8080:8080"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health/ready || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
 
 volumes:
   siteroof-sql:
