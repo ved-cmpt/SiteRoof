@@ -29,12 +29,7 @@
 
     <article class="content">
       <p class="disclaimer" role="note">
-        <sr-icon name="info" [size]="18" />
-        <span>
-          <strong>Independent portfolio project.</strong> SiteRoof is not affiliated with, endorsed by, or built for any
-          construction company and does not recreate any proprietary system. Every project, person, company, address and
-          record in it is fictional.
-        </span>
+        <span><strong>A personal project.</strong> Every project, person, company, address and record in SiteRoof is fictional.</span>
       </p>
 
       <section id="problem">
@@ -43,7 +38,7 @@
         <p>
           On a commercial renovation, the schedule lives in the office and the facts live on site. A drywall crew
           discovers it is 40 sheets short; the supervisor texts the project manager; the request is approved in an email
-          thread; purchasing may or may not hear about it. Meanwhile the "percent complete" in the weekly report was typed
+          thread; purchasing may or may not hear about it. Meanwhile the “percent complete” in the weekly report was typed
           in by hand.
         </p>
         <p>
@@ -59,7 +54,7 @@
         <div class="cards">
           <div><h3>Project manager</h3><p>Creates projects and milestones, approves or rejects material requests, watches overdue work and the approval backlog.</p></div>
           <div><h3>Site supervisor</h3><p>Creates and assigns work orders to people on the roster, verifies progress, resolves blockers and closes out work.</p></div>
-          <div><h3>Crew member</h3><p>Sees assigned work on their projects only, reports quantities, notes and blockers, requests materials.</p></div>
+          <div><h3>Crew member</h3><p>Sees assigned work on their own projects, reports quantities, notes and blockers, and requests materials.</p></div>
           <div><h3>Admin</h3><p>Manages workspace settings and people; can read every project in the workspace.</p></div>
         </div>
       </section>
@@ -74,7 +69,7 @@
           <li>Closed and cancelled work is locked. Editing it returns <code>409 work-order-locked</code>; only a project manager can reopen closed work, with a reason that is audited.</li>
           <li>Progress must be verified by someone other than the person who reported it.</li>
           <li>A material request is submitted once (client-generated idempotency key) and decided once by the project manager. Repeating the same decision is a no-op; contradicting it is a 409.</li>
-          <li>Concurrent edits use SQL Server <code>rowversion</code>. A stale version returns <code>409 concurrency-conflict</code> and the UI shows a "someone else changed this" banner instead of overwriting.</li>
+          <li>Concurrent edits use SQL Server <code>rowversion</code>. A stale version returns <code>409 concurrency-conflict</code> and the UI shows a “someone else changed this” notice instead of overwriting.</li>
           <li>Dependencies stay inside one project and can't form cycles.</li>
         </ul>
       </section>
@@ -221,7 +216,7 @@
         <ul class="checks">
           <li>Cookie authentication (HttpOnly, SameSite=Lax, Secure when hosted) and antiforgery tokens validated on every unsafe <code>/api</code> request.</li>
           <li>Object-level authorization in the service layer: other tenants' ids return 404; same-tenant projects without membership return 403. The UI hides actions only as a convenience.</li>
-          <li>Guest isolation: each "Try Demo" click provisions a separate tenant with password-less personas. No shared mutable data, no credentials shown anywhere.</li>
+          <li>Guest isolation: each “Try the demo” click provisions a separate tenant with passwordless personas. No shared mutable data and no credentials shown anywhere.</li>
           <li>Rate limits per client (global API, demo provisioning, sign-in), demo quotas, capacity cap and automatic expiry.</li>
           <li>Security headers (CSP without inline scripts, frame-ancestors none, nosniff, referrer policy), structured JSON logs, secrets only from environment variables.</li>
         </ul>
@@ -236,7 +231,7 @@
           other's data. They cover the must-pass rules: URL tampering by a crew member, cross-tenant ids, approvals that
           are logged, idempotent and forbidden for crew, ERP 503-then-retry without duplicates, bounded retries, 409 on
           conflicting edits, and dashboard/database/activity updates when work is created and completed. Angular unit
-          tests cover services and components; Playwright runs the recruiter scenario end to end in Chromium.
+          tests cover services and components; Playwright runs the full demo scenario end to end in Chromium.
         </p>
         <p>
           Exact commands and the latest recorded results are kept in
@@ -274,7 +269,7 @@
             <line x1="650" y1="90" x2="698" y2="90" class="edge" marker-end="url(#arrow2)" />
             <text x="440" y="190" class="t-warn" text-anchor="middle">Planned target, documented in docs/DEPLOYMENT.md. Not deployed yet.</text>
           </svg>
-          <figcaption>Owner-run deployment. Locally the same Dockerfile runs with <code>docker compose --profile full up</code>.</figcaption>
+          <figcaption>Not deployed yet; the hosting steps are documented. Locally the same Dockerfile runs with <code>docker compose --profile full up</code>.</figcaption>
         </figure>
       </section>
 
@@ -282,12 +277,12 @@
         <p class="sheet-no">B-11</p>
         <h2>Demo walkthrough</h2>
         <ol class="steps">
-          <li><strong>Open Riverbend.</strong> As Marcus (site supervisor), open Riverbend Library Renovation and turn on "Overdue only": the drywall work orders are late and RBL-007 is blocked by a 40-sheet shortage.</li>
-          <li><strong>Submit progress.</strong> Switch to Leah (crew). On RBL-006 report the square metres installed today. Her view only contains Riverbend.</li>
+          <li><strong>Open Riverbend.</strong> As Marcus (site supervisor), open Riverbend Library Renovation and turn on “Overdue only”: the drywall work orders are late and RBL-007 is blocked by a 40-sheet shortage.</li>
+          <li><strong>Submit progress.</strong> Switch to Leah (crew). On RBL-006 report the square metres installed today. Her view shows only Riverbend.</li>
           <li><strong>Verify.</strong> Switch back to Marcus and verify Leah's log.</li>
           <li><strong>Approve materials.</strong> As Dana (project manager), open Approvals and approve the Type X board for RBL-007.</li>
-          <li><strong>Watch the ERP.</strong> The requisition shows "Retrying" after the simulated 503, then "Acknowledged by ERP" with a reference number.</li>
-          <li><strong>Check the dashboard.</strong> Overview and the project dashboard recalculate from the database: approval backlog down by one, progress up.</li>
+          <li><strong>Watch the ERP.</strong> The requisition shows “Retrying” after the simulated 503, then “Acknowledged by ERP” with a reference number.</li>
+          <li><strong>Check the dashboard.</strong> Home and the project dashboard recalculate from the database: the approval backlog drops by one and progress goes up.</li>
         </ol>
         <a routerLink="/demo" class="sr-btn primary">Run it yourself <sr-icon name="arrow_forward" [size]="18" /></a>
       </section>
@@ -296,7 +291,7 @@
         <p class="sheet-no">B-12</p>
         <h2>Known limitations</h2>
         <ul class="checks warn">
-          <li>Not yet deployed; hosting steps are documented for the owner.</li>
+          <li>Not deployed yet; the hosting steps are documented.</li>
           <li>Single region, single container. Data-protection keys are not persisted, so a container restart signs visitors out (demo workspaces are disposable anyway).</li>
           <li>No offline mode, file attachments, notifications or scheduling engine; those belong to other tools.</li>
           <li>The ERP is a self-hosted simulator, not a real purchasing system.</li>
@@ -307,4 +302,4 @@
   </div>
 </main>
 
-<sr-public-footer sheet="B-001" />
+<sr-public-footer />
