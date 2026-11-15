@@ -16,7 +16,13 @@ case study, and a working demo where each visitor gets a private, seeded workspa
 | --- | --- | --- |
 | ![Board](docs/screenshots/project-board.png) | ![Work order](docs/screenshots/work-order.png) | ![Approvals](docs/screenshots/approvals.png) |
 
-Screenshots were captured from the running app by `tests/e2e/specs/screenshots.spec.ts`.
+| On a phone (crew member) | Landing page |
+| --- | --- |
+| ![Phone overview for a crew member](docs/screenshots/mobile-overview.png) | ![Landing page](docs/screenshots/landing.png) |
+
+Screenshots were captured from the running app by `tests/e2e/specs/screenshots.spec.ts`. The app is
+usable at 375px: tables become stacked rows, the board shows one status column at a time, dialogs open as
+full-screen sheets and the crew's progress form has a sticky submit button.
 
 ## What it does
 
@@ -98,4 +104,4 @@ docs                    Spec, status, architecture, database, API, deployment, s
 
 ## License
 
-[MIT](LICENSE). Icons: Material Symbols (Apache 2.0). Fonts: Inter and JetBrains Mono (SIL OFL 1.1).
+[MIT](LICENSE). Icons: Material Symbols (Apache 2.0). Fonts: IBM Plex Sans and IBM Plex Mono (SIL OFL 1.1).

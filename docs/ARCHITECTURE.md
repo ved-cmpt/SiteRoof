@@ -129,11 +129,21 @@ styles and shared primitives.
 | Surfaces | Drawing-paper background `#F6F4EF`, white surfaces, subtle wells `#F0EDE6`, 1px hairlines `#E2DED6` / `#CFC9BD` |
 | Ink | Text `#16181D`, secondary `#3D4048`, warm-gray tertiary `#67625A` (5.5:1 on the background) |
 | Accent | Construction orange `#D9480F` for non-text marks (focus ring, active nav marker, overdue rules, callouts); `#B93D0B` for filled buttons and accent text (5.6:1 on white, WCAG AA) |
-| Type | Inter (UI and headings, 400/500/600, tight tracking on large headings) and JetBrains Mono (codes, ids, quantities, dates, numbers, sheet labels), both self-hosted |
+| Type | IBM Plex Sans (UI and headings) and IBM Plex Mono (codes, ids, quantities, dates, numbers), both self-hosted. In the app: three sizes per screen (20px title, 14px body, 12px small), weights 400/500 with 600 only for page titles |
 | Motifs | Faint 24px drawing grid behind heroes, mono "sheet" labels, title-block footer, dimension-line divider; no gradients or heavy shadows |
+| Spacing and shape | Spacing scale 4/8/12/16/24/32 (`--sr-s1`…`--sr-s6`), one 6px radius, 1px hairlines |
 | Motion | 150 ms fades and colour transitions only, disabled under `prefers-reduced-motion` |
 
-Status pills use muted tinted backgrounds with an icon and a text label, so colour is never the only signal.
+Status pills use muted tinted backgrounds with an icon and a text label, so colour is never the only signal,
+and appear only in status columns.
+
+App building blocks live in `web/src/styles/_app.scss` and are reused on every `/app` screen: page head
+(breadcrumb, title, one meta line, actions), section and panel, the `.sr-dt` data table (aligned columns, mono
+numbers right-aligned, whole-row links; below 640px — or 1024px with `.stack-md` — rows become stacked list rows),
+list rows, labelled form fields with inline errors, notices, the `sr-stats` strip and `sr-state` for
+loading/empty/error. Phones and tablets (below 960px) get a drawer for navigation and one compact menu for project,
+persona and demo controls; touch targets are at least 44px; dialogs become full-screen sheets; the work-order board
+shows one status column at a time below 1200px.
 
 ### Chart colours
 

@@ -1,6 +1,6 @@
 # SiteRoof — Status
 
-_Last updated: 2026-11-15. Phases 1, 2 and 3 plus the visual redesign are complete locally. **Not deployed.**_
+_Last updated: 2026-11-15. Phases 1–3, the visual redesign and the app polish pass are complete locally. **Not deployed.**_
 
 ## Done
 
@@ -61,21 +61,40 @@ _Last updated: 2026-11-15. Phases 1, 2 and 3 plus the visual redesign are comple
   option text; fixed with an explicit `aria-label` (no test assertion was relaxed).
 - Screenshots in `docs/screenshots` and `web/public/screens` recaptured from the redesigned app.
 
-## Verification (run on 2026-11-15 after the redesign, Windows 11, Docker Desktop)
+**App polish pass (2026-11-15)**
+- Audited every /app screen, dialog and state at 375, 768 and 1440 px (51 captures, untracked in `.local/audit/`),
+  listed 34 issues and fixed each; resolutions are recorded next to the list.
+- Type: IBM Plex Sans + IBM Plex Mono (self-hosted). App scale of three sizes (20/14/12 px), weights 400/500 with
+  600 for page titles only; spacing scale 4–32 px; one 6px radius.
+- Removed dashboard tells: greeting, six KPI tiles (now one 4-number strip), pills outside status columns, heading
+  icons, card grids and filler sentences. Overview, projects, approvals, milestones, team and admin are tables.
+- Phones and tablets: drawer navigation and one compact menu, tables stack into list rows, one board column at a
+  time with a status picker, 44px touch targets, full-screen sheet dialogs, sticky submit for logging progress,
+  crew sees "Assigned to me" first.
+- Bugs found and fixed during the pass: the guided-demo panel opened over the content on phones; tab paging arrows
+  overlapped tabs on phones; the tablet approvals table clipped its action column; desktop dialogs scrolled
+  sideways; the compact menu header ran name and role together.
+- New Playwright phone checks (375 px): no horizontal overflow on every /app route (plus milestones/team and list
+  view), drawer and compact menu, one-column board, crew logs progress and a blocker, dialogs as full-screen sheets.
+
+## Verification (run on 2026-11-15 after the polish pass, Windows 11, Docker Desktop)
 
 | Command | Result |
 | --- | --- |
-| `dotnet build SiteRoof.slnx -c Release -warnaserror` | Succeeded, 0 warnings, 0 errors |
-| `dotnet test SiteRoof.slnx` | **60 passed**, 0 failed (xUnit; SQL Server 2022 via Testcontainers) |
 | `cd web; npm run lint` | All files pass linting |
 | `cd web; npm test` | **14 passed** (3 files, Vitest) |
-| `cd web; npm run build` | Succeeded, no warnings; initial bundle 323.74 kB raw / 86.46 kB estimated transfer |
-| `cd tests/e2e; npx playwright test --project=chromium` (API on :5080 serving the production build) | **10 passed** |
-| `docker compose --profile full up -d --build` then `E2E_BASE_URL=http://127.0.0.1:8080 npx playwright test --project=chromium` (with `DEMO_PROVISION_PERMITS=500`) | **10 passed** against the rebuilt production container |
-| `docker run rhysd/actionlint:1.7.12` on `.github/workflows` | No findings |
-| `docker run zricethezav/gitleaks:v8.30.1 git /repo` | No leaks found |
+| `cd web; npm run build` | Succeeded, no warnings; initial bundle 340.36 kB raw / 88.41 kB estimated transfer |
+| `dotnet test SiteRoof.slnx` | **60 passed**, 0 failed (xUnit; SQL Server 2022 via Testcontainers) |
+| `cd tests/e2e; npx playwright test --project=chromium` (API on :5080 serving the production build) | **15 passed** (10 desktop + 5 phone-viewport) |
+| `docker compose --profile full up -d --build` (default demo limit, 6 per client per 15 min) | Built and started; `/health/ready` 200; demo start, `/api/overview` and `/app/overview` return 200 |
+| `node scripts/audit.mjs .local/audit/after http://127.0.0.1:8080` | 51 after-screenshots captured from the production container |
 
-The `actionlint` and `gitleaks` rows above are from the pre-redesign run; the redesign did not touch the workflow.
+The full Playwright suite was not run against the default-limit container: it starts about 15 demo workspaces and
+the production limit allows 6 per client per 15 minutes (see Known issues). It passed against the production build
+served by the API. The previous container run (raised limit) passed 10/10 before the polish pass.
+
+Earlier checks still valid (no backend or workflow changes since): `dotnet build -c Release -warnaserror` 0 warnings,
+actionlint no findings, gitleaks no leaks.
 
 Local latency (pre-redesign; backend unchanged since), measured with `node scripts/measure-latency.mjs http://127.0.0.1:8080 30` against the
 production container and SQL Server 2022 in Docker on the development machine (not a hosted environment):
