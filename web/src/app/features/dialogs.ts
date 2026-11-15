@@ -107,18 +107,16 @@ export interface WorkOrderFormData {
               <option [value]="p"></option>
             }
           </datalist>
-          <mat-hint>e.g. Drywall, Electrical</mat-hint>
           <mat-error>Enter a work package.</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Assignee</mat-label>
+          <mat-label>Assignee (project team)</mat-label>
           <mat-select formControlName="assigneeId" data-testid="wo-assignee">
             <mat-option [value]="null">Unassigned</mat-option>
             @for (m of data.members; track m.userId) {
               <mat-option [value]="m.userId">{{ m.displayName }} · {{ m.trade || m.role }}</mat-option>
             }
           </mat-select>
-          <mat-hint>Only this project's roster can be assigned.</mat-hint>
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Due date</mat-label>
@@ -321,7 +319,7 @@ export class MaterialDialogComponent {
         {{ data.request.workOrderKey }}, requested by {{ data.request.requestedBy.displayName }}.
       </p>
       @if (data.decision === 'Approve') {
-        <p class="sr-muted">Approving records an audit entry and queues a requisition to the ERP in the same transaction. Decisions can't be reversed.</p>
+        <p class="sr-meta">Approval is recorded in the audit trail and sent to the ERP. It can't be reversed.</p>
       }
       <mat-form-field appearance="outline">
         <mat-label>{{ data.decision === 'Reject' ? 'Reason (required)' : 'Note (optional)' }}</mat-label>
