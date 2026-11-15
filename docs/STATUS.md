@@ -117,8 +117,8 @@ These are single-machine numbers for orientation only; nothing has been measured
 - Dependabot's `open-pull-requests-limit: 2` applies per ecosystem (GitHub has no global cap).
 - Running the full Playwright suite against the container or a hosted URL needs a higher demo provisioning
   limit (`DEMO_PROVISION_PERMITS` / `Demo__ProvisionPermitsPerWindow`), because each spec creates a workspace.
-- The board uses horizontal scrolling for its five status columns on small screens; List view is the
-  better mobile layout.
+- Material form fields in the work-order, project and material dialogs keep their own outline style; all other
+  app forms use the shared labelled fields.
 - The optional AI summary provider is an interface only; no provider is implemented or configured.
 
 ## Owner-only next steps
