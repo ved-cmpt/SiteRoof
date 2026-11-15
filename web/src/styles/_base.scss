@@ -80,7 +80,8 @@ samp {
 }
 
 ::selection {
-  background: var(--sr-accent-soft);
+  background: var(--sr-selection);
+  color: var(--sr-ink);
 }
 
 .sr-only {
