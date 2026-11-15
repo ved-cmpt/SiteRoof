@@ -36,7 +36,7 @@
       }
     </header>
 
-    <mat-tab-group [selectedIndex]="tab()" (selectedIndexChange)="onTab($event)" animationDuration="0ms" mat-stretch-tabs="false" class="tabs">
+    <mat-tab-group [selectedIndex]="tab()" (selectedIndexChange)="onTab($event)" animationDuration="0ms" mat-stretch-tabs="false" [disablePagination]="true" class="tabs">
       <!-- ============================================================ WORK ORDERS -->
       <mat-tab label="Work orders">
         <div class="tab">

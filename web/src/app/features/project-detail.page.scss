@@ -4,6 +4,18 @@
 
 .tabs {
   --mat-tab-header-label-text-size: var(--sr-app-body);
+
+  // Tabs scroll natively on narrow screens instead of using paging arrows.
+  ::ng-deep .mat-mdc-tab-label-container {
+    overflow-x: auto !important;
+    scrollbar-width: none;
+  }
+
+  ::ng-deep .mat-mdc-tab {
+    min-width: 0;
+    padding: 0 var(--sr-s3);
+    flex-shrink: 0;
+  }
 }
 
 .denied {
