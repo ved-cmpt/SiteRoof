@@ -11,7 +11,7 @@ import { Loader } from '../core/loader';
 import { ProjectDetail, ProjectSummary } from '../core/models';
 import { NotifyService } from '../core/notify.service';
 import { SessionService } from '../core/session.service';
-import { IconComponent, MeterComponent, StateComponent } from '../shared/ui';
+import { StateComponent } from '../shared/ui';
 
 @Component({
   selector: 'sr-project-dialog',
@@ -24,7 +24,6 @@ import { IconComponent, MeterComponent, StateComponent } from '../shared/ui';
         <mat-form-field appearance="outline">
           <mat-label>Code</mat-label>
           <input matInput formControlName="code" maxlength="20" required placeholder="e.g. WHS" />
-          <mat-hint>Uppercase letters, digits, dashes</mat-hint>
           <mat-error>Use 2–20 uppercase letters, digits or dashes.</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
@@ -100,77 +99,75 @@ export class ProjectDialogComponent {
 
 @Component({
   selector: 'sr-projects',
-  imports: [RouterLink, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, IconComponent, StateComponent, MeterComponent],
+  imports: [RouterLink, FormsModule, MatButtonModule, StateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="sr-page">
-      <header class="sr-page-head">
+      <header class="sr-head">
         <div>
-          <p class="sr-kicker">Projects</p>
-          <h1>Your projects</h1>
-          <p>Only projects you are a member of are listed{{ session.isAdmin() ? ' (admins see every project in the workspace)' : '' }}.</p>
-        </div>
-        <div class="sr-row">
-          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
-            <mat-label>Search projects</mat-label>
-            <input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" />
-          </mat-form-field>
-          @if (canCreate()) {
-            <button mat-flat-button (click)="create()"><sr-icon name="add" [size]="18" /> New project</button>
+          <nav class="crumbs" aria-label="Breadcrumb"><span>{{ session.user()?.tenant?.name }}</span></nav>
+          <h1>Projects</h1>
+          @if (projects.data(); as list) {
+            <div class="meta"><span>{{ list.length }} projects</span></div>
           }
         </div>
+        @if (canCreate()) {
+          <div class="actions"><button mat-flat-button (click)="create()">New project</button></div>
+        }
       </header>
 
-      @if (projects.error(); as e) {
-        <sr-state kind="error" [error]="e" (retry)="load()" />
-      } @else if (!projects.data()) {
-        <sr-state kind="loading" />
-      } @else if (filtered().length === 0) {
-        <sr-state [title]="search() ? 'No projects match “' + search() + '”' : 'No projects yet'" message="Try a different search, or create a project." />
-      } @else {
-        <div class="grid">
-          @for (p of filtered(); track p.id) {
-            <a class="project" [routerLink]="['/app/projects', p.id]" [attr.data-testid]="'project-' + p.code">
-              <div class="top">
-                <span class="code">{{ p.code }}</span>
-                <span class="status" [attr.data-status]="p.status">{{ p.status === 'OnHold' ? 'On hold' : p.status }}</span>
-              </div>
-              <h2>{{ p.title }}</h2>
-              <p class="sr-muted"><sr-icon name="location_on" [size]="14" /> {{ p.city || '—' }} · target <span class="sr-mono">{{ p.targetDate }}</span></p>
-              <sr-meter [value]="p.percentComplete" [label]="p.title + ' completion'" [tone]="p.percentComplete === 100 ? 'good' : 'info'" />
-              <dl class="stats">
-                <div><dt>Complete</dt><dd class="sr-num">{{ p.percentComplete }}%</dd></div>
-                <div><dt>Done</dt><dd class="sr-num">{{ p.doneWorkOrders }}/{{ p.totalWorkOrders }}</dd></div>
-                <div [class.bad]="p.overdueWorkOrders > 0"><dt>Overdue</dt><dd class="sr-num">{{ p.overdueWorkOrders }}</dd></div>
-                <div [class.bad]="p.blockedWorkOrders > 0"><dt>Blocked</dt><dd class="sr-num">{{ p.blockedWorkOrders }}</dd></div>
-              </dl>
-              @if (p.myRole) {
-                <span class="role">You: {{ p.myRole }}</span>
+      <div class="sr-toolbar">
+        <label class="sr-field search">
+          <span class="sr-only">Search projects</span>
+          <input type="search" placeholder="Search by name, code or city" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+        </label>
+      </div>
+
+      <div class="sr-panel">
+        @if (projects.error(); as e) {
+          <sr-state kind="error" [error]="e" (retry)="load()" />
+        } @else if (!projects.data()) {
+          <sr-state kind="loading" />
+        } @else if (filtered().length === 0) {
+          <sr-state [title]="search() ? 'No projects match “' + search() + '”' : 'No projects yet'" />
+        } @else {
+          <table class="sr-dt">
+            <thead>
+              <tr>
+                <th scope="col">Code</th>
+                <th scope="col">Project</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="m-hide">City</th>
+                <th scope="col" class="num">Done</th>
+                <th scope="col" class="num m-hide">Work orders</th>
+                <th scope="col" class="num">Overdue</th>
+                <th scope="col" class="num m-hide">Blocked</th>
+                <th scope="col">Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of filtered(); track p.id) {
+                <tr>
+                  <td class="c-id">{{ p.code }}</td>
+                  <td class="c-title"><a [routerLink]="['/app/projects', p.id]" [attr.data-testid]="'project-' + p.code">{{ p.title }}</a></td>
+                  <td class="c-status">{{ p.status === 'OnHold' ? 'On hold' : p.status }}</td>
+                  <td class="m-hide">{{ p.city }}</td>
+                  <td class="num m-label" data-label="Done">{{ p.percentComplete }}%</td>
+                  <td class="num m-hide">{{ p.doneWorkOrders }}/{{ p.totalWorkOrders }}</td>
+                  <td class="num m-label" data-label="Overdue" [class.late]="p.overdueWorkOrders > 0">{{ p.overdueWorkOrders }}</td>
+                  <td class="num m-hide">{{ p.blockedWorkOrders }}</td>
+                  <td class="c-date m-label" data-label="Target">{{ p.targetDate }}</td>
+                </tr>
               }
-            </a>
-          }
-        </div>
-      }
+            </tbody>
+          </table>
+        }
+      </div>
     </div>
   `,
   styles: `
-    .search { width: 240px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-    .project { display: block; background: var(--sr-surface); border: 1px solid var(--sr-line); border-radius: var(--sr-radius-lg); padding: 18px; color: inherit; text-decoration: none; transition: border-color var(--sr-fast) var(--sr-ease); }
-    .project:hover { border-color: var(--sr-ink-3); }
-    .top { display: flex; justify-content: space-between; align-items: center; }
-    .code { font-family: var(--sr-font-mono); font-size: 0.75rem; color: var(--sr-ink-2); border: 1px solid var(--sr-line-strong); padding: 2px 6px; border-radius: var(--sr-radius-sm); }
-    .status { font-size: 0.75rem; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: var(--sr-info-soft); color: var(--sr-info); }
-    .status[data-status='Completed'] { background: var(--sr-good-soft); color: var(--sr-good); }
-    .status[data-status='OnHold'] { background: var(--sr-warn-soft); color: var(--sr-warn); }
-    h2 { margin: 14px 0 4px; font-size: var(--sr-text-md); font-weight: 600; }
-    p { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); margin: 14px 0 0; border-top: 1px solid var(--sr-line); }
-    .stats div { padding: 8px 0 0; }
-    .stats dt { font-family: var(--sr-font-mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sr-ink-3); }
-    .stats dd { margin: 0; font-family: var(--sr-font-mono); font-weight: 500; font-size: 1rem; }
-    .stats .bad dd { color: var(--sr-accent-strong); }
-    .role { display: inline-block; margin-top: 12px; font-size: 0.78rem; color: var(--sr-ink-3); }
+    .search { width: 320px; max-width: 100%; }
+    @media (max-width: 767px) { .search { width: 100%; } }
   `,
 })
 export class ProjectsPage implements OnInit {
