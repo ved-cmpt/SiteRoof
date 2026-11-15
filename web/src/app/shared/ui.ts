@@ -94,9 +94,9 @@ export class DayPipe implements PipeTransform {
   selector: 'sr-status',
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<span class="chip" [attr.data-status]="status()"><sr-icon [name]="icon()" [size]="13" />{{ label() }}</span>`,
+  template: `<span class="chip" [attr.data-status]="status()"><sr-icon [name]="icon()" [size]="12" />{{ label() }}</span>`,
   styles: `
-    .chip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
+    .chip { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px; border-radius: var(--sr-radius); font-size: var(--sr-app-small, 0.75rem); font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
     [data-status='Open'] { background: var(--sr-st-open-bg); color: var(--sr-st-open); border-color: transparent; }
     [data-status='InProgress'] { background: var(--sr-st-progress-bg); color: var(--sr-st-progress); border-color: transparent; }
     [data-status='Blocked'] { background: var(--sr-st-blocked-bg); color: var(--sr-st-blocked); border-color: transparent; }
@@ -117,7 +117,7 @@ export class StatusChipComponent {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<span class="p" [attr.data-p]="priority()">
     @if (priority() === 'Critical' || priority() === 'High') {
-      <sr-icon name="flag" [size]="13" />
+      <sr-icon name="flag" [size]="12" />
     }
     {{ priority() }}</span
   >`,
@@ -145,10 +145,10 @@ const ERP_LABEL: Record<ErpTransmissionStatus, string> = {
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<span class="chip" [attr.data-s]="status()">
-    <sr-icon [name]="status() === 'Approved' ? 'check_circle' : status() === 'Rejected' ? 'block' : 'hourglass_top'" [size]="13" />{{ label() }}
+    <sr-icon [name]="status() === 'Approved' ? 'check_circle' : status() === 'Rejected' ? 'block' : 'hourglass_top'" [size]="12" />{{ label() }}
   </span>`,
   styles: `
-    .chip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
+    .chip { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px; border-radius: var(--sr-radius); font-size: var(--sr-app-small, 0.75rem); font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
     [data-s='Submitted'] { background: var(--sr-warn-soft); color: var(--sr-warn); border-color: transparent; }
     [data-s='Approved'] { background: var(--sr-good-soft); color: var(--sr-good); border-color: transparent; }
     [data-s='Rejected'] { background: var(--sr-critical-soft); color: var(--sr-critical); border-color: transparent; }
@@ -164,10 +164,10 @@ export class MaterialStatusComponent {
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<span class="chip" [attr.data-s]="status()" [attr.data-testid]="'erp-' + status()">
-    <sr-icon [name]="icon()" [size]="13" />{{ label() }}
+    <sr-icon [name]="icon()" [size]="12" />{{ label() }}
   </span>`,
   styles: `
-    .chip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
+    .chip { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px; border-radius: var(--sr-radius); font-size: var(--sr-app-small, 0.75rem); font-weight: 500; line-height: 1; white-space: nowrap; border: 1px solid var(--sr-line); background: var(--sr-surface); color: var(--sr-ink-2); }
     [data-s='Queued'] { background: var(--sr-info-soft); color: var(--sr-info); border-color: transparent; }
     [data-s='Retrying'] { background: var(--sr-warn-soft); color: var(--sr-warn); border-color: transparent; }
     [data-s='Sent'] { background: var(--sr-good-soft); color: var(--sr-good); border-color: transparent; }
@@ -228,7 +228,6 @@ export class KpiComponent {
 
 @Component({
   selector: 'sr-state',
-  imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @switch (kind()) {
@@ -240,10 +239,9 @@ export class KpiComponent {
       }
       @case ('error') {
         <div class="state error" role="alert">
-          <sr-icon name="error" [size]="20" />
-          <div>
+          <div class="text">
             <strong>{{ error()?.title || 'Something went wrong' }}</strong>
-            <p>{{ error()?.detail || message() }}</p>
+            <span>{{ error()?.detail || message() }}</span>
           </div>
           @if (retryable()) {
             <button type="button" class="retry" (click)="retry.emit()">Try again</button>
@@ -252,11 +250,10 @@ export class KpiComponent {
       }
       @default {
         <div class="state empty">
-          <sr-icon [name]="'checklist'" [size]="20" />
-          <div>
+          <div class="text">
             <strong>{{ title() || 'Nothing here yet' }}</strong>
             @if (message()) {
-              <p>{{ message() }}</p>
+              <span>{{ message() }}</span>
             }
           </div>
           <ng-content />
@@ -265,15 +262,15 @@ export class KpiComponent {
     }
   `,
   styles: `
-    .state { display: flex; align-items: center; gap: 12px; padding: 18px; color: var(--sr-ink-2); flex-wrap: wrap; }
-    .state p { margin: 2px 0 0; color: var(--sr-ink-3); font-size: var(--sr-text-sm); }
-    .state sr-icon { color: var(--sr-ink-4); }
-    .error { background: var(--sr-surface); border: 1px solid var(--sr-line); border-left: 2px solid var(--sr-critical); border-radius: var(--sr-radius); }
-    .error sr-icon { color: var(--sr-critical); }
-    .empty { border: 1px dashed var(--sr-line-strong); border-radius: var(--sr-radius); background: var(--sr-surface); }
-    .retry { margin-left: auto; height: 32px; padding: 0 12px; border-radius: var(--sr-radius); border: 1px solid var(--sr-line-strong); background: var(--sr-surface); color: var(--sr-ink); font: inherit; font-weight: 500; cursor: pointer; }
+    .state { display: flex; align-items: center; gap: var(--sr-s3); flex-wrap: wrap; padding: var(--sr-s4); color: var(--sr-ink-2); }
+    .text { display: flex; flex-direction: column; gap: 2px; flex: 1 1 200px; }
+    .text strong { font-weight: 500; color: var(--sr-ink); }
+    .text span { font-size: var(--sr-app-small, 0.75rem); color: var(--sr-ink-3); }
+    .error { box-shadow: inset 2px 0 0 var(--sr-critical); }
+    .retry { height: 32px; padding: 0 var(--sr-s3); border-radius: var(--sr-radius); border: 1px solid var(--sr-line-strong); background: var(--sr-surface); color: var(--sr-ink); font: inherit; font-weight: 500; cursor: pointer; }
     .spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--sr-line); border-top-color: var(--sr-ink-2); animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 767px) { .retry { height: 44px; } }
   `,
 })
 export class StateComponent {
@@ -283,6 +280,51 @@ export class StateComponent {
   readonly error = input<ApiError | null>(null);
   readonly retryable = input(true);
   readonly retry = output<void>();
+}
+
+export interface StatItem {
+  label: string;
+  value: string | number;
+  hint?: string;
+  tone?: 'neutral' | 'critical';
+  testId?: string;
+}
+
+/** One quiet row of 3-4 key numbers (replaces rows of identical KPI tiles). */
+@Component({
+  selector: 'sr-stats',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <dl class="stats" [style.--cols]="items().length">
+      @for (s of items(); track s.label) {
+        <div class="stat" [attr.data-tone]="s.tone ?? 'neutral'">
+          <dt>{{ s.label }}</dt>
+          <dd class="value" [attr.data-testid]="s.testId || null">{{ s.value }}</dd>
+          @if (s.hint) {
+            <dd class="hint">{{ s.hint }}</dd>
+          }
+        </div>
+      }
+    </dl>
+  `,
+  styles: `
+    .stats { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); margin: 0; background: var(--sr-surface); border: 1px solid var(--sr-line); border-radius: var(--sr-radius); }
+    .stat { padding: var(--sr-s3) var(--sr-s4); border-left: 1px solid var(--sr-line); min-width: 0; }
+    .stat:first-child { border-left: 0; }
+    dt { font-size: var(--sr-app-small); color: var(--sr-ink-3); }
+    dd { margin: 0; }
+    .value { font-family: var(--sr-font-mono); font-size: var(--sr-app-title); font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
+    [data-tone='critical'] .value { color: var(--sr-accent-strong); }
+    .hint { font-size: var(--sr-app-small); color: var(--sr-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (max-width: 639px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat:nth-child(odd) { border-left: 0; }
+      .stat:nth-child(n + 3) { border-top: 1px solid var(--sr-line); }
+    }
+  `,
+})
+export class StatsComponent {
+  readonly items = input.required<StatItem[]>();
 }
 
 /** Labelled progress meter with an accessible value. */
@@ -315,6 +357,7 @@ export const SHARED = [
   MaterialStatusComponent,
   ErpStatusComponent,
   KpiComponent,
+  StatsComponent,
   StateComponent,
   MeterComponent,
   StatusLabelPipe,
