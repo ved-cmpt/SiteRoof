@@ -1,0 +1,184 @@
+<sr-public-header />
+
+<main id="main">
+  <!-- Hero -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Construction operations platform</p>
+        <h1 id="hero-title">Keep site work, decisions, and progress in one place.</h1>
+        <p class="lede">
+          SiteRoof connects the office and the field: work orders that respect the schedule, progress the supervisor
+          verifies, and material approvals that reach purchasing exactly once.
+        </p>
+        <div class="ctas">
+          <a routerLink="/demo" class="sr-btn-safety big" data-testid="hero-try-demo">
+            Try Demo <sr-icon name="arrow_forward" [size]="20" />
+          </a>
+          <a routerLink="/case-study" class="sr-btn-ghost big">Read the case study</a>
+        </div>
+        <p class="note"><sr-icon name="lock" [size]="16" /> No sign-up. You get a private workspace that resets on demand and expires on its own.</p>
+      </div>
+
+      <figure class="preview" aria-label="Screenshot of the SiteRoof overview dashboard">
+        <div class="frame">
+          <div class="frame-bar" aria-hidden="true"><span></span><span></span><span></span><em>siteroof · overview</em></div>
+          <img
+            src="screens/overview.png"
+            width="1440"
+            height="900"
+            alt="SiteRoof overview: KPIs for open, overdue and blocked work, a status chart per project and an attention queue."
+            fetchpriority="high"
+          />
+        </div>
+        <figcaption>Captured from the running app with seeded demo data.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Problem / solution -->
+  <section class="band" id="product" aria-labelledby="problem-title">
+    <div class="wrap">
+      <p class="sr-kicker">The problem</p>
+      <h2 id="problem-title">Construction runs on coordination. Most of it happens in texts and spreadsheets.</h2>
+      <div class="problems">
+        @for (p of problems; track p.title) {
+          <article class="problem">
+            <sr-icon name="warning" [size]="22" />
+            <h3>{{ p.title }}</h3>
+            <p>{{ p.body }}</p>
+          </article>
+        }
+      </div>
+      <div class="solution">
+        <div>
+          <p class="sr-kicker">The approach</p>
+          <h3>One system of record for day-to-day execution</h3>
+        </div>
+        <ul>
+          <li><sr-icon name="check_circle" /> Every work order belongs to a project, and only that project's team can be assigned to it.</li>
+          <li><sr-icon name="check_circle" /> Progress, blockers and approvals are stored once and audited, so the dashboard is always derived, never typed in.</li>
+          <li><sr-icon name="check_circle" /> Integration to purchasing is asynchronous and idempotent, so a flaky ERP never loses or duplicates an order.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workflows -->
+  <section class="wrap section" id="workflows" aria-labelledby="workflows-title">
+    <p class="sr-kicker">Three roles, one workflow</p>
+    <h2 id="workflows-title">Built around how site teams actually hand work off</h2>
+    <div class="workflows">
+      @for (w of workflows; track w.role) {
+        <article class="workflow">
+          <header><sr-icon [name]="w.icon" [size]="26" /><h3>{{ w.role }}</h3></header>
+          <ol>
+            @for (s of w.steps; track s) {
+              <li>{{ s }}</li>
+            }
+          </ol>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- Capabilities -->
+  <section class="band light" aria-labelledby="features-title">
+    <div class="wrap">
+      <p class="sr-kicker">Capabilities</p>
+      <h2 id="features-title">What is actually implemented</h2>
+      <div class="features">
+        @for (f of features; track f.title) {
+          <article class="feature">
+            <span class="ficon"><sr-icon [name]="f.icon" [size]="22" /></span>
+            <h3>{{ f.title }}</h3>
+            <p>{{ f.body }}</p>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section class="wrap section" id="demo" aria-labelledby="demo-title">
+    <div class="demo-head">
+      <div>
+        <p class="sr-kicker">How the demo works</p>
+        <h2 id="demo-title">A real workspace, just for you, in about two seconds</h2>
+      </div>
+      <a routerLink="/demo" class="sr-btn-safety">Start the demo <sr-icon name="arrow_forward" [size]="18" /></a>
+    </div>
+    <ol class="steps">
+      @for (s of demoSteps; track s.title; let i = $index) {
+        <li>
+          <span class="n" aria-hidden="true">{{ i + 1 }}</span>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.body }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <!-- Engineering -->
+  <section class="band dark" id="engineering" aria-labelledby="eng-title">
+    <div class="wrap eng">
+      <div>
+        <p class="sr-kicker on-dark">Engineering</p>
+        <h2 id="eng-title">Enterprise patterns, small enough to read in an afternoon</h2>
+        <p>
+          A modular monolith: Angular served by the ASP.NET Core API from one container, cookie authentication with CSRF
+          protection, SQL Server with constraints that back up the business rules, and an outbox worker for the ERP
+          integration.
+        </p>
+        <ul class="chips" aria-label="Technology stack">
+          @for (t of stack; track t) {
+            <li>{{ t }}</li>
+          }
+        </ul>
+        <div class="ctas">
+          <a routerLink="/case-study" class="sr-btn-safety">Architecture and decisions</a>
+          <a [href]="github" class="sr-btn-ghost" rel="noopener" target="_blank">Source <sr-icon name="open_in_new" [size]="16" /></a>
+        </div>
+      </div>
+      <div class="proof">
+        <h3>Tested against a real database</h3>
+        <ul>
+          <li><sr-icon name="task_alt" /> A crew member cannot view another project by changing a URL id.</li>
+          <li><sr-icon name="task_alt" /> Approvals are logged, idempotent and refused for crew accounts.</li>
+          <li><sr-icon name="task_alt" /> ERP returns 503 once; the retry succeeds with no duplicate requisition.</li>
+          <li><sr-icon name="task_alt" /> Conflicting edits return a visible 409 instead of overwriting.</li>
+          <li><sr-icon name="task_alt" /> Creating and completing work updates the dashboard, database and activity feed.</li>
+        </ul>
+        <p class="small">xUnit integration tests run the real API against SQL Server 2022 in a disposable container; Playwright drives the full recruiter scenario in a browser.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why -->
+  <section class="wrap section why" aria-labelledby="why-title">
+    <div>
+      <p class="sr-kicker">Why this exists</p>
+      <h2 id="why-title">A portfolio project about the software behind building things</h2>
+    </div>
+    <div>
+      <p>
+        I built SiteRoof as an independent portfolio project while applying for a software developer student role at a
+        general contractor in Edmonton. It is my attempt to show, with working code, the kind of internal business
+        software construction teams depend on: secure web apps, clean APIs, careful relational data, reliable
+        integrations and tests that check the business rules.
+      </p>
+      <p class="sr-muted">
+        It is not affiliated with or endorsed by any company, and every project, person and record in it is fictional.
+      </p>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap final-inner">
+      <h2>See Riverbend Library get back on schedule.</h2>
+      <a routerLink="/demo" class="sr-btn-safety big">Try Demo <sr-icon name="arrow_forward" [size]="20" /></a>
+    </div>
+  </section>
+</main>
+
+<sr-public-footer />

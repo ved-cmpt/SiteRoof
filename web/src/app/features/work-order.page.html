@@ -1,0 +1,322 @@
+<div class="sr-page">
+  @if (wo.error(); as e) {
+    @if (e.status === 403 || e.status === 404) {
+      <section class="denied" [attr.data-testid]="e.status === 403 ? 'forbidden-page' : 'not-found-page'" role="alert">
+        <span class="code" aria-hidden="true">{{ e.status }}</span>
+        <h1>{{ e.status === 403 ? "You don't have access to this work order" : 'Work order not found' }}</h1>
+        <p>{{ e.detail }}</p>
+        <a routerLink="/app/projects" class="sr-btn-safety">See your projects</a>
+      </section>
+    } @else {
+      <sr-state kind="error" [error]="e" (retry)="reload()" />
+    }
+  } @else if (!wo.data()) {
+    <sr-state kind="loading" message="Loading work order…" />
+  } @else {
+    @let w = wo.data()!;
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a routerLink="/app/projects">Projects</a>
+      <sr-icon name="chevron_right" [size]="16" />
+      <a [routerLink]="['/app/projects', w.projectId]">{{ w.projectCode }} · {{ w.projectTitle }}</a>
+      <sr-icon name="chevron_right" [size]="16" />
+      <span>{{ w.key }}</span>
+    </nav>
+
+    <header class="whead">
+      <div>
+        <div class="sr-row">
+          <span class="key">{{ w.key }}</span>
+          <sr-status [status]="w.status" data-testid="wo-status" />
+          <sr-priority [priority]="w.priority" />
+          @if (w.isOverdue) {
+            <span class="late"><sr-icon name="schedule" [size]="15" /> Overdue since {{ w.dueDate | day }}</span>
+          }
+        </div>
+        <h1>{{ w.title }}</h1>
+        <p class="sr-muted">{{ w.workPackage }} · created by {{ w.createdBy.displayName }} {{ w.createdAt | ago }} · updated {{ w.updatedAt | ago }}</p>
+      </div>
+      <div class="actions" role="group" aria-label="Status actions">
+        @for (t of w.availableTransitions; track t) {
+          @if (transitions[t].primary) {
+            <button mat-flat-button (click)="transition(t)" [disabled]="busy()" [attr.data-testid]="'transition-' + t">
+              <sr-icon [name]="transitions[t].icon" [size]="18" /> {{ transitions[t].label }}
+            </button>
+          } @else {
+            <button mat-stroked-button (click)="transition(t)" [disabled]="busy()" [attr.data-testid]="'transition-' + t">
+              <sr-icon [name]="transitions[t].icon" [size]="18" /> {{ transitions[t].label }}
+            </button>
+          }
+        }
+        @if (w.permissions.canEdit && !editing()) {
+          <button mat-stroked-button (click)="startEdit()" data-testid="edit-work-order"><sr-icon name="edit" [size]="18" /> Edit</button>
+        }
+      </div>
+    </header>
+
+    @if (conflict(); as c) {
+      <div class="banner conflict" role="alert" data-testid="conflict-banner">
+        <sr-icon name="warning" [size]="22" />
+        <div>
+          <strong>Someone else changed this work order</strong>
+          <p>{{ c.detail }} Your change was not saved, so nothing was overwritten.</p>
+        </div>
+        <button mat-flat-button (click)="reload()" data-testid="conflict-reload">Load latest version</button>
+      </div>
+    }
+
+    @if (w.isLocked) {
+      <div class="banner locked" role="status">
+        <sr-icon name="lock" [size]="20" />
+        <p>
+          This work order is {{ w.status === 'Closed' ? 'closed' : 'cancelled' }} and locked against edits.
+          @if (w.status === 'Closed') {
+            A project manager can reopen it with a reason; the reopen is recorded in the audit trail.
+          }
+        </p>
+      </div>
+    }
+
+    <div class="grid">
+      <div class="main">
+        @if (editing()) {
+          <section class="sr-card" aria-labelledby="edit-title">
+            <div class="sr-card-title"><h2 id="edit-title">Edit work order</h2></div>
+            <form [formGroup]="editForm" (ngSubmit)="saveEdit()" class="form-grid">
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Title</mat-label>
+                <input matInput formControlName="title" maxlength="160" />
+                <mat-error>Enter a title.</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Priority</mat-label>
+                <mat-select formControlName="priority" data-testid="edit-priority">
+                  @for (p of priorities; track p) {
+                    <mat-option [value]="p">{{ p }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Due date</mat-label>
+                <input matInput type="date" formControlName="dueDate" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Assignee</mat-label>
+                <mat-select formControlName="assigneeId">
+                  <mat-option [value]="null">Unassigned</mat-option>
+                  @for (m of project.data()?.members ?? []; track m.userId) {
+                    <mat-option [value]="m.userId">{{ m.displayName }} · {{ m.trade || m.role }}</mat-option>
+                  }
+                </mat-select>
+                <mat-hint>Only this project's roster</mat-hint>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Planned quantity ({{ w.unit || 'units' }})</mat-label>
+                <input matInput type="number" min="0" formControlName="plannedQuantity" />
+              </mat-form-field>
+              <div class="full sr-row">
+                <button mat-flat-button type="submit" [disabled]="busy()" data-testid="save-edit">Save changes</button>
+                <button mat-button type="button" (click)="editing.set(false)">Cancel</button>
+              </div>
+            </form>
+          </section>
+        }
+
+        @if (w.description) {
+          <section class="sr-card">
+            <h2 class="sr-kicker">Scope</h2>
+            <p class="desc">{{ w.description }}</p>
+          </section>
+        }
+
+        @if (w.permissions.canReportProgress) {
+          <section class="sr-card report" aria-labelledby="report-title">
+            <div class="sr-card-title"><h2 id="report-title">Report progress</h2></div>
+            <form [formGroup]="progressForm" (ngSubmit)="reportProgress()" class="form-grid" data-testid="progress-form">
+              <mat-form-field appearance="outline">
+                <mat-label>Quantity installed ({{ w.unit || 'units' }})</mat-label>
+                <input matInput type="number" min="0" step="any" formControlName="quantity" data-testid="progress-qty" />
+                <mat-error>Quantity can't be negative.</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Note</mat-label>
+                <input matInput formControlName="note" maxlength="2000" data-testid="progress-note" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Blocker (optional)</mat-label>
+                <input matInput formControlName="blocker" maxlength="1000" placeholder="e.g. Waiting on board delivery" data-testid="progress-blocker" />
+                <mat-hint>Reporting a blocker moves in-progress work to Blocked and alerts the supervisor.</mat-hint>
+              </mat-form-field>
+              <div class="full">
+                <button mat-flat-button type="submit" [disabled]="busy()" data-testid="progress-submit">Submit progress</button>
+              </div>
+            </form>
+          </section>
+        }
+
+        <section class="sr-card" aria-labelledby="hist-title">
+          <div class="sr-card-title"><h2 id="hist-title">Progress history</h2><span class="sr-muted small">{{ w.progress.length }} log(s)</span></div>
+          @if (w.progress.length === 0) {
+            <sr-state title="No progress reported yet" />
+          } @else {
+            <ol class="logs" data-testid="progress-history">
+              @for (p of w.progress; track p.id) {
+                <li [class.has-blocker]="p.blocker && !p.blockerResolvedAt">
+                  <div class="log-head">
+                    <strong class="sr-num">{{ p.quantity }} {{ w.unit }}</strong>
+                    <span class="sr-muted small">by {{ p.reporter.displayName }} · <time [attr.datetime]="p.createdAt">{{ p.createdAt | ago }}</time></span>
+                    <span class="sr-spacer"></span>
+                    @if (p.verifiedBy) {
+                      <span class="ok small"><sr-icon name="verified" [size]="16" /> Verified by {{ p.verifiedBy.displayName }}</span>
+                    } @else {
+                      <span class="pending small">Awaiting verification</span>
+                      @if (w.permissions.canVerify && p.reporter.id !== myId()) {
+                        <button mat-stroked-button class="sm" (click)="verify(p.id)" [disabled]="busy()" data-testid="verify-progress">Verify</button>
+                      }
+                    }
+                  </div>
+                  @if (p.note) {
+                    <p>{{ p.note }}</p>
+                  }
+                  @if (p.blocker) {
+                    <div class="blocker" [class.resolved]="p.blockerResolvedAt">
+                      <sr-icon [name]="p.blockerResolvedAt ? 'task_alt' : 'block'" [size]="16" />
+                      <span><strong>{{ p.blockerResolvedAt ? 'Resolved blocker' : 'Blocker' }}:</strong> {{ p.blocker }}</span>
+                      @if (!p.blockerResolvedAt && w.permissions.canVerify && !w.isLocked) {
+                        <button mat-stroked-button class="sm" (click)="resolve(p.id)" [disabled]="busy()" data-testid="resolve-blocker">Mark resolved</button>
+                      }
+                    </div>
+                  }
+                </li>
+              }
+            </ol>
+          }
+        </section>
+
+        <section class="sr-card" aria-labelledby="com-title">
+          <div class="sr-card-title"><h2 id="com-title">Comments</h2></div>
+          <ol class="comments">
+            @for (c of w.comments; track c.id) {
+              <li>
+                <span class="avatar" aria-hidden="true">{{ c.author.displayName.charAt(0) }}</span>
+                <div>
+                  <p class="meta"><strong>{{ c.author.displayName }}</strong> <time [attr.datetime]="c.createdAt">{{ c.createdAt | ago }}</time></p>
+                  <p>{{ c.body }}</p>
+                </div>
+              </li>
+            } @empty {
+              <li class="sr-muted">No comments yet.</li>
+            }
+          </ol>
+          @if (w.permissions.canComment) {
+            <form class="comment-form" (ngSubmit)="addComment()">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Add a comment</mat-label>
+                <textarea matInput name="comment" [(ngModel)]="commentText" rows="2" maxlength="2000" data-testid="comment-input"></textarea>
+              </mat-form-field>
+              <button mat-stroked-button type="submit" [disabled]="!commentText.trim()">Post</button>
+            </form>
+          }
+        </section>
+      </div>
+
+      <aside class="side">
+        <section class="sr-card" aria-labelledby="det-title">
+          <h2 id="det-title" class="sr-kicker">Assignment</h2>
+          <dl class="facts">
+            <div><dt>Assignee</dt><dd data-testid="wo-assignee">{{ w.assignee?.displayName || 'Unassigned' }}</dd></div>
+            <div><dt>Due</dt><dd [class.late-text]="w.isOverdue">{{ w.dueDate | day: 'long' }}</dd></div>
+            <div><dt>Milestone</dt><dd>{{ w.milestone?.name || '—' }}</dd></div>
+            <div><dt>Work package</dt><dd>{{ w.workPackage }}</dd></div>
+            @if (w.completedAt) {
+              <div><dt>Completed</dt><dd>{{ w.completedAt | ago }}</dd></div>
+            }
+          </dl>
+          @if (w.plannedQuantity > 0) {
+            <div class="qty">
+              <div class="sr-row"><strong class="sr-num">{{ w.reportedQuantity }} / {{ w.plannedQuantity }} {{ w.unit }}</strong><span class="sr-spacer"></span><span class="sr-num">{{ w.percentComplete }}%</span></div>
+              <sr-meter [value]="w.percentComplete" [label]="w.key + ' quantity complete'" [tone]="w.status === 'Blocked' ? 'critical' : w.percentComplete === 100 ? 'good' : 'info'" />
+            </div>
+          }
+        </section>
+
+        <section class="sr-card" aria-labelledby="mat-title">
+          <div class="sr-card-title">
+            <h2 id="mat-title" class="sr-kicker">Materials</h2>
+            @if (w.permissions.canRequestMaterials) {
+              <button mat-stroked-button class="sm" (click)="requestMaterials()" data-testid="request-materials"><sr-icon name="add" [size]="16" /> Request</button>
+            }
+          </div>
+          @if (materials.data(); as list) {
+            @if (list.length === 0) {
+              <p class="sr-muted small">No material requests for this work order.</p>
+            }
+            <ul class="mats">
+              @for (m of list; track m.id) {
+                <li>
+                  <strong>{{ m.quantity }} {{ m.unit }} {{ m.itemName }}</strong>
+                  <div class="sr-row">
+                    <sr-mr-status [status]="m.status" />
+                    @if (m.status === 'Approved') {
+                      <sr-erp-status [status]="m.erp.status" />
+                    }
+                  </div>
+                  <span class="sr-muted small">{{ m.requestedBy.displayName }} · {{ m.requestedAt | ago }}@if (m.externalReference) { · {{ m.externalReference }} }</span>
+                  @if (m.decisionNote) {
+                    <span class="small">“{{ m.decisionNote }}”</span>
+                  }
+                  @if (m.canDecide) {
+                    <div class="sr-row">
+                      <button mat-flat-button class="sm" (click)="decide(m, 'Approve')">Approve</button>
+                      <button mat-stroked-button class="sm" (click)="decide(m, 'Reject')">Reject</button>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          } @else if (materials.error(); as e) {
+            <sr-state kind="error" [error]="e" [retryable]="false" />
+          }
+        </section>
+
+        <section class="sr-card" aria-labelledby="dep-title">
+          <h2 id="dep-title" class="sr-kicker">Dependencies</h2>
+          <p class="sr-muted small">Finish-to-start: this work can't be completed until these are done.</p>
+          <ul class="deps">
+            @for (d of w.dependencies; track d.id) {
+              <li>
+                <a [routerLink]="['/app/work-orders', d.id]">{{ d.key }} · {{ d.title }}</a>
+                <sr-status [status]="d.status" />
+                @if (w.permissions.canManageDependencies) {
+                  <button type="button" class="x" (click)="removeDependency(d.id)" [attr.aria-label]="'Remove dependency on ' + d.key"><sr-icon name="link_off" [size]="16" /></button>
+                }
+              </li>
+            } @empty {
+              <li class="sr-muted small">No dependencies.</li>
+            }
+          </ul>
+          @if (w.permissions.canManageDependencies) {
+            <div class="add-dep">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Depends on…</mat-label>
+                <mat-select [ngModel]="newDependency()" (ngModelChange)="newDependency.set($event)" (openedChange)="loadSiblings()">
+                  @for (s of dependencyOptions(); track s.id) {
+                    <mat-option [value]="s.id">{{ s.key }} · {{ s.title }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <button mat-stroked-button (click)="addDependency()" [disabled]="!newDependency()">Add</button>
+            </div>
+          }
+          @if (w.dependents.length > 0) {
+            <h3 class="small-h">Waiting on this</h3>
+            <ul class="deps">
+              @for (d of w.dependents; track d.id) {
+                <li><a [routerLink]="['/app/work-orders', d.id]">{{ d.key }} · {{ d.title }}</a><sr-status [status]="d.status" /></li>
+              }
+            </ul>
+          }
+        </section>
+      </aside>
+    </div>
+  }
+</div>

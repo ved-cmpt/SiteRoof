@@ -1,0 +1,333 @@
+@use '@angular/material' as mat;
+
+// ---------------------------------------------------------------------------
+// SiteRoof design tokens. Construction-inspired: slate/steel neutrals, concrete
+// surfaces, safety-yellow accent, blueprint blue for interaction.
+// ---------------------------------------------------------------------------
+:root {
+  color-scheme: light;
+
+  --sr-ink: #13171d;
+  --sr-ink-2: #3b4452;
+  --sr-ink-3: #5d6776;
+  --sr-steel: #1f2732;
+  --sr-steel-2: #2b3542;
+  --sr-concrete: #eef0f2;
+  --sr-concrete-2: #e3e6ea;
+  --sr-paper: #ffffff;
+  --sr-line: #d5dae0;
+  --sr-line-strong: #b9c0c9;
+
+  --sr-safety: #f5b800;
+  --sr-safety-ink: #0b0b0b;
+  --sr-safety-soft: #fff4cc;
+  --sr-blueprint: #1d4ed8;
+  --sr-blueprint-soft: #e6edff;
+
+  // Status (always paired with an icon + label).
+  --sr-good: #1f7a45;
+  --sr-good-soft: #e3f4ea;
+  --sr-warning: #9a6700;
+  --sr-warning-soft: #fff3d6;
+  --sr-critical: #b42318;
+  --sr-critical-soft: #fde8e6;
+  --sr-info: #1d4ed8;
+  --sr-info-soft: #e6edff;
+
+  // Work-order status series (validated categorical palette, see docs/ARCHITECTURE.md).
+  --sr-st-open: #a77bca;
+  --sr-st-inprogress: #2a6fdb;
+  --sr-st-blocked: #d03b3b;
+  --sr-st-completed: #c98a00;
+  --sr-st-closed: #1f7a45;
+
+  --sr-font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sr-font-display: 'Archivo Variable', 'Inter Variable', system-ui, sans-serif;
+
+  --sr-radius: 6px;
+  --sr-radius-lg: 10px;
+  --sr-shadow: 0 1px 2px rgb(19 23 29 / 6%), 0 4px 14px rgb(19 23 29 / 6%);
+  --sr-focus: 0 0 0 3px var(--sr-paper), 0 0 0 5px var(--sr-blueprint);
+}
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$blue-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: (
+        plain-family: 'Inter Variable',
+        brand-family: 'Archivo Variable',
+      ),
+      density: 0,
+    )
+  );
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--sr-concrete);
+  color: var(--sr-ink);
+  font-family: var(--sr-font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--sr-font-display);
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+  letter-spacing: -0.01em;
+  color: var(--sr-ink);
+}
+
+h1 {
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  font-weight: 750;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+p {
+  margin: 0 0 0.75em;
+}
+
+a {
+  color: var(--sr-blueprint);
+  text-underline-offset: 2px;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--sr-focus);
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 1000;
+  padding: 10px 14px;
+  background: var(--sr-safety);
+  color: var(--sr-safety-ink);
+  font-weight: 700;
+  border-radius: var(--sr-radius);
+  text-decoration: none;
+
+  &:focus {
+    top: 12px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shared layout primitives
+// ---------------------------------------------------------------------------
+.sr-page {
+  padding: 24px clamp(16px, 3vw, 32px) 48px;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.sr-card {
+  background: var(--sr-paper);
+  border: 1px solid var(--sr-line);
+  border-radius: var(--sr-radius-lg);
+  box-shadow: var(--sr-shadow);
+  padding: 18px 20px;
+}
+
+.sr-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  h2,
+  h3 {
+    margin: 0;
+  }
+}
+
+.sr-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.sr-kicker {
+  font-family: var(--sr-font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sr-ink-3);
+}
+
+.sr-muted {
+  color: var(--sr-ink-3);
+}
+
+.sr-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sr-spacer {
+  flex: 1 1 auto;
+}
+
+.sr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th,
+  td {
+    text-align: left;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--sr-line);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--sr-font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sr-ink-3);
+    font-weight: 700;
+    background: var(--sr-concrete);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.sr-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// Buttons beyond Material: the safety-yellow CTA.
+.sr-btn-safety {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--sr-radius);
+  border: 0;
+  background: var(--sr-safety);
+  color: var(--sr-safety-ink);
+  font: 700 1rem/1.1 var(--sr-font-display);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 18%);
+  transition: transform 0.12s ease, background 0.12s ease;
+
+  &:hover {
+    background: #ffc61a;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &[disabled] {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+
+.sr-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: var(--sr-radius);
+  border: 1px solid currentcolor;
+  background: transparent;
+  color: inherit;
+  font: 600 1rem/1.1 var(--sr-font-display);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(255 255 255 / 8%);
+  }
+}
+
+// Hazard stripe accent used sparingly (headers, demo banner).
+.sr-hazard {
+  background: repeating-linear-gradient(-45deg, var(--sr-safety) 0 10px, var(--sr-steel) 10px 20px);
+}
+
+// Material density/tone tweaks
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-snack-bar-container.sr-snack-error {
+  --mdc-snackbar-container-color: var(--sr-critical);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .sr-card {
+    border: 1px solid CanvasText;
+  }
+}

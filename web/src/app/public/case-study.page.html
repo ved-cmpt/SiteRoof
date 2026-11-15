@@ -1,0 +1,298 @@
+<sr-public-header />
+
+<main id="main">
+  <header class="hero">
+    <div class="wrap">
+      <p class="sr-kicker on-dark">Case study</p>
+      <h1>SiteRoof: coordinating site work, decisions and progress</h1>
+      <p class="lede">
+        How a small modular monolith handles the parts of construction software that are easy to get wrong: who may see
+        and change what, approvals that happen exactly once, an unreliable downstream ERP, and dashboards that are always
+        derived from the records.
+      </p>
+      <div class="ctas">
+        <a routerLink="/demo" class="sr-btn-safety">Try the live demo <sr-icon name="arrow_forward" [size]="18" /></a>
+        <a [href]="github" class="sr-btn-ghost" rel="noopener" target="_blank">Source on GitHub <sr-icon name="open_in_new" [size]="16" /></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap layout">
+    <nav class="toc" aria-label="On this page">
+      <p class="sr-kicker">On this page</p>
+      <ol>
+        @for (t of toc; track t.id) {
+          <li><a [href]="'/case-study#' + t.id">{{ t.label }}</a></li>
+        }
+      </ol>
+    </nav>
+
+    <article class="content">
+      <p class="disclaimer" role="note">
+        <sr-icon name="info" [size]="18" />
+        <span>
+          <strong>Independent portfolio project.</strong> SiteRoof is not affiliated with, endorsed by, or built for any
+          construction company and does not recreate any proprietary system. Every project, person, company, address and
+          record in it is fictional.
+        </span>
+      </p>
+
+      <section id="problem">
+        <h2>The problem</h2>
+        <p>
+          On a commercial renovation, the schedule lives in the office and the facts live on site. A drywall crew
+          discovers it is 40 sheets short; the supervisor texts the project manager; the request is approved in an email
+          thread; purchasing may or may not hear about it. Meanwhile the "percent complete" in the weekly report was typed
+          in by hand.
+        </p>
+        <p>
+          SiteRoof is a deliberately scoped execution tool for that gap: projects, milestones, assigned work orders, field
+          progress with supervisor verification, and a limited material approval flow that hands off to an ERP. It is not a
+          purchasing suite, document control system or scheduling engine.
+        </p>
+      </section>
+
+      <section id="users">
+        <h2>Who it is for</h2>
+        <div class="cards">
+          <div><h3>Project manager</h3><p>Creates projects and milestones, approves or rejects material requests, watches overdue work and the approval backlog.</p></div>
+          <div><h3>Site supervisor</h3><p>Creates and assigns work orders to people on the roster, verifies progress, resolves blockers and closes out work.</p></div>
+          <div><h3>Crew member</h3><p>Sees assigned work on their projects only, reports quantities, notes and blockers, requests materials.</p></div>
+          <div><h3>Admin</h3><p>Manages workspace settings and people; can read every project in the workspace.</p></div>
+        </div>
+      </section>
+
+      <section id="rules">
+        <h2>Business rules the code enforces</h2>
+        <ul class="checks">
+          <li>Every work order belongs to a project, and can only be assigned to a member of that project's roster.</li>
+          <li>Quantities can't be negative (validated in the API and by <code>CHECK</code> constraints in SQL Server).</li>
+          <li>Work-order status follows a state machine: Open → In progress ⇄ Blocked → Completed → Closed, with cancel and reopen. Completing requires all finish-to-start dependencies to be done; closing requires verified progress, no open blockers and no pending material requests.</li>
+          <li>Closed and cancelled work is locked. Editing it returns <code>409 work-order-locked</code>; only a project manager can reopen closed work, with a reason that is audited.</li>
+          <li>Progress must be verified by someone other than the person who reported it.</li>
+          <li>A material request is submitted once (client-generated idempotency key) and decided once by the project manager. Repeating the same decision is a no-op; contradicting it is a 409.</li>
+          <li>Concurrent edits use SQL Server <code>rowversion</code>. A stale version returns <code>409 concurrency-conflict</code> and the UI shows a "someone else changed this" banner instead of overwriting.</li>
+          <li>Dependencies stay inside one project and can't form cycles.</li>
+        </ul>
+      </section>
+
+      <section id="architecture">
+        <h2>Architecture</h2>
+        <p>
+          One deployable: the ASP.NET Core API serves the compiled Angular app from the same origin, which keeps cookie
+          authentication simple (no CORS, no tokens in browser storage) and fits a single free container. Inside, the code
+          is organised by feature module (projects, work orders, materials, integrations, dashboards, demo) with services
+          that own authorization, validation and transactions.
+        </p>
+        <figure class="diagram">
+          <svg viewBox="0 0 880 470" role="img" aria-labelledby="arch-title arch-desc">
+            <title id="arch-title">Runtime architecture</title>
+            <desc id="arch-desc">The browser calls the single ASP.NET Core container over HTTPS. The container serves the Angular build, runs the middleware pipeline and feature services, talks to SQL Server through EF Core, and runs two background workers. The outbox worker calls the mock ERP endpoint over HTTP.</desc>
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 10 5 0 10z" class="arrowhead" />
+              </marker>
+            </defs>
+            <rect x="20" y="40" width="170" height="120" rx="10" class="box" />
+            <text x="105" y="72" class="t-strong" text-anchor="middle">Browser</text>
+            <text x="105" y="96" class="t" text-anchor="middle">Angular SPA</text>
+            <text x="105" y="116" class="t" text-anchor="middle">Material · signals</text>
+            <text x="105" y="136" class="t-muted" text-anchor="middle">XSRF header on writes</text>
+
+            <rect x="250" y="20" width="410" height="420" rx="12" class="container" />
+            <text x="270" y="46" class="t-strong">ASP.NET Core container (.NET 10)</text>
+            <rect x="270" y="62" width="370" height="46" rx="8" class="box-soft" />
+            <text x="455" y="90" class="t" text-anchor="middle">Static files: built Angular app (same origin)</text>
+            <rect x="270" y="118" width="370" height="64" rx="8" class="box-soft" />
+            <text x="455" y="142" class="t" text-anchor="middle">Middleware: security headers · rate limits</text>
+            <text x="455" y="164" class="t" text-anchor="middle">Identity cookie auth · CSRF validation · ProblemDetails</text>
+            <rect x="270" y="192" width="370" height="84" rx="8" class="box" />
+            <text x="455" y="216" class="t-strong" text-anchor="middle">Feature controllers → services</text>
+            <text x="455" y="238" class="t" text-anchor="middle">ProjectAccess (tenant + membership) on every call</text>
+            <text x="455" y="258" class="t" text-anchor="middle">AuditWriter + outbox in the same SaveChanges</text>
+            <rect x="270" y="286" width="370" height="40" rx="8" class="box-soft" />
+            <text x="455" y="311" class="t" text-anchor="middle">EF Core 10 · tenant query filters · rowversion</text>
+            <rect x="270" y="338" width="178" height="86" rx="8" class="worker" />
+            <text x="359" y="362" class="t-strong" text-anchor="middle">Outbox worker</text>
+            <text x="359" y="384" class="t" text-anchor="middle">poll · claim (READPAST)</text>
+            <text x="359" y="404" class="t" text-anchor="middle">backoff · max 5 tries</text>
+            <rect x="462" y="338" width="178" height="86" rx="8" class="worker" />
+            <text x="551" y="362" class="t-strong" text-anchor="middle">Mock ERP endpoint</text>
+            <text x="551" y="384" class="t" text-anchor="middle">/mock-erp · shared key</text>
+            <text x="551" y="404" class="t" text-anchor="middle">dedupe by Idempotency-Key</text>
+
+            <rect x="720" y="170" width="140" height="150" rx="10" class="db" />
+            <text x="790" y="200" class="t-strong" text-anchor="middle">SQL Server</text>
+            <text x="790" y="222" class="t" text-anchor="middle">2022 / Azure SQL</text>
+            <text x="790" y="250" class="t-muted" text-anchor="middle">tables · FKs · CHECKs</text>
+            <text x="790" y="270" class="t-muted" text-anchor="middle">T-SQL views</text>
+            <text x="790" y="290" class="t-muted" text-anchor="middle">mockerp schema</text>
+
+            <line x1="190" y1="100" x2="268" y2="100" class="edge" marker-end="url(#arrow)" />
+            <text x="229" y="90" class="t-muted" text-anchor="middle">HTTPS</text>
+            <line x1="640" y1="306" x2="718" y2="260" class="edge" marker-end="url(#arrow)" />
+            <line x1="448" y1="381" x2="460" y2="381" class="edge" marker-end="url(#arrow)" />
+            <text x="455" y="452" class="t-muted" text-anchor="middle">HTTP POST /mock-erp/requisitions (in-process host, real HTTP)</text>
+            <line x1="640" y1="381" x2="718" y2="300" class="edge dashed" marker-end="url(#arrow)" />
+          </svg>
+          <figcaption>Runtime architecture as implemented. The demo-cleanup worker (not shown) deletes expired guest workspaces.</figcaption>
+        </figure>
+      </section>
+
+      <section id="data">
+        <h2>Data model</h2>
+        <p>
+          Business tables carry a <code>TenantId</code> (directly or through their project) with EF Core global query filters,
+          so a forgotten check fails closed. Two documented T-SQL views feed the dashboards:
+          <code>vw_ProjectWorkOrderRollup</code> (one conditional-aggregation pass per project, supported by the
+          <code>(ProjectId, Status, DueDate)</code> index) and <code>vw_WorkPackageCompletion</code> (per-package completion
+          using <code>OUTER APPLY</code> over progress logs).
+        </p>
+        <figure class="diagram">
+          <svg viewBox="0 0 880 420" role="img" aria-labelledby="dm-title dm-desc">
+            <title id="dm-title">Data model</title>
+            <desc id="dm-desc">Tenant has users and projects. Project has memberships, milestones and work orders. Work order has progress logs, comments, dependencies and material requests. Approved material requests create integration outbox rows. Audit events reference tenant, project and actor.</desc>
+            <g class="entities">
+              <rect x="20" y="30" width="150" height="58" rx="8" class="box" /><text x="95" y="56" class="t-strong" text-anchor="middle">Tenant</text><text x="95" y="76" class="t-muted" text-anchor="middle">IsDemo · ExpiresAt</text>
+              <rect x="20" y="170" width="150" height="58" rx="8" class="box" /><text x="95" y="196" class="t-strong" text-anchor="middle">User (Identity)</text><text x="95" y="216" class="t-muted" text-anchor="middle">TenantId · roles</text>
+              <rect x="250" y="30" width="170" height="58" rx="8" class="box" /><text x="335" y="56" class="t-strong" text-anchor="middle">Project</text><text x="335" y="76" class="t-muted" text-anchor="middle">UQ (TenantId, Code)</text>
+              <rect x="250" y="170" width="170" height="58" rx="8" class="box" /><text x="335" y="196" class="t-strong" text-anchor="middle">ProjectMembership</text><text x="335" y="216" class="t-muted" text-anchor="middle">PK (Project, User) · Role</text>
+              <rect x="490" y="30" width="150" height="58" rx="8" class="box" /><text x="565" y="56" class="t-strong" text-anchor="middle">Milestone</text><text x="565" y="76" class="t-muted" text-anchor="middle">DueDate · Status</text>
+              <rect x="490" y="150" width="170" height="78" rx="8" class="box hl" /><text x="575" y="176" class="t-strong" text-anchor="middle">WorkOrder</text><text x="575" y="196" class="t-muted" text-anchor="middle">UQ (Project, Number)</text><text x="575" y="214" class="t-muted" text-anchor="middle">Status · RowVersion</text>
+              <rect x="720" y="30" width="145" height="58" rx="8" class="box" /><text x="792" y="56" class="t-strong" text-anchor="middle">Dependency</text><text x="792" y="76" class="t-muted" text-anchor="middle">CHECK not self</text>
+              <rect x="720" y="130" width="145" height="58" rx="8" class="box" /><text x="792" y="156" class="t-strong" text-anchor="middle">Comment</text><text x="792" y="176" class="t-muted" text-anchor="middle">Body · Author</text>
+              <rect x="720" y="230" width="145" height="58" rx="8" class="box" /><text x="792" y="256" class="t-strong" text-anchor="middle">ProgressLog</text><text x="792" y="276" class="t-muted" text-anchor="middle">CHECK Qty ≥ 0</text>
+              <rect x="490" y="300" width="170" height="78" rx="8" class="box" /><text x="575" y="326" class="t-strong" text-anchor="middle">MaterialRequest</text><text x="575" y="346" class="t-muted" text-anchor="middle">UQ (WO, ClientRequestId)</text><text x="575" y="364" class="t-muted" text-anchor="middle">CHECK Qty &gt; 0</text>
+              <rect x="250" y="320" width="170" height="58" rx="8" class="worker" /><text x="335" y="346" class="t-strong" text-anchor="middle">IntegrationOutbox</text><text x="335" y="366" class="t-muted" text-anchor="middle">UQ IdempotencyKey</text>
+              <rect x="20" y="320" width="150" height="58" rx="8" class="box-soft" /><text x="95" y="346" class="t-strong" text-anchor="middle">AuditEvent</text><text x="95" y="366" class="t-muted" text-anchor="middle">before/after JSON</text>
+            </g>
+            <g class="rels">
+              <line x1="170" y1="59" x2="250" y2="59" class="edge" />
+              <line x1="95" y1="88" x2="95" y2="170" class="edge" />
+              <line x1="335" y1="88" x2="335" y2="170" class="edge" />
+              <line x1="170" y1="199" x2="250" y2="199" class="edge" />
+              <line x1="420" y1="59" x2="490" y2="59" class="edge" />
+              <line x1="420" y1="75" x2="490" y2="170" class="edge" />
+              <line x1="660" y1="170" x2="720" y2="70" class="edge" />
+              <line x1="660" y1="185" x2="720" y2="159" class="edge" />
+              <line x1="660" y1="205" x2="720" y2="259" class="edge" />
+              <line x1="575" y1="228" x2="575" y2="300" class="edge" />
+              <line x1="490" y1="349" x2="420" y2="349" class="edge dashed" />
+              <line x1="250" y1="349" x2="170" y2="349" class="edge dashed" />
+            </g>
+            <text x="455" y="410" class="t-muted" text-anchor="middle">Solid: foreign keys (one-to-many). Dashed: written in the same transaction (approval → outbox, change → audit).</text>
+          </svg>
+          <figcaption>Main entities and constraints (Identity tables and the mock ERP's own schema omitted).</figcaption>
+        </figure>
+      </section>
+
+      <section id="integration">
+        <h2>ERP integration: transactional outbox</h2>
+        <ol class="steps">
+          <li>The manager approves. In one <code>SaveChanges</code> (one database transaction) SiteRoof updates the request, writes the audit event and inserts an outbox row keyed <code>mr-approved:&#123;id&#125;</code>.</li>
+          <li>A background worker claims due rows with <code>UPDATE … OUTPUT</code> using <code>READPAST, UPDLOCK</code>, so concurrent workers never deliver the same row at once.</li>
+          <li>It POSTs the requisition to the self-hosted mock ERP with an <code>Idempotency-Key</code> header. In the demo, the ERP answers the first attempt with 503.</li>
+          <li>Transient failures are rescheduled with exponential backoff (5 s, 10 s, 20 s, 40 s, capped) for at most five attempts, then dead-lettered as Failed with a manual retry.</li>
+          <li>On success the external reference is stored on the request; the ERP keeps one requisition per key, so a redelivery returns the same reference instead of a duplicate.</li>
+        </ol>
+      </section>
+
+      <section id="stack">
+        <h2>Why this stack</h2>
+        <ul class="checks">
+          <li><strong>Angular + TypeScript (strict) + Angular Material</strong>: typed forms, standalone components and signals; accessible components out of the box for internal business apps.</li>
+          <li><strong>ASP.NET Core + C#</strong>: dependency injection, model validation, ProblemDetails, built-in rate limiting, Identity and antiforgery — the enterprise defaults without extra frameworks.</li>
+          <li><strong>SQL Server + EF Core</strong>: relational integrity where it matters (FKs, unique keys, CHECK constraints, rowversion) plus hand-written T-SQL where it is clearer (views, the outbox claim).</li>
+          <li><strong>xUnit + Testcontainers + Playwright</strong>: business rules are tested against a real SQL Server and through a real browser, not mocks.</li>
+          <li><strong>Modular monolith</strong>: one deployable keeps the demo free to host; feature boundaries keep it easy to split later if the ERP adapter ever needed its own service.</li>
+        </ul>
+      </section>
+
+      <section id="security">
+        <h2>Security decisions</h2>
+        <ul class="checks">
+          <li>Cookie authentication (HttpOnly, SameSite=Lax, Secure when hosted) and antiforgery tokens validated on every unsafe <code>/api</code> request.</li>
+          <li>Object-level authorization in the service layer: other tenants' ids return 404; same-tenant projects without membership return 403. The UI hides actions only as a convenience.</li>
+          <li>Guest isolation: each "Try Demo" click provisions a separate tenant with password-less personas. No shared mutable data, no credentials shown anywhere.</li>
+          <li>Rate limits per client (global API, demo provisioning, sign-in), demo quotas, capacity cap and automatic expiry.</li>
+          <li>Security headers (CSP without inline scripts, frame-ancestors none, nosniff, referrer policy), structured JSON logs, secrets only from environment variables.</li>
+        </ul>
+      </section>
+
+      <section id="testing">
+        <h2>Testing</h2>
+        <p>
+          Backend integration tests boot the real API (middleware, auth, CSRF, EF Core) against SQL Server 2022 in a
+          disposable Testcontainers container. Each test provisions its own demo tenant, so tests never reset each
+          other's data. They cover the must-pass rules: URL tampering by a crew member, cross-tenant ids, approvals that
+          are logged, idempotent and forbidden for crew, ERP 503-then-retry without duplicates, bounded retries, 409 on
+          conflicting edits, and dashboard/database/activity updates when work is created and completed. Angular unit
+          tests cover services and components; Playwright runs the recruiter scenario end to end in Chromium.
+        </p>
+        <p>
+          Exact commands and the latest recorded results are kept in
+          <a [href]="github + '/blob/main/docs/STATUS.md'" rel="noopener" target="_blank">docs/STATUS.md</a>. No performance or
+          uptime figures are claimed because none have been measured on a hosted environment.
+        </p>
+      </section>
+
+      <section id="deployment">
+        <h2>Deployment</h2>
+        <figure class="diagram">
+          <svg viewBox="0 0 880 210" role="img" aria-labelledby="dep-title dep-desc">
+            <title id="dep-title">Deployment pipeline</title>
+            <desc id="dep-desc">A push to GitHub runs GitHub Actions: backend build and tests, frontend lint, tests and build, Playwright, and a Docker build, ending in a required ci-ok job. A Render web service builds the same Dockerfile into one container that connects to an Azure SQL Database. Hosting is documented but not deployed.</desc>
+            <defs>
+              <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 10 5 0 10z" class="arrowhead" />
+              </marker>
+            </defs>
+            <rect x="20" y="50" width="140" height="80" rx="10" class="box" /><text x="90" y="86" class="t-strong" text-anchor="middle">GitHub repo</text><text x="90" y="108" class="t-muted" text-anchor="middle">main branch</text>
+            <rect x="210" y="30" width="200" height="120" rx="10" class="box-soft" />
+            <text x="310" y="56" class="t-strong" text-anchor="middle">GitHub Actions CI</text>
+            <text x="310" y="78" class="t" text-anchor="middle">backend build + tests</text>
+            <text x="310" y="96" class="t" text-anchor="middle">frontend lint/test/build</text>
+            <text x="310" y="114" class="t" text-anchor="middle">Playwright · Docker build</text>
+            <text x="310" y="134" class="t-muted" text-anchor="middle">required: ci-ok</text>
+            <rect x="460" y="40" width="190" height="100" rx="10" class="container" />
+            <text x="555" y="68" class="t-strong" text-anchor="middle">Render web service</text>
+            <text x="555" y="90" class="t" text-anchor="middle">Dockerfile → 1 container</text>
+            <text x="555" y="110" class="t" text-anchor="middle">API + Angular, HTTPS</text>
+            <rect x="700" y="50" width="160" height="80" rx="10" class="db" /><text x="780" y="84" class="t-strong" text-anchor="middle">Azure SQL Database</text><text x="780" y="106" class="t-muted" text-anchor="middle">free offer</text>
+            <line x1="160" y1="90" x2="208" y2="90" class="edge" marker-end="url(#arrow2)" />
+            <line x1="410" y1="90" x2="458" y2="90" class="edge dashed" marker-end="url(#arrow2)" />
+            <line x1="650" y1="90" x2="698" y2="90" class="edge" marker-end="url(#arrow2)" />
+            <text x="440" y="190" class="t-warn" text-anchor="middle">Planned target, documented in docs/DEPLOYMENT.md. Not deployed yet.</text>
+          </svg>
+          <figcaption>Owner-run deployment. Locally the same Dockerfile runs with <code>docker compose --profile full up</code>.</figcaption>
+        </figure>
+      </section>
+
+      <section id="walkthrough">
+        <h2>Demo walkthrough</h2>
+        <ol class="steps">
+          <li><strong>Open Riverbend.</strong> As Marcus (site supervisor), open Riverbend Library Renovation and turn on "Overdue only": the drywall work orders are late and RBL-007 is blocked by a 40-sheet shortage.</li>
+          <li><strong>Submit progress.</strong> Switch to Leah (crew). On RBL-006 report the square metres installed today. Her view only contains Riverbend.</li>
+          <li><strong>Verify.</strong> Switch back to Marcus and verify Leah's log.</li>
+          <li><strong>Approve materials.</strong> As Dana (project manager), open Approvals and approve the Type X board for RBL-007.</li>
+          <li><strong>Watch the ERP.</strong> The requisition shows "Retrying" after the simulated 503, then "Acknowledged by ERP" with a reference number.</li>
+          <li><strong>Check the dashboard.</strong> Overview and the project dashboard recalculate from the database: approval backlog down by one, progress up.</li>
+        </ol>
+        <a routerLink="/demo" class="sr-btn-safety">Run it yourself <sr-icon name="arrow_forward" [size]="18" /></a>
+      </section>
+
+      <section id="limits">
+        <h2>Known limitations</h2>
+        <ul class="checks warn">
+          <li>Not yet deployed; hosting steps are documented for the owner.</li>
+          <li>Single region, single container. Data-protection keys are not persisted, so a container restart signs visitors out (demo workspaces are disposable anyway).</li>
+          <li>No offline mode, file attachments, notifications or scheduling engine; those belong to other tools.</li>
+          <li>The ERP is a self-hosted simulator, not a real purchasing system.</li>
+          <li>The blocker summary is rules-based keyword classification. An optional AI provider interface exists but is disabled and not implemented.</li>
+        </ul>
+      </section>
+    </article>
+  </div>
+</main>
+
+<sr-public-footer />
