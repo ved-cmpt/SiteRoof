@@ -81,7 +81,7 @@ export class SignInPage {
       await this.session.ensureLoaded();
       await this.session.login(this.email, this.password);
       const next = this.route.snapshot.queryParamMap.get('next');
-      await this.router.navigateByUrl(next?.startsWith('/app') ? next : '/app/overview');
+      await this.router.navigateByUrl(next?.startsWith('/app') ? next : '/app/home');
     } catch (err) {
       this.error.set(ApiError.from(err));
     } finally {

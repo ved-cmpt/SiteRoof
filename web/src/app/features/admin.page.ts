@@ -20,7 +20,6 @@ import { ConfirmDialogComponent } from './dialogs';
     <div class="sr-page">
       <header class="sr-head">
         <div>
-          <nav class="crumbs" aria-label="Breadcrumb"><span>Admin</span></nav>
           <h1>Workspace settings</h1>
           @if (tenant.data(); as t) {
             <div class="meta">
@@ -167,7 +166,7 @@ export class AdminPage implements OnInit {
         try {
           await this.session.resetDemo();
           this.notify.success('Your demo workspace was reset.');
-          await this.router.navigateByUrl('/app/overview');
+          await this.router.navigateByUrl('/app/home');
         } catch (err) {
           this.notify.error(err);
         } finally {

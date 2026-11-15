@@ -98,7 +98,7 @@ public sealed class DemoController(
                 "The approval writes an outbox event in the same transaction. The mock ERP rejects the first attempt with 503; the worker retries with backoff.",
                 "manager", "/app/approvals", erpSent),
             new(6, "See the dashboard update",
-                "Overview and the project dashboard are recalculated from the database on every load.", "manager", "/app/overview", null),
+                "Home and the project dashboard are recalculated from the database on every load.", "manager", "/app/home", null),
         };
 
         var personas = DemoPeople.Personas.Select(key =>

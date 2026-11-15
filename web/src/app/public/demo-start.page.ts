@@ -68,7 +68,7 @@ export class DemoStartPage implements OnInit {
       const requested = this.route.snapshot.queryParamMap.get('persona');
       const persona: Persona = requested === 'supervisor' || requested === 'crew' ? requested : 'manager';
       await this.session.startDemo(persona);
-      await this.router.navigateByUrl('/app/overview?guide=1', { replaceUrl: true });
+      await this.router.navigateByUrl('/app/home?guide=1', { replaceUrl: true });
     } catch (err) {
       this.error.set(ApiError.from(err));
     }

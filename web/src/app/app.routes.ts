@@ -28,10 +28,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./shell/shell.component').then((m) => m.ShellComponent),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'overview' },
+      { path: '', pathMatch: 'full', redirectTo: 'home' },
+      { path: 'overview', pathMatch: 'full', redirectTo: 'home' },
       {
-        path: 'overview',
-        title: 'Overview — SiteRoof',
+        path: 'home',
+        title: 'Home — SiteRoof',
         loadComponent: () => import('./features/overview.page').then((m) => m.OverviewPage),
       },
       {

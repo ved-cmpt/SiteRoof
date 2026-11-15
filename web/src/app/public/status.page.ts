@@ -21,7 +21,7 @@ const STYLES = `
       <h1>We couldn't find that page</h1>
       <p>The link may be out of date, or the record may belong to another workspace.</p>
       <div class="row">
-        <a routerLink="/app/overview" class="sr-btn primary">Go to the overview</a>
+        <a routerLink="/app/home" class="sr-btn primary">Go to Home</a>
         <a routerLink="/">Home page</a>
       </div>
     </section>
@@ -40,7 +40,7 @@ export class NotFoundPage {}
       <h1>You don't have access to this</h1>
       <p>Your role or project membership doesn't include this page. Access is checked by the server on every request.</p>
       <div class="row">
-        <a routerLink="/app/overview" class="sr-btn primary">Back to the overview</a>
+        <a routerLink="/app/home" class="sr-btn primary">Back to Home</a>
       </div>
     </section>
   `,

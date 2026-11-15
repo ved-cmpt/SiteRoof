@@ -15,8 +15,7 @@ import { AgoPipe, StateComponent, StatItem, StatsComponent, StatusChipComponent 
     <div class="sr-page">
       <header class="sr-head">
         <div>
-          <nav class="crumbs" aria-label="Breadcrumb"><span>{{ session.user()?.tenant?.name }}</span></nav>
-          <h1>Overview</h1>
+          <h1>Home</h1>
           @if (overview.data(); as o) {
             <div class="meta">
               <span>{{ o.projects.length }} project{{ o.projects.length === 1 ? '' : 's' }}</span>
